@@ -1,0 +1,165 @@
+@font-face {
+  font-family: "Noto Sans JP";
+  src: url("assets/fonts/NotoSansJP-wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #f7f8f9;
+  --panel: #ffffff;
+  --ink: #1f2730;
+  --line: #d8dde3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.hero {
+  padding: 2rem 1rem 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  margin-bottom: 0.4rem;
+}
+
+.note {
+  color: #5f6873;
+  font-size: 0.95rem;
+}
+
+.map-help {
+  margin-top: 0;
+  color: #5e6874;
+}
+
+.asean-map {
+  position: relative;
+  margin-top: 0.8rem;
+  border: 1px solid #d5dbe2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #eef2f6;
+}
+
+#asean-map-svg {
+  width: 100%;
+  height: 620px;
+  background: #eef2f6;
+  display: block;
+}
+
+.country-shape {
+  fill: #d5dce4;
+  fill-opacity: 0.95;
+  stroke: #6a7682;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: fill 0.18s ease, fill-opacity 0.18s ease, stroke 0.18s ease, stroke-width 0.18s ease;
+}
+
+.country-shape.hover {
+  fill: #99a9bc;
+  fill-opacity: 1;
+  stroke: #495768;
+  stroke-width: 2.2;
+}
+
+.country-shape.active {
+  fill: #5f7898;
+  fill-opacity: 1;
+  stroke: #ffffff;
+  stroke-width: 2.3;
+}
+
+.map-error-text {
+  fill: #516560;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #c7d3ca;
+  border-radius: 8px;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 980px;
+}
+
+th,
+td {
+  border: 1px solid var(--line);
+  padding: 0.55rem;
+  vertical-align: top;
+}
+
+th {
+  background: #f1f4f8;
+  text-align: left;
+}
+
+footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  color: #5e6773;
+}
+
+@media (max-width: 720px) {
+  #asean-map-svg {
+    height: 68vh;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+  }
+}
