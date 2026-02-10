@@ -7,16 +7,20 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const MAP_WIDTH = 960;
 const MAP_HEIGHT = 620;
 const MAP_PADDING = 24;
-const COUNTRY_PADDING_FACTOR = 1.05;
-const MIN_COUNTRY_SCALE = 2.0;
+const ASEAN_FOCUS_PADDING = 1.08;
+const COUNTRY_PADDING_FACTOR = 1.22;
+const MIN_COUNTRY_SCALE = 1.0;
 const MAX_COUNTRY_SCALE = 10;
+const ZOOM_ANIMATION_MS = 320;
 
 let countries = [];
 const countryShapes = new Map();
 const countryBounds = new Map();
 let mapGroup = null;
 let currentViewBox = { x: 0, y: 0, width: MAP_WIDTH, height: MAP_HEIGHT };
-let viewBoxAnimationFrame = null;
+let viewBoxAnimationFrameId = null;
+let selectedCountry = "all";
+let hoveredCountry = null;
 
 const ISO3_TO_JA = new Map([
   ["BRN", "ブルネイ"],
@@ -36,17 +40,14 @@ function rowTemplate(item) {
     <tr>
       <td>${item.country}</td>
       <td>${item.standards}</td>
-      <td>${item.lowVoltageScope}</td>
       <td>${item.grid}</td>
       <td>${item.certification}</td>
-      <td>${item.memo}</td>
-      <td>${item.updatedAt}</td>
     </tr>
   `;
 }
 
 function render() {
-  const selected = filterSelect.value;
+  const selected = selectedCountry;
   const keyword = keywordInput.value.trim().toLowerCase();
 
   const filtered = countries.filter((item) => {
@@ -121,8 +122,24 @@ function collectProjectedBounds(features) {
   return { minX, minY, maxX, maxY };
 }
 
-function createProjector(features) {
-  const bounds = collectProjectedBounds(features);
+function expandBounds(bounds, factor) {
+  const dx = bounds.maxX - bounds.minX || 1;
+  const dy = bounds.maxY - bounds.minY || 1;
+  const cx = (bounds.minX + bounds.maxX) / 2;
+  const cy = (bounds.minY + bounds.maxY) / 2;
+  const halfW = (dx * factor) / 2;
+  const halfH = (dy * factor) / 2;
+  return {
+    minX: cx - halfW,
+    minY: cy - halfH,
+    maxX: cx + halfW,
+    maxY: cy + halfH,
+  };
+}
+
+function createProjector(features, focusFeatures = features, focusPadding = 1) {
+  const baseBounds = collectProjectedBounds(focusFeatures);
+  const bounds = focusPadding > 1 ? expandBounds(baseBounds, focusPadding) : baseBounds;
   const dx = bounds.maxX - bounds.minX || 1;
   const dy = bounds.maxY - bounds.minY || 1;
   const innerWidth = MAP_WIDTH - MAP_PADDING * 2;
@@ -194,60 +211,88 @@ function applyViewBox(box) {
 }
 
 function stopViewBoxAnimation() {
-  if (viewBoxAnimationFrame !== null) {
-    cancelAnimationFrame(viewBoxAnimationFrame);
-    viewBoxAnimationFrame = null;
+  if (viewBoxAnimationFrameId !== null) {
+    cancelAnimationFrame(viewBoxAnimationFrameId);
+    viewBoxAnimationFrameId = null;
   }
 }
 
-function animateViewBox(targetBox, durationMs = 240) {
-  stopViewBoxAnimation();
+function boxesAlmostEqual(a, b) {
+  const eps = 0.01;
+  return (
+    Math.abs(a.x - b.x) < eps &&
+    Math.abs(a.y - b.y) < eps &&
+    Math.abs(a.width - b.width) < eps &&
+    Math.abs(a.height - b.height) < eps
+  );
+}
 
-  const startBox = { ...currentViewBox };
-  const startedAt = performance.now();
-  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-
-  function tick(now) {
-    const elapsed = now - startedAt;
-    const progress = Math.min(1, elapsed / durationMs);
-    const eased = easeOutCubic(progress);
-    const next = {
-      x: startBox.x + (targetBox.x - startBox.x) * eased,
-      y: startBox.y + (targetBox.y - startBox.y) * eased,
-      width: startBox.width + (targetBox.width - startBox.width) * eased,
-      height: startBox.height + (targetBox.height - startBox.height) * eased,
-    };
-    applyViewBox(next);
-    if (progress < 1) {
-      viewBoxAnimationFrame = requestAnimationFrame(tick);
-    } else {
-      viewBoxAnimationFrame = null;
-    }
-  }
-
-  if (typeof requestAnimationFrame !== "function") {
+function animateViewBox(targetBox, durationMs = ZOOM_ANIMATION_MS) {
+  if (boxesAlmostEqual(currentViewBox, targetBox)) {
     applyViewBox(targetBox);
     return;
   }
-  viewBoxAnimationFrame = requestAnimationFrame(tick);
+  stopViewBoxAnimation();
+
+  const from = { ...currentViewBox };
+  const startAt = performance.now();
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  const step = (now) => {
+    const t = Math.min(1, (now - startAt) / durationMs);
+    const e = easeOutCubic(t);
+    const next = {
+      x: from.x + (targetBox.x - from.x) * e,
+      y: from.y + (targetBox.y - from.y) * e,
+      width: from.width + (targetBox.width - from.width) * e,
+      height: from.height + (targetBox.height - from.height) * e,
+    };
+    applyViewBox(next);
+    if (t < 1) {
+      viewBoxAnimationFrameId = requestAnimationFrame(step);
+      return;
+    }
+    viewBoxAnimationFrameId = null;
+    applyViewBox(targetBox);
+  };
+
+  viewBoxAnimationFrameId = requestAnimationFrame(step);
 }
 
 function resetMapZoom(animated = true) {
   const full = { x: 0, y: 0, width: MAP_WIDTH, height: MAP_HEIGHT };
   if (animated) {
     animateViewBox(full);
-  } else {
-    applyViewBox(full);
+    return;
   }
+  stopViewBoxAnimation();
+  applyViewBox(full);
 }
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
+function viewBoxForCountry(bounds) {
+  const width = Math.max(bounds.maxX - bounds.minX, MAP_WIDTH * 0.05);
+  const height = Math.max(bounds.maxY - bounds.minY, MAP_HEIGHT * 0.05);
+  const fitScale = Math.min(
+    (MAP_WIDTH * 0.9) / (width * COUNTRY_PADDING_FACTOR),
+    (MAP_HEIGHT * 0.9) / (height * COUNTRY_PADDING_FACTOR)
+  );
+  const scale = clamp(Math.max(MIN_COUNTRY_SCALE, fitScale), MIN_COUNTRY_SCALE, MAX_COUNTRY_SCALE);
+  const centerX = (bounds.minX + bounds.maxX) / 2;
+  const centerY = (bounds.minY + bounds.maxY) / 2;
+  const zoomWidth = MAP_WIDTH / scale;
+  const zoomHeight = MAP_HEIGHT / scale;
+  const x = clamp(centerX - zoomWidth / 2, 0, MAP_WIDTH - zoomWidth);
+  const y = clamp(centerY - zoomHeight / 2, 0, MAP_HEIGHT - zoomHeight);
+  return { x, y, width: zoomWidth, height: zoomHeight };
+}
+
 function updateMapZoom(selectedCountry) {
   if (selectedCountry === "all" || !countryBounds.has(selectedCountry)) {
-    resetMapZoom();
+    resetMapZoom(true);
     return;
   }
 
@@ -259,25 +304,10 @@ function updateMapZoom(selectedCountry) {
     !Number.isFinite(bounds.maxX) ||
     !Number.isFinite(bounds.maxY)
   ) {
-    resetMapZoom();
+    resetMapZoom(true);
     return;
   }
-  const width = Math.max(bounds.maxX - bounds.minX, MAP_WIDTH * 0.08);
-  const height = Math.max(bounds.maxY - bounds.minY, MAP_HEIGHT * 0.08);
-  const fitScale = Math.min(
-    MAP_WIDTH / (width * COUNTRY_PADDING_FACTOR),
-    MAP_HEIGHT / (height * COUNTRY_PADDING_FACTOR)
-  );
-  const scale = clamp(Math.max(MIN_COUNTRY_SCALE, fitScale), 1, MAX_COUNTRY_SCALE);
-
-  const centerX = (bounds.minX + bounds.maxX) / 2;
-  const centerY = (bounds.minY + bounds.maxY) / 2;
-  const zoomWidth = MAP_WIDTH / scale;
-  const zoomHeight = MAP_HEIGHT / scale;
-  const x = clamp(centerX - zoomWidth / 2, 0, MAP_WIDTH - zoomWidth);
-  const y = clamp(centerY - zoomHeight / 2, 0, MAP_HEIGHT - zoomHeight);
-
-  animateViewBox({ x, y, width: zoomWidth, height: zoomHeight });
+  animateViewBox(viewBoxForCountry(bounds));
 }
 
 function clearAllHoverStates() {
@@ -290,7 +320,7 @@ function clearAllHoverStates() {
 
 function setCountryHoverState(countryName, hovering) {
   const shapes = countryShapes.get(countryName) || [];
-  const active = filterSelect.value === countryName;
+  const active = selectedCountry === countryName;
   if (active) {
     return;
   }
@@ -314,6 +344,7 @@ function updateMapActiveState(selectedCountry) {
 
 function attachShapeEvents(shape, countryName) {
   shape.addEventListener("mouseenter", () => {
+    hoveredCountry = countryName;
     clearAllHoverStates();
     setCountryHoverState(countryName, true);
     bringCountryToFront(countryName);
@@ -332,18 +363,22 @@ function attachShapeEvents(shape, countryName) {
     setCountryHoverState(countryName, false);
   });
 
-  shape.addEventListener("click", () => {
+  shape.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     selectCountry(countryName);
   });
 
   shape.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
+      event.stopPropagation();
       selectCountry(countryName);
     }
   });
 
   shape.addEventListener("focus", () => {
+    hoveredCountry = countryName;
     setCountryHoverState(countryName, true);
     bringCountryToFront(countryName);
   });
@@ -354,9 +389,69 @@ function attachShapeEvents(shape, countryName) {
 }
 
 function selectCountry(countryName) {
-  filterSelect.value = countryName;
+  clearAllHoverStates();
+  hoveredCountry = null;
+  if (selectedCountry === countryName) {
+    selectedCountry = "all";
+    filterSelect.value = "all";
+    render();
+    return;
+  }
+  selectedCountry = countryName;
+  if (Array.from(filterSelect.options).some((opt) => opt.value === countryName)) {
+    filterSelect.value = countryName;
+  }
   render();
-  updateMapZoom(countryName);
+}
+
+function findCountryAtClientPoint(clientX, clientY) {
+  if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) {
+    return null;
+  }
+
+  const svgPoint = mapSvg.createSVGPoint();
+  svgPoint.x = clientX;
+  svgPoint.y = clientY;
+
+  for (const [countryName, shapes] of countryShapes.entries()) {
+    for (const shape of shapes) {
+      const ctm = shape.getScreenCTM();
+      if (!ctm) {
+        continue;
+      }
+      let localPoint;
+      try {
+        localPoint = svgPoint.matrixTransform(ctm.inverse());
+      } catch {
+        continue;
+      }
+      if (shape.isPointInFill(localPoint) || shape.isPointInStroke(localPoint)) {
+        return countryName;
+      }
+    }
+  }
+  return null;
+}
+
+function handleMapPointerUp(event) {
+  const targetCountry =
+    event.target &&
+    event.target.getAttribute &&
+    event.target.getAttribute("data-country");
+  if (targetCountry && countryBounds.has(targetCountry)) {
+    selectCountry(targetCountry);
+    return;
+  }
+
+  const hitCountry = findCountryAtClientPoint(event.clientX, event.clientY);
+  if (hitCountry && countryBounds.has(hitCountry)) {
+    selectCountry(hitCountry);
+    return;
+  }
+
+  selectedCountry = "all";
+  filterSelect.value = "all";
+  render();
 }
 
 function renderMap(features) {
@@ -365,17 +460,23 @@ function renderMap(features) {
   countryBounds.clear();
   resetMapZoom(false);
 
-  const project = createProjector(features);
+  const aseanFeatures = features.filter((feature) => ISO3_TO_JA.has(feature.properties?.iso3));
+  const focusFeatures = aseanFeatures.length ? aseanFeatures : features;
+  const project = createProjector(features, focusFeatures, ASEAN_FOCUS_PADDING);
   mapGroup = document.createElementNS(SVG_NS, "g");
   mapGroup.setAttribute("class", "map-group");
+  const contextGroup = document.createElementNS(SVG_NS, "g");
+  contextGroup.setAttribute("class", "context-layer");
+  const aseanGroup = document.createElementNS(SVG_NS, "g");
+  aseanGroup.setAttribute("class", "asean-layer");
+  mapGroup.appendChild(contextGroup);
+  mapGroup.appendChild(aseanGroup);
   mapSvg.appendChild(mapGroup);
 
   for (const feature of features) {
     const iso3 = feature.properties?.iso3;
     const countryName = ISO3_TO_JA.get(iso3);
-    if (!countryName) {
-      continue;
-    }
+    const isAsean = Boolean(countryName);
 
     const polygons = geometryToPolygons(feature.geometry);
     for (const polygon of polygons) {
@@ -386,41 +487,45 @@ function renderMap(features) {
 
       const path = document.createElementNS(SVG_NS, "path");
       path.setAttribute("d", pathInfo.d);
-      path.setAttribute("class", "country-shape");
-      path.setAttribute("data-country", countryName);
-      path.setAttribute("tabindex", "0");
-      path.setAttribute("aria-label", countryName);
+      path.setAttribute("data-iso3", iso3 || "");
 
-      attachShapeEvents(path, countryName);
-      mapGroup.appendChild(path);
-
-      if (!countryShapes.has(countryName)) {
-        countryShapes.set(countryName, []);
-      }
-      countryShapes.get(countryName).push(path);
-
-      if (!countryBounds.has(countryName)) {
-        countryBounds.set(countryName, { ...pathInfo.bounds });
+      if (!isAsean) {
+        path.setAttribute("class", "context-shape");
+        path.setAttribute("aria-hidden", "true");
+        contextGroup.appendChild(path);
       } else {
-        const b = countryBounds.get(countryName);
-        b.minX = Math.min(b.minX, pathInfo.bounds.minX);
-        b.minY = Math.min(b.minY, pathInfo.bounds.minY);
-        b.maxX = Math.max(b.maxX, pathInfo.bounds.maxX);
-        b.maxY = Math.max(b.maxY, pathInfo.bounds.maxY);
+        path.setAttribute("class", "country-shape");
+        path.setAttribute("data-country", countryName);
+        path.setAttribute("tabindex", "0");
+        path.setAttribute("aria-label", countryName);
+
+        attachShapeEvents(path, countryName);
+        aseanGroup.appendChild(path);
+
+        if (!countryShapes.has(countryName)) {
+          countryShapes.set(countryName, []);
+        }
+        countryShapes.get(countryName).push(path);
+
+        if (!countryBounds.has(countryName)) {
+          countryBounds.set(countryName, { ...pathInfo.bounds });
+        } else {
+          const b = countryBounds.get(countryName);
+          b.minX = Math.min(b.minX, pathInfo.bounds.minX);
+          b.minY = Math.min(b.minY, pathInfo.bounds.minY);
+          b.maxX = Math.max(b.maxX, pathInfo.bounds.maxX);
+          b.maxY = Math.max(b.maxY, pathInfo.bounds.maxY);
+        }
       }
     }
   }
 
   mapSvg.addEventListener("mouseleave", () => {
+    hoveredCountry = null;
     clearAllHoverStates();
   });
 
-  mapSvg.addEventListener("click", (event) => {
-    if (event.target === mapSvg) {
-      filterSelect.value = "all";
-      render();
-    }
-  });
+  mapSvg.addEventListener("pointerup", handleMapPointerUp);
 
   resetMapZoom(false);
 }
@@ -438,7 +543,20 @@ function showMapError(message) {
 }
 
 async function initMap() {
-  let geo = window.__ASEAN_MAP_DATA;
+  let geo = window.__ASEAN_CONTEXT_MAP_DATA;
+  if (!geo) {
+    try {
+      const contextRes = await fetch("data/asean_context_10m.geojson");
+      if (contextRes.ok) {
+        geo = await contextRes.json();
+      }
+    } catch {
+      // Fallback below.
+    }
+  }
+  if (!geo) {
+    geo = window.__ASEAN_MAP_DATA;
+  }
   if (!geo) {
     const res = await fetch("data/asean_10m.geojson");
     if (!res.ok) {
@@ -461,6 +579,7 @@ async function init() {
   }
 
   initCountryFilter(countries);
+  selectedCountry = filterSelect.value || "all";
 
   try {
     await initMap();
@@ -469,11 +588,53 @@ async function init() {
   }
 
   render();
+  setupFadeInObserver();
 }
 
-filterSelect.addEventListener("change", render);
+filterSelect.addEventListener("change", () => {
+  selectedCountry = filterSelect.value || "all";
+  render();
+});
 keywordInput.addEventListener("input", render);
 
+function setupFadeInObserver() {
+  const targets = document.querySelectorAll(".fade-in");
+  if (!targets.length) {
+    return;
+  }
+  if (
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    for (const el of targets) {
+      el.classList.add("visible");
+    }
+    return;
+  }
+  if (typeof IntersectionObserver !== "function") {
+    for (const el of targets) {
+      el.classList.add("visible");
+    }
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      }
+    },
+    { threshold: 0.15 }
+  );
+
+  for (const el of targets) {
+    observer.observe(el);
+  }
+}
+
 init().catch((err) => {
-  tableBody.innerHTML = `<tr><td colspan="7">データ読み込みに失敗しました: ${err}</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="4">データ読み込みに失敗しました: ${err}</td></tr>`;
 });

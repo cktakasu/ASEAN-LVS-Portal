@@ -3,86 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASEAN低圧遮断器ナレッジ</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>ASEAN低圧配制事業ポータル</title>
   </head>
   <body>
-    <header class="hero">
-      <h1>ASEAN 低圧遮断器ナレッジ</h1>
-      <p>自部署向け: 各国の低圧遮断器に関する規格・制度・実務情報を横断整理</p>
-      <p class="note">注意: 法令・制度は更新されるため、最終判断前に必ず一次情報を確認してください。</p>
-    </header>
-
-    <main>
-      <section class="panel">
-        <h2>ASEANマップ</h2>
-        <p class="map-help">国境にマウスオーバーで強調表示、クリックで比較テーブルを絞り込みます。</p>
-        <div class="asean-map" aria-label="ASEAN map navigation">
-          <svg id="asean-map-svg" viewBox="0 0 960 620" role="img" aria-label="ASEAN countries map">
-            <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="map-error-text">
-              地図を読み込み中...
-            </text>
-          </svg>
-        </div>
-      </section>
-
-      <section class="panel controls">
-        <div>
-          <label for="country-filter">国で絞り込み</label>
-          <select id="country-filter">
-            <option value="all">すべて</option>
-          </select>
-        </div>
-        <div>
-          <label for="keyword">キーワード検索</label>
-          <input id="keyword" type="text" placeholder="例: IEC 60947, 認証, 50Hz" />
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2>国別比較テーブル</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>国</th>
-                <th>主な規格/準拠</th>
-                <th>低圧定義 (目安)</th>
-                <th>商用電圧・周波数</th>
-                <th>認証/登録の論点</th>
-                <th>実務メモ</th>
-                <th>最終更新日</th>
-              </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2>運用ルール（推奨）</h2>
-        <ul>
-          <li>情報ソースは「法令/規格原文」「認証機関」「現地代理店情報」の3系統で確認する</li>
-          <li>更新時は必ず「最終更新日」「更新者」「根拠URL」を残す</li>
-          <li>見積前チェックとして「規格適合」「周波数」「短絡容量」「認証要否」を確認する</li>
-        </ul>
-      </section>
-    </main>
-
-    <footer>
-      <small>ASEAN Low Voltage Breaker Portal</small>
-    </footer>
-    <script
-      src="data/countries-data.js"
-      onerror="document.getElementById('asean-map-svg').innerHTML='<text x=&quot;50%&quot; y=&quot;50%&quot; text-anchor=&quot;middle&quot; dominant-baseline=&quot;middle&quot; class=&quot;map-error-text&quot;>countries-data.js の読み込みに失敗</text>'"
-    ></script>
-    <script
-      src="data/asean-map-data.js"
-      onerror="document.getElementById('asean-map-svg').innerHTML='<text x=&quot;50%&quot; y=&quot;50%&quot; text-anchor=&quot;middle&quot; dominant-baseline=&quot;middle&quot; class=&quot;map-error-text&quot;>asean-map-data.js の読み込みに失敗</text>'"
-    ></script>
-    <script
-      src="app.js"
-      onerror="document.getElementById('asean-map-svg').innerHTML='<text x=&quot;50%&quot; y=&quot;50%&quot; text-anchor=&quot;middle&quot; dominant-baseline=&quot;middle&quot; class=&quot;map-error-text&quot;>app.js の読み込みに失敗</text>'"
-    ></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

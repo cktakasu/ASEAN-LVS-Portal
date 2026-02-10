@@ -1,37 +1,43 @@
-# ASEAN低圧遮断器サイト（部署内向け）
+# ASEAN低圧配制事業ポータル
 
 ## 概要
-ASEAN各国の低圧遮断器に関する情報を、国別に比較・検索できるシンプルな静的サイトです。
-トップにASEANマップを配置し、国をクリックしてテーブルを絞り込めます。
+ASEAN各国の低圧配制に関する情報を、地図と比較テーブルで横断確認できる社内向けポータルです。
+地図上の国をクリックすると、その国へズームし、比較テーブルを絞り込みます。同じ国を再クリックすると全体表示へ戻ります。
+
+## 技術スタック
+- React 18
+- TypeScript
+- Vite
+- SVG（GeoJSONをクライアントで描画）
+- フォント: Noto Sans JP（ローカル同梱）
 
 ## ファイル構成
-- `index.html`: 画面本体
-- `styles.css`: 見た目
-- `app.js`: フィルタ・検索ロジック
-- `data/countries.json`: 国別データ
-- `data/asean_10m.geojson`: ASEAN 10か国の高精細境界データ
-- `data/countries-data.js`: 国別データのJS埋め込み版
-- `data/asean-map-data.js`: 地図データのJS埋め込み版
-- `assets/fonts/NotoSansJP-wght.ttf`: サイト共通フォント
+- `index.html`: Viteエントリ
+- `src/main.tsx`: React起動
+- `src/App.tsx`: 画面構成・地図ロジック・絞り込み
+- `src/styles.css`: サイト全体スタイル
+- `public/data/countries.json`: 比較テーブルデータ
+- `public/data/asean_context_10m.geojson`: ASEAN中心の周辺国含む地図データ
+- `public/data/asean_10m.geojson`: ASEAN地図データ（フォールバック）
+- `public/fonts/NotoSansJP-wght.ttf`: サイト共通フォント
 
-## 使い方
-1. このフォルダでローカルサーバーを起動
+## 開発環境起動
+1. 依存関係をインストール
 ```bash
-python3 -m http.server 8000
+npm install
 ```
-2. ブラウザで `http://localhost:8000` を開く
+2. 開発サーバー起動（8080固定）
+```bash
+npm run dev
+```
+3. ブラウザで `http://localhost:8080` を開く
 
-## 実装メモ
-- 地図は外部CDNに依存せず、`data/asean-map-data.js` からSVGに直接描画
-- フォントは `Noto Sans JP` をローカル同梱して全体に適用
+## 本番ビルド
+```bash
+npm run build
+npm run preview
+```
 
-## データ更新方法
-- `data/countries.json` を編集
-- 各国オブジェクトの `updatedAt` は `YYYY-MM-DD` 形式で更新
-- 推奨: 各項目に根拠URLや社内メモIDを追記して監査可能にする
-
-## 次の拡張候補
-- 根拠URL列の追加（一次情報リンク）
-- 更新者名・レビュー承認者列の追加
-- CSVエクスポート機能
-- 認証要否チェックリスト（見積前チェック）
+## データ更新
+- 比較テーブル: `public/data/countries.json` を編集
+- 地図: `public/data/asean_context_10m.geojson`（必要時 `public/data/asean_10m.geojson`）を差し替え
