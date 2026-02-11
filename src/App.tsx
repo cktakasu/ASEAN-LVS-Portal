@@ -75,9 +75,12 @@ const MAP_HEIGHT = 620;
 const MAP_PADDING = 24;
 const ASEAN_FOCUS_PADDING = 1.0;
 const COUNTRY_PADDING_FACTOR = 1.22;
+const INDONESIA_PADDING_FACTOR = 0.9;
+const INDONESIA_MIN_SCALE = 1.58;
 const MIN_COUNTRY_SCALE = 1.0;
 const MAX_COUNTRY_SCALE = 10;
 const ZOOM_ANIMATION_MS = 360;
+const RESET_ANIMATION_MS = 500;
 const LABEL_EXIT_TOTAL_MS = 860;
 const FULL_VIEWBOX: ViewBox = { x: 0, y: 0, width: MAP_WIDTH, height: MAP_HEIGHT };
 
@@ -448,16 +451,20 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function viewBoxForCountry(bounds: Bounds): ViewBox {
+function viewBoxForCountry(countryName: string, bounds: Bounds): ViewBox {
   const width = Math.max(bounds.maxX - bounds.minX, MAP_WIDTH * 0.05);
   const height = Math.max(bounds.maxY - bounds.minY, MAP_HEIGHT * 0.05);
+  const paddingFactor = countryName === "インドネシア" ? INDONESIA_PADDING_FACTOR : COUNTRY_PADDING_FACTOR;
+  const fitWidthRatio = countryName === "インドネシア" ? 1.0 : 0.9;
+  const fitHeightRatio = countryName === "インドネシア" ? 0.92 : 0.9;
 
   const fitScale = Math.min(
-    (MAP_WIDTH * 0.9) / (width * COUNTRY_PADDING_FACTOR),
-    (MAP_HEIGHT * 0.9) / (height * COUNTRY_PADDING_FACTOR)
+    (MAP_WIDTH * fitWidthRatio) / (width * paddingFactor),
+    (MAP_HEIGHT * fitHeightRatio) / (height * paddingFactor)
   );
 
-  const scale = clamp(Math.max(MIN_COUNTRY_SCALE, fitScale), MIN_COUNTRY_SCALE, MAX_COUNTRY_SCALE);
+  const minScale = countryName === "インドネシア" ? INDONESIA_MIN_SCALE : MIN_COUNTRY_SCALE;
+  const scale = clamp(Math.max(minScale, fitScale), MIN_COUNTRY_SCALE, MAX_COUNTRY_SCALE);
   const centerX = (bounds.minX + bounds.maxX) / 2;
   const centerY = (bounds.minY + bounds.maxY) / 2;
   const zoomWidth = MAP_WIDTH / scale;
@@ -522,7 +529,6 @@ export default function App(): JSX.Element {
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
   const [activeLabel, setActiveLabel] = useState<ActiveLabel | null>(null);
-  const [keyword, setKeyword] = useState<string>("");
   const [tableError, setTableError] = useState<string>("");
   const [mapError, setMapError] = useState<string>("");
   const [viewBox, setViewBox] = useState<ViewBox>(FULL_VIEWBOX);
@@ -600,28 +606,14 @@ export default function App(): JSX.Element {
   const { paths, countryBounds } = useMemo(() => buildMapPaths(geoFeatures), [geoFeatures]);
 
   useEffect(() => {
-    if (selectedCountry !== "all" && !countries.some((item) => item.country === selectedCountry)) {
+    if (selectedCountry !== "all" && !countryBounds.has(selectedCountry)) {
       setSelectedCountry("all");
     }
-  }, [countries, selectedCountry]);
+  }, [countryBounds, selectedCountry]);
 
   const filteredRows = useMemo(() => {
-    const normalizedKeyword = keyword.trim().toLowerCase();
-
-    return countries.filter((item) => {
-      const byCountry = selectedCountry === "all" || item.country === selectedCountry;
-      if (!byCountry) {
-        return false;
-      }
-
-      if (!normalizedKeyword) {
-        return true;
-      }
-
-      const searchableText = Object.values(item).join(" ").toLowerCase();
-      return searchableText.includes(normalizedKeyword);
-    });
-  }, [countries, keyword, selectedCountry]);
+    return countries.filter((item) => selectedCountry === "all" || item.country === selectedCountry);
+  }, [countries, selectedCountry]);
 
   const animateViewBox = useCallback((target: ViewBox, durationMs = ZOOM_ANIMATION_MS): Promise<void> => {
     return new Promise((resolve) => {
@@ -727,13 +719,15 @@ export default function App(): JSX.Element {
         window.clearTimeout(labelExitTimerRef.current);
         labelExitTimerRef.current = null;
       }
-      await hideEditorialLabel(runId);
-      if (runId !== transitionRunRef.current) {
+
+      if (selectedCountry === "all") {
+        setActiveLabel(null);
+        await animateViewBox(FULL_VIEWBOX, RESET_ANIMATION_MS);
         return;
       }
 
-      if (selectedCountry === "all") {
-        await animateViewBox(FULL_VIEWBOX);
+      await hideEditorialLabel(runId);
+      if (runId !== transitionRunRef.current) {
         return;
       }
 
@@ -743,7 +737,7 @@ export default function App(): JSX.Element {
         return;
       }
 
-      await animateViewBox(viewBoxForCountry(bounds));
+      await animateViewBox(viewBoxForCountry(selectedCountry, bounds));
       if (runId !== transitionRunRef.current) {
         return;
       }
@@ -814,7 +808,6 @@ export default function App(): JSX.Element {
       left: `${left}%`,
       top: `${top}%`,
       "--label-tracking": spec.tracking,
-      "--rule-width": `${spec.ruleWidth}px`,
       "--rule-offset": `${spec.ruleOffset}px`,
     } as CSSProperties & Record<string, string>;
 
@@ -934,7 +927,6 @@ export default function App(): JSX.Element {
           <div className="nav-links">
             <a href="#top">ホーム</a>
             <a href="#map-section">マップ</a>
-            <a href="#controls-section">検索</a>
             <a href="#table-section">比較表</a>
           </div>
           <div className="nav-actions" aria-hidden="true">
@@ -963,29 +955,20 @@ export default function App(): JSX.Element {
             </svg>
             {editorialLabel ? (
               <div className={`editorial-label phase-${editorialLabel.phase}`} style={editorialLabel.style} aria-hidden="true">
-                <p className="label-headline">{editorialLabel.headline}</p>
-                <span className="label-rule" />
+                <div className="label-title-wrap">
+                  <p className="label-headline">{editorialLabel.headline}</p>
+                  <span className="label-rule" />
+                </div>
                 <p className="label-official">{editorialLabel.official}</p>
               </div>
             ) : null}
           </div>
         </section>
 
-        <section id="controls-section" className="card-grid card-grid--single fade-in" aria-label="search controls">
-          <article className="card card--white">
-            <h3>キーワード検索</h3>
-            <p>規格名・認証名などを入力</p>
-            <input
-              type="text"
-              value={keyword}
-              onChange={(event) => setKeyword(event.target.value)}
-              placeholder="例: IEC 60947, 認証, 50Hz"
-            />
-          </article>
-        </section>
-
         <section id="table-section" className="content-block fade-in">
-          <h2>国別比較テーブル</h2>
+          <p className="section-kicker">REGIONAL OVERVIEW</p>
+          <h2>ASEAN at a Glance</h2>
+          <p className="section-subline">Country-by-country regulatory and business comparison</p>
           <div className="table-wrap">
             <table>
               <thead>
