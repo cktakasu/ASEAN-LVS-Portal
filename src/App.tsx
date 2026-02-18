@@ -1,4 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import MalaysiaPage from "./MalaysiaPage";
 
 type Coordinate = [number, number];
 type Ring = Coordinate[];
@@ -833,6 +835,7 @@ async function loadMapFeatures(): Promise<Feature[]> {
 }
 
 export default function App(): JSX.Element {
+  const navigate = useNavigate();
   const [geoFeatures, setGeoFeatures] = useState<Feature[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
@@ -1238,7 +1241,10 @@ export default function App(): JSX.Element {
       </header>
 
       <main>
-        <section id="map-section" className="hero hero--gray fade-in">
+        <Routes>
+          <Route path="/" element={
+            <>
+              <section id="map-section" className="hero hero--gray fade-in">
           <div className="map-stage" aria-label="ASEAN map navigation">
             <svg
               id="asean-map-svg"
@@ -1250,7 +1256,19 @@ export default function App(): JSX.Element {
               {renderMapBody()}
             </svg>
             {editorialLabel ? (
-              <div className={`editorial-label phase-${editorialLabel.phase}`} style={editorialLabel.style} aria-hidden="true">
+              <div
+                className={`editorial-label phase-${editorialLabel.phase}`}
+                style={{
+                  ...editorialLabel.style,
+                  cursor: activeLabel?.countryName === "マレーシア" ? "pointer" : "default"
+                }}
+                aria-hidden="true"
+                onClick={() => {
+                  if (activeLabel?.countryName === "マレーシア") {
+                    navigate("/malaysia");
+                  }
+                }}
+              >
                 <div className="label-title-wrap">
                   <p className="label-headline">{editorialLabel.headline}</p>
                   <span className="label-rule" />
@@ -1449,6 +1467,10 @@ export default function App(): JSX.Element {
             </ol>
           </article>
         </section>
+            </>
+          } />
+          <Route path="/malaysia" element={<MalaysiaPage />} />
+        </Routes>
       </main>
 
       <footer className="footer fade-in">

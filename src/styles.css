@@ -135,6 +135,7 @@ body {
 
 #map-section.hero {
   padding-top: 36px;
+  padding-bottom: 60px;
 }
 
 .hero--light {
@@ -214,9 +215,9 @@ body {
 }
 
 .map-stage {
-  width: min(1024px, calc(100vw - 12px));
+  width: min(1400px, calc(100vw - 12px));
   margin-top: 12px;
-  height: 520px;
+  height: 750px;
   background: var(--bg-gray);
   overflow: hidden;
   position: relative;
@@ -273,7 +274,7 @@ body {
   z-index: 4;
   transform: translate(-50%, -50%);
   color: #0f1d31;
-  pointer-events: none;
+  pointer-events: auto;
   text-align: left;
   width: max-content;
   min-width: 0;
