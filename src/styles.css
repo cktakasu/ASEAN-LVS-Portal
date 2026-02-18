@@ -663,6 +663,29 @@ td:first-child {
   font-weight: 400;
 }
 
+.my-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 6px 14px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--link);
+  font-size: 13px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.my-back-btn:hover {
+  border-color: var(--link);
+  color: var(--link-hover);
+}
+
 .fade-in {
   opacity: 0;
   transform: translateY(20px);
