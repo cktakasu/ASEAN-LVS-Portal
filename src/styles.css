@@ -686,6 +686,65 @@ td:first-child {
   color: var(--link-hover);
 }
 
+/* Tab navigation */
+
+.tab-nav {
+  display: flex;
+  gap: 0;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-nav-item {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.tab-nav-item:hover {
+  border-bottom-color: var(--text-sub);
+}
+
+.tab-nav-item.active {
+  border-bottom-color: var(--link);
+}
+
+.tab-nav-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.tab-nav-item.active .tab-nav-label {
+  color: var(--link);
+}
+
+.tab-nav-sublabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.tab-content {
+  min-height: 300px;
+}
+
 .fade-in {
   opacity: 0;
   transform: translateY(20px);
