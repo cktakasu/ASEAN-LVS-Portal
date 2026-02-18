@@ -1,5 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+  BarChart,
+  Bar,
+  Cell,
+  ResponsiveContainer,
+} from "recharts";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -24,21 +37,141 @@ type TabDef = {
   sublabel: string;
 };
 
+type GdpTrendPoint = {
+  year: number;
+  actual: number | null;
+  forecast: number | null;
+};
+
+type GdpSector = {
+  sector: string;
+  share: number;
+  cb_relevance: "High" | "Medium" | "Low";
+};
+
+type NewsItem = {
+  date: string;
+  category: "Policy" | "Investment" | "Infrastructure" | "Trade" | "Other";
+  headline: string;
+  summary: string;
+  cb_impact: "High" | "Medium" | "Low" | "None";
+};
+
 /* ------------------------------------------------------------------ */
 /*  Tab definitions                                                    */
 /* ------------------------------------------------------------------ */
 
 const TABS: TabDef[] = [
-  { id: "t1", label: "Country Profile",       sublabel: "Is this country worth targeting?" },
-  { id: "t2", label: "Market & Demand",        sublabel: "Where is the demand?" },
-  { id: "t3", label: "Regulatory Gateway",     sublabel: "What is required to sell here?" },
-  { id: "t4", label: "Competitive Landscape",  sublabel: "Who are we competing against?" },
-  { id: "t5", label: "Our Position",           sublabel: "Where do we stand?" },
-  { id: "t6", label: "Strategic Assessment",   sublabel: "What should we do?" },
+  { id: "t1", label: "Country Profile",      sublabel: "Is this country worth targeting?" },
+  { id: "t2", label: "Market & Demand",      sublabel: "Where is the demand?" },
+  { id: "t3", label: "Regulatory Gateway",   sublabel: "What is required to sell here?" },
+  { id: "t4", label: "Competitive Landscape",sublabel: "Who are we competing against?" },
+  { id: "t5", label: "Our Position",         sublabel: "Where do we stand?" },
+  { id: "t6", label: "Strategic Assessment", sublabel: "What should we do?" },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  T1 data                                                            */
+/*  T1 static data — Section 1: Economic KPIs                         */
+/* ------------------------------------------------------------------ */
+
+const T1_KPI = {
+  gdp_usd_billion: 430.9,
+  gdp_growth_pct: 5.2,
+  population_million: 34.3,
+  gdp_per_capita_usd: 12560,
+  fdi_inflow_usd_billion: 16.9,
+  exchange_rate_to_usd: 4.45,
+};
+
+/* ------------------------------------------------------------------ */
+/*  T1 static data — Section 2: GDP Trend 2019–2027                   */
+/*  2024 is the connection point (appears in both actual & forecast)   */
+/* ------------------------------------------------------------------ */
+
+const GDP_TREND: GdpTrendPoint[] = [
+  { year: 2019, actual: 365.3, forecast: null  },
+  { year: 2020, actual: 337.0, forecast: null  },
+  { year: 2021, actual: 372.7, forecast: null  },
+  { year: 2022, actual: 406.3, forecast: null  },
+  { year: 2023, actual: 430.2, forecast: null  },
+  { year: 2024, actual: 430.9, forecast: 430.9 },
+  { year: 2025, actual: null,  forecast: 458.2 },
+  { year: 2026, actual: null,  forecast: 485.0 },
+  { year: 2027, actual: null,  forecast: 513.8 },
+];
+
+/* ------------------------------------------------------------------ */
+/*  T1 static data — Section 3: GDP Composition by sector             */
+/* ------------------------------------------------------------------ */
+
+const GDP_COMPOSITION: GdpSector[] = [
+  { sector: "Services",        share: 54.2, cb_relevance: "Medium" },
+  { sector: "Manufacturing",   share: 23.4, cb_relevance: "High"   },
+  { sector: "Mining & Energy", share:  9.1, cb_relevance: "Low"    },
+  { sector: "Construction",    share:  5.8, cb_relevance: "High"   },
+  { sector: "Agriculture",     share:  5.1, cb_relevance: "Low"    },
+  { sector: "Finance",         share:  2.4, cb_relevance: "Medium" },
+];
+
+/* ------------------------------------------------------------------ */
+/*  T1 static data — Section 4: Power infrastructure                  */
+/* ------------------------------------------------------------------ */
+
+const POWER_INFO: InfoItem[] = [
+  { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
+  { label: "周波数",           value: "50 Hz" },
+  { label: "プラグ形状",       value: "Type G（英国型 BS 1363）" },
+  { label: "配電方式",         value: "TN-S / TN-C-S（半島）、地域によりTT" },
+  { label: "主要電力会社",     value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
+  { label: "サバ・サラワク",   value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
+  { label: "電化率",           value: "99.9%（2024年）" },
+  { label: "再エネ目標",       value: "40% by 2035（NETR・RE NKRA）" },
+];
+
+/* ------------------------------------------------------------------ */
+/*  T1 static data — Section 5: Economic news                         */
+/* ------------------------------------------------------------------ */
+
+const ECONOMIC_NEWS: NewsItem[] = [
+  {
+    date: "2024-10",
+    category: "Investment",
+    headline: "AWS、マレーシアに2037年までUSD 60億ドル投資を表明",
+    summary: "データセンター建設の急拡大により、Johor・クランバレー周辺でのLV配電盤需要が大幅増加する見込み。ACB・MCCBの需要が主に増加。",
+    cb_impact: "High",
+  },
+  {
+    date: "2024-09",
+    category: "Investment",
+    headline: "NVIDIA、マレーシア政府とAIインフラ整備で提携合意",
+    summary: "大型データセンター増設計画が後押し。高信頼性LV配電システムの需要拡大が見込まれる。",
+    cb_impact: "High",
+  },
+  {
+    date: "2023-08",
+    category: "Policy",
+    headline: "国家エネルギー転換ロードマップ（NETR）発表：再エネ比率40%目標（2035年）",
+    summary: "太陽光・風力発電の急拡大に伴い、MCCB・RCCBの大量需要が想定。インバーター対応の遮断器規格への注目が高まる。",
+    cb_impact: "High",
+  },
+  {
+    date: "2024-01",
+    category: "Infrastructure",
+    headline: "Johor-Singapore経済特区（JS-SEZ）正式始動",
+    summary: "製造業・ICT・ヘルスケア産業の集積が加速。インフラ整備フェーズでの大型LV配電盤需要が生じる。",
+    cb_impact: "High",
+  },
+  {
+    date: "2024-06",
+    category: "Trade",
+    headline: "半導体・EV関連FDIが過去最高水準——2023年比40%増",
+    summary: "クリーンルーム施設・テスト工場の新設が相次ぐ。精密電源品質が求められるためACB・MCCBの高品位品への需要が増大。",
+    cb_impact: "Medium",
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Existing data (cert, SIRIM, regional — to be moved to T3 later)   */
 /* ------------------------------------------------------------------ */
 
 const CERT_ROWS: CertRow[] = [
@@ -47,15 +180,6 @@ const CERT_ROWS: CertRow[] = [
   { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
   { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
   { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
-];
-
-const POWER_INFO: InfoItem[] = [
-  { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
-  { label: "周波数",           value: "50 Hz" },
-  { label: "主要電力会社",     value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
-  { label: "サバ・サラワク",   value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
-  { label: "プラグ形状",       value: "Type G（英国型 BS 1363）" },
-  { label: "配電方式",         value: "TN-S / TN-C-S（半島）、地域によりTT" },
 ];
 
 const SIRIM_PROCESS: string[] = [
@@ -67,8 +191,8 @@ const SIRIM_PROCESS: string[] = [
 ];
 
 const REGIONAL_DIFF: InfoItem[] = [
-  { label: "半島マレーシア",         value: "TNB系統。MS規格・SIRIM CoA体制が最も整備されており、ST登録が実質必須。" },
-  { label: "サバ（ボルネオ北部）",   value: "SESBが管轄。系統容量は半島より小さく、プロジェクト仕様でIECまたはBS準拠を要求するケースが多い。" },
+  { label: "半島マレーシア",           value: "TNB系統。MS規格・SIRIM CoA体制が最も整備されており、ST登録が実質必須。" },
+  { label: "サバ（ボルネオ北部）",     value: "SESBが管轄。系統容量は半島より小さく、プロジェクト仕様でIECまたはBS準拠を要求するケースが多い。" },
   { label: "サラワク（ボルネオ北西）", value: "SEBが独立運営。半島とは別制度。認証要件をSEB仕様で個別確認要。" },
 ];
 
@@ -81,13 +205,228 @@ const MARKET_NOTES: string[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Tab content components                                             */
+/*  Constants / helpers                                                */
+/* ------------------------------------------------------------------ */
+
+const CB_RELEVANCE_COLOR: Record<string, string> = {
+  High:   "#0066cc",
+  Medium: "#5e8fbf",
+  Low:    "#b0bec5",
+};
+
+const CATEGORY_BADGE_CLASS: Record<string, string> = {
+  Policy:         "badge--policy",
+  Investment:     "badge--investment",
+  Infrastructure: "badge--infrastructure",
+  Trade:          "badge--trade",
+  Other:          "badge--other",
+};
+
+const IMPACT_BADGE_CLASS: Record<string, string> = {
+  High:   "badge--impact-high",
+  Medium: "badge--impact-medium",
+  Low:    "badge--impact-low",
+  None:   "badge--other",
+};
+
+const CATEGORY_LABEL: Record<string, string> = {
+  Policy:         "政策",
+  Investment:     "投資",
+  Infrastructure: "インフラ",
+  Trade:          "通商",
+  Other:          "その他",
+};
+
+const IMPACT_LABEL: Record<string, string> = {
+  High:   "CB需要 High",
+  Medium: "CB需要 Medium",
+  Low:    "CB需要 Low",
+  None:   "CB影響 なし",
+};
+
+/* ------------------------------------------------------------------ */
+/*  T1 sub-components                                                  */
+/* ------------------------------------------------------------------ */
+
+function KpiGrid(): React.JSX.Element {
+  const cards = [
+    { label: "GDP（名目）",    value: `USD ${T1_KPI.gdp_usd_billion}B`,                 sub: "Nominal GDP (2024)" },
+    { label: "GDP 成長率",     value: `+${T1_KPI.gdp_growth_pct}%`,                     sub: "Real GDP Growth (2024)", highlight: true },
+    { label: "人口",           value: `${T1_KPI.population_million}M`,                  sub: "Population (2024)" },
+    { label: "1人当たり GDP",  value: `USD ${T1_KPI.gdp_per_capita_usd.toLocaleString()}`, sub: "GDP per Capita (2024)" },
+    { label: "FDI 流入額",    value: `USD ${T1_KPI.fdi_inflow_usd_billion}B`,           sub: "FDI Inflows (2024)" },
+    { label: "対 USD 為替",   value: `MYR ${T1_KPI.exchange_rate_to_usd}`,              sub: "Annual Avg Exchange Rate" },
+  ];
+
+  return (
+    <div className="kpi-grid">
+      {cards.map((c) => (
+        <div key={c.label} className={`kpi-card${c.highlight ? " kpi-card--highlight" : ""}`}>
+          <span className="kpi-card__label">{c.label}</span>
+          <span className="kpi-card__value">{c.value}</span>
+          <span className="kpi-card__sub">{c.sub}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function GdpTrendChart(): React.JSX.Element {
+  return (
+    <div className="chart-wrap">
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={GDP_TREND} margin={{ top: 8, right: 32, left: 8, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+          <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+          <YAxis
+            tick={{ fontSize: 12 }}
+            tickFormatter={(v: number) => `${v}B`}
+            domain={[300, 560]}
+          />
+          <Tooltip formatter={(v: number | undefined) => v != null ? [`USD ${v}B`, ""] : ["-", ""]} />
+          <ReferenceLine
+            x={2024}
+            stroke="#ccc"
+            strokeDasharray="4 4"
+            label={{ value: "実績 / 予測", position: "insideTopRight", fontSize: 11, fill: "#999" }}
+          />
+          <Line
+            type="monotone"
+            dataKey="actual"
+            name="実績"
+            stroke="#0066cc"
+            strokeWidth={2.5}
+            dot={{ r: 3, fill: "#0066cc" }}
+            connectNulls={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="forecast"
+            name="予測"
+            stroke="#ff8c00"
+            strokeWidth={2.5}
+            strokeDasharray="6 4"
+            dot={{ r: 3, fill: "#ff8c00" }}
+            connectNulls={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+      <p style={{ textAlign: "right", margin: "4px 32px 0", fontSize: 11, color: "var(--text-sub)" }}>
+        出典: World Bank / IMF WEO 2024。予測値は IMF ベースライン。
+      </p>
+    </div>
+  );
+}
+
+function GdpCompositionChart(): React.JSX.Element {
+  return (
+    <div className="chart-wrap">
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart
+          layout="vertical"
+          data={GDP_COMPOSITION}
+          margin={{ top: 4, right: 60, left: 16, bottom: 4 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e0e0e0" />
+          <XAxis
+            type="number"
+            tick={{ fontSize: 12 }}
+            tickFormatter={(v: number) => `${v}%`}
+            domain={[0, 60]}
+          />
+          <YAxis
+            type="category"
+            dataKey="sector"
+            tick={{ fontSize: 12 }}
+            width={130}
+          />
+          <Tooltip formatter={(v: number | undefined) => v != null ? [`${v}%`, "GDP 構成比"] : ["-", "GDP 構成比"]} />
+          <Bar dataKey="share" radius={[0, 4, 4, 0]}>
+            {GDP_COMPOSITION.map((entry) => (
+              <Cell key={entry.sector} fill={CB_RELEVANCE_COLOR[entry.cb_relevance]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+      <div className="cb-relevance-legend">
+        {(["High", "Medium", "Low"] as const).map((r) => (
+          <span key={r} className="cb-relevance-item">
+            <span className="cb-dot" style={{ background: CB_RELEVANCE_COLOR[r] }} />
+            CB需要 {r}
+          </span>
+        ))}
+      </div>
+      <p style={{ textAlign: "right", margin: "4px 0 0", fontSize: 11, color: "var(--text-sub)" }}>
+        出典: DOSM Malaysia（2024年推計値）
+      </p>
+    </div>
+  );
+}
+
+function EconomicNewsList(): React.JSX.Element {
+  return (
+    <ul className="news-list">
+      {ECONOMIC_NEWS.map((news) => (
+        <li
+          key={news.headline}
+          className={`news-item news-item--${news.cb_impact.toLowerCase()}`}
+        >
+          <div className="news-item__meta">
+            <span className="news-item__date">{news.date}</span>
+            <span className={`badge ${CATEGORY_BADGE_CLASS[news.category]}`}>
+              {CATEGORY_LABEL[news.category]}
+            </span>
+            <span className={`badge ${IMPACT_BADGE_CLASS[news.cb_impact]}`}>
+              {IMPACT_LABEL[news.cb_impact]}
+            </span>
+          </div>
+          <div className="news-item__body">
+            <p className="news-item__headline">{news.headline}</p>
+            <p className="news-item__summary">{news.summary}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  T1 tab content                                                     */
 /* ------------------------------------------------------------------ */
 
 function T1CountryProfile(): React.JSX.Element {
   return (
     <>
+      {/* Section 1 — Economic KPIs */}
       <section className="content-block fade-in" style={{ marginTop: "24px" }}>
+        <p className="section-kicker">ECONOMIC KPIs</p>
+        <h2>経済概況</h2>
+        <p className="section-subline">Malaysia — Key Economic Indicators (2024)</p>
+        <KpiGrid />
+      </section>
+
+      {/* Section 2 — GDP Trend */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">GDP TREND</p>
+        <h2>GDP 推移</h2>
+        <p className="section-subline">過去実績（2019–2024）＋予測（2025–2027）　単位: 十億 USD</p>
+        <article className="reference-block">
+          <GdpTrendChart />
+        </article>
+      </section>
+
+      {/* Section 3 — GDP Composition */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">GDP COMPOSITION</p>
+        <h2>産業別 GDP 構成比</h2>
+        <p className="section-subline">CB市場への関連度（High / Medium / Low）で色分け</p>
+        <article className="reference-block">
+          <GdpCompositionChart />
+        </article>
+      </section>
+
+      {/* Section 4 — Power Infrastructure */}
+      <section className="content-block fade-in">
         <p className="section-kicker">POWER INFRASTRUCTURE</p>
         <h2>電力インフラ基本情報</h2>
         <p className="section-subline">系統電圧・周波数・プラグ規格・主要電力会社</p>
@@ -112,6 +451,18 @@ function T1CountryProfile(): React.JSX.Element {
           </div>
         </article>
       </section>
+
+      {/* Section 5 — Economic News */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">ECONOMIC NEWS</p>
+        <h2>主要経済ニュース</h2>
+        <p className="section-subline">CB市場に影響を与える政策・投資・インフラ動向</p>
+        <article className="reference-block">
+          <EconomicNewsList />
+        </article>
+      </section>
+
+      {/* ---- Below: existing sections (to be reorganised into T3) ---- */}
 
       <section className="content-block fade-in">
         <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
@@ -205,6 +556,10 @@ function T1CountryProfile(): React.JSX.Element {
     </>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Placeholder for unimplemented tabs                                 */
+/* ------------------------------------------------------------------ */
 
 function TabPlaceholder({ tab }: { tab: TabDef }): React.JSX.Element {
   return (
