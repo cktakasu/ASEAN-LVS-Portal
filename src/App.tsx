@@ -1,5 +1,5 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import MalaysiaPage from "./MalaysiaPage";
 
 type Coordinate = [number, number];
@@ -836,6 +836,8 @@ async function loadMapFeatures(): Promise<Feature[]> {
 
 export default function App(): JSX.Element {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isCountryPage = pathname !== "/";
   const [geoFeatures, setGeoFeatures] = useState<Feature[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
@@ -1235,10 +1237,12 @@ export default function App(): JSX.Element {
         </div>
       </nav>
 
-      <header id="top" className="hero hero--light fade-in">
-        <p className="hero-kicker">ASEAN LOW VOLTAGE BUSINESS PORTAL</p>
-        <h1>ASEAN低圧配制事業ポータル</h1>
-      </header>
+      {!isCountryPage && (
+        <header id="top" className="hero hero--light fade-in">
+          <p className="hero-kicker">ASEAN LOW VOLTAGE BUSINESS PORTAL</p>
+          <h1>ASEAN低圧配制事業ポータル</h1>
+        </header>
+      )}
 
       <main>
         <Routes>
