@@ -42,42 +42,42 @@ const TABS: TabDef[] = [
 /* ------------------------------------------------------------------ */
 
 const CERT_ROWS: CertRow[] = [
-  { product: "ACB",  requirement: "Conditional", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "Often required in project specifications" },
-  { product: "MCCB", requirement: "Conditional", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "SIRIM CoA commonly required in project specs" },
-  { product: "MCB",  requirement: "Mandatory",   standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "ST-SIRIM CoA mandatory" },
-  { product: "RCCB", requirement: "Mandatory",   standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA mandatory" },
-  { product: "RCBO", requirement: "Mandatory",   standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA mandatory" },
+  { product: "ACB",  requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様で要求多し" },
+  { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様でSIRIM CoA要求" },
+  { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
 ];
 
 const POWER_INFO: InfoItem[] = [
-  { label: "System Voltage (LV)",  value: "240 V (single-phase) / 415 V (three-phase)" },
-  { label: "Frequency",            value: "50 Hz" },
-  { label: "Main Utility",         value: "Tenaga Nasional Berhad (TNB) — Peninsular Malaysia" },
-  { label: "Sabah & Sarawak",      value: "Sabah Electricity Sdn Bhd (SESB) / Sarawak Energy Berhad (SEB)" },
-  { label: "Plug Type",            value: "Type G (British standard BS 1363)" },
-  { label: "Distribution System",  value: "TN-S / TN-C-S (Peninsular); TT in some areas" },
+  { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
+  { label: "周波数",           value: "50 Hz" },
+  { label: "主要電力会社",     value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
+  { label: "サバ・サラワク",   value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
+  { label: "プラグ形状",       value: "Type G（英国型 BS 1363）" },
+  { label: "配電方式",         value: "TN-S / TN-C-S（半島）、地域によりTT" },
 ];
 
 const SIRIM_PROCESS: string[] = [
-  "Submit application, product specifications, and test report (from accredited lab) to SIRIM QAS International",
-  "Product evaluation against applicable MS standards (MS IEC 60898 / 61008 / 61009, etc.)",
-  "Issuance of Certificate of Approval (CoA)",
-  "Registration and notification to ST (Suruhanjaya Tenaga / Energy Commission)",
-  "Product may be shipped bearing the ST-SIRIM CoA mark",
+  "SIRIM QAS International へ申請書・製品仕様書・試験報告書（認定ラボ発行）を提出",
+  "MS規格（MS IEC 60898 / 61008 / 61009 等）に基づく製品評価",
+  "CoA（Certificate of Approval）発行",
+  "ST（Suruhanjaya Tenaga / Energy Commission）への届出・登録",
+  "ST-SIRIM CoAマーク付き製品として出荷可能",
 ];
 
 const REGIONAL_DIFF: InfoItem[] = [
-  { label: "Peninsular Malaysia", value: "TNB grid. The MS standards and SIRIM CoA framework is most developed here; ST registration is effectively mandatory." },
-  { label: "Sabah (North Borneo)", value: "Under SESB. Grid capacity is smaller than Peninsular. Project specs typically require IEC or BS compliance." },
-  { label: "Sarawak (Northwest Borneo)", value: "SEB operates independently. Certification requirements must be confirmed separately against SEB specifications." },
+  { label: "半島マレーシア",         value: "TNB系統。MS規格・SIRIM CoA体制が最も整備されており、ST登録が実質必須。" },
+  { label: "サバ（ボルネオ北部）",   value: "SESBが管轄。系統容量は半島より小さく、プロジェクト仕様でIECまたはBS準拠を要求するケースが多い。" },
+  { label: "サラワク（ボルネオ北西）", value: "SEBが独立運営。半島とは別制度。認証要件をSEB仕様で個別確認要。" },
 ];
 
 const MARKET_NOTES: string[] = [
-  "ST-SIRIM CoA is a mandatory requirement for residential MCB, RCCB, and RCBO. Certificates from bodies other than SIRIM QAS are not accepted.",
-  "Industrial ACB and MCCB are not subject to mandatory certification, but TNB and PLC tender specifications frequently require submission of a SIRIM CoA or IEC CB Scheme certificate.",
-  "Holding an IECEE CB certificate may allow partial waiver of SIRIM testing. Confirm with SIRIM QAS on a case-by-case basis before application.",
-  "HS codes: 8536.20 (MCB), 8536.10 (RCCB/RCBO and other circuit breakers). It is standard practice to declare the certification number on customs documents at import.",
-  "For MCCB compliant with IEC 60947-2, some projects — particularly those led by UK-based engineering firms — may additionally require test reports equivalent to BS EN 60947-2.",
+  "住宅向けMCB・RCCB・RCBOはST-SIRIM CoAが強制要件。SIRIM QAS以外の認証機関では取得不可。",
+  "産業用ACB・MCCBは強制認証対象外だが、PLCやTNBの入札仕様で「SIRIM CoAまたはCBスキーム証明書提出」を要求するケースが多い。",
+  "CBスキーム（IEC CB Scheme）証明書があれば、SIRIM試験の一部省略が可能な場合がある。事前にSIRIM QASに確認要。",
+  "HS分類：8536.20（MCB）、8536.10（RCCB/RCBO含む遮断器類）。輸入時に認証番号を税関申告書に記載する実務が定着している。",
+  "IEC 60947-2準拠のMCCBでもプロジェクトによってはBS EN 60947-2相当の試験報告書を追加要求されることがある（英国系エンジニアリング会社案件）。",
 ];
 
 /* ------------------------------------------------------------------ */
@@ -89,15 +89,15 @@ function T1CountryProfile(): React.JSX.Element {
     <>
       <section className="content-block fade-in" style={{ marginTop: "24px" }}>
         <p className="section-kicker">POWER INFRASTRUCTURE</p>
-        <h2>Power Infrastructure</h2>
-        <p className="section-subline">System voltage, frequency, plug type, and main utility companies</p>
+        <h2>電力インフラ基本情報</h2>
+        <p className="section-subline">系統電圧・周波数・プラグ規格・主要電力会社</p>
         <article className="reference-block">
           <div className="table-wrap">
             <table className="definition-table">
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th>Details</th>
+                  <th>項目</th>
+                  <th>内容</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,19 +115,19 @@ function T1CountryProfile(): React.JSX.Element {
 
       <section className="content-block fade-in">
         <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
-        <h2>Certification Requirements by Product</h2>
+        <h2>製品別 認証要件</h2>
         <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
         <article className="reference-block">
-          <h3>Certification Requirements</h3>
+          <h3>認証要件一覧</h3>
           <div className="table-wrap">
             <table className="requirements-table">
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Requirement</th>
-                  <th>Standard</th>
-                  <th>Authority</th>
-                  <th>Notes</th>
+                  <th>製品</th>
+                  <th>認証</th>
+                  <th>適用規格</th>
+                  <th>認証機関</th>
+                  <th>備考</th>
                 </tr>
               </thead>
               <tbody>
@@ -136,7 +136,7 @@ function T1CountryProfile(): React.JSX.Element {
                     <td><strong>{row.product}</strong></td>
                     <td
                       style={{
-                        color: row.requirement === "Mandatory" ? "#c00" : row.requirement === "Conditional" ? "#885500" : "inherit",
+                        color: row.requirement === "必須" ? "#c00" : row.requirement === "条件付き" ? "#885500" : "inherit",
                         fontWeight: 600,
                       }}
                     >
@@ -151,12 +151,12 @@ function T1CountryProfile(): React.JSX.Element {
             </table>
           </div>
           <p className="country-procedure">
-            <strong>Required Procedure: </strong>
-            SIRIM product certification → ST (Energy Commission) label → CoA issuance
+            <strong>必要手続き：</strong>
+            SIRIM製品認証 → ST（Energy Commission）ラベル取得 → CoA発行
           </p>
         </article>
         <article className="reference-block">
-          <h3>SIRIM Certification Process</h3>
+          <h3>SIRIM認証プロセス</h3>
           <ol className="notes-list">
             {SIRIM_PROCESS.map((step) => (
               <li key={step}>{step}</li>
@@ -167,15 +167,15 @@ function T1CountryProfile(): React.JSX.Element {
 
       <section className="content-block fade-in">
         <p className="section-kicker">REGIONAL DIFFERENCES</p>
-        <h2>Regional Notes</h2>
-        <p className="section-subline">Key differences between Peninsular Malaysia, Sabah, and Sarawak</p>
+        <h2>地域別 留意点</h2>
+        <p className="section-subline">半島マレーシア・サバ・サラワクの制度差</p>
         <article className="reference-block">
           <div className="table-wrap">
             <table className="definition-table">
               <thead>
                 <tr>
-                  <th>Region</th>
-                  <th>Key Points</th>
+                  <th>地域</th>
+                  <th>留意点</th>
                 </tr>
               </thead>
               <tbody>
@@ -193,7 +193,7 @@ function T1CountryProfile(): React.JSX.Element {
 
       <section className="content-block fade-in">
         <p className="section-kicker">MARKET &amp; PRACTICAL NOTES</p>
-        <h2>Market &amp; Practical Notes</h2>
+        <h2>市場・実務ノート</h2>
         <article className="reference-block">
           <ol className="notes-list">
             {MARKET_NOTES.map((note) => (
@@ -212,7 +212,7 @@ function TabPlaceholder({ tab }: { tab: TabDef }): React.JSX.Element {
       <p className="section-kicker">{tab.label.toUpperCase()}</p>
       <h2>{tab.sublabel}</h2>
       <p className="section-subline" style={{ marginTop: "16px" }}>
-        This section is under construction.
+        準備中です。
       </p>
     </section>
   );
@@ -235,17 +235,21 @@ export default function MalaysiaPage(): React.JSX.Element {
 
   return (
     <main className="fade-in">
-      <header className="hero hero--light" style={{ paddingTop: "32px", paddingBottom: "16px" }}>
-        <button
-          className="my-back-btn"
-          onClick={() => navigate("/")}
-          aria-label="Back to top page"
-        >
-          ← Back to ASEAN Overview
-        </button>
-        <p className="hero-kicker">COUNTRY PROFILE — MALAYSIA</p>
-        <h1 style={{ marginTop: "8px" }}>Malaysia</h1>
-        <p className="hero-sub">LV Circuit Breaker Market Intelligence</p>
+      <header className="my-page-header">
+        <div className="my-page-header-top">
+          <button
+            className="my-back-btn"
+            onClick={() => navigate("/")}
+            aria-label="Back to top page"
+          >
+            Back to ASEAN Overview →
+          </button>
+          <p className="hero-kicker" style={{ margin: 0 }}>COUNTRY PROFILE — MALAYSIA</p>
+        </div>
+        <div className="my-page-header-body">
+          <h1 style={{ margin: 0 }}>Malaysia</h1>
+          <p className="hero-sub" style={{ margin: 0 }}>LV Circuit Breaker Market Intelligence</p>
+        </div>
       </header>
 
       <nav className="tab-nav" aria-label="Dashboard tabs">

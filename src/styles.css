@@ -686,6 +686,42 @@ td:first-child {
   color: var(--link-hover);
 }
 
+/* Country page header (PC-optimised, left-aligned) */
+
+.my-page-header {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 14px 10px 12px;
+}
+
+.my-page-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.my-page-header-body {
+  margin-top: 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.my-page-header-body h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--text-dark);
+}
+
+.my-page-header-body .hero-sub {
+  font-size: 14px;
+  color: var(--text-sub);
+  text-align: left;
+}
+
 /* Tab navigation */
 
 .tab-nav {
