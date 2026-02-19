@@ -21,10 +21,16 @@
           var params = new URLSearchParams(l.search);
           var p = params.get('p');
           if (p) {
-            var pathSegments = l.pathname.split('/').filter(Boolean);
-            var repoName = pathSegments[0];
-            var newPath = '/' + repoName + '/' + decodeURIComponent(p);
-            // Use replaceState instead of replace to avoid reloading the page
+            // %BASE_URL% is replaced by Vite at build time (e.g., '/Kaikiei-Group-Site-Codex/')
+            var base = '%BASE_URL%'.replace(/\/$/, ''); // '/Kaikiei-Group-Site-Codex'
+            var decoded = decodeURIComponent(p);
+            // If 404.html from a root repo redirected with full path like
+            // '?p=Kaikiei-Group-Site-Codex/malaysia', strip the repo prefix
+            var repoName = base.replace(/^\//, ''); // 'Kaikiei-Group-Site-Codex'
+            if (repoName && (decoded === repoName || decoded.startsWith(repoName + '/'))) {
+              decoded = decoded.slice(repoName.length).replace(/^\//, '');
+            }
+            var newPath = base + (decoded ? '/' + decoded : '/');
             window.history.replaceState(null, '', newPath + l.hash);
           }
         }
