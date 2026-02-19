@@ -585,7 +585,7 @@ export default function MalaysiaPage(): React.JSX.Element {
         <div className="my-page-header-top">
           <button
             className="my-back-btn"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
             aria-label="Back to top page"
           >
             Back to ASEAN Overview →
