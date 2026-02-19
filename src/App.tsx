@@ -1075,8 +1075,12 @@ export default function App(): JSX.Element {
 
   const onSelectCountry = useCallback((countryName: string) => {
     setHoveredCountry(null);
+    if (countryName === "マレーシア") {
+      navigate("/malaysia");
+      return;
+    }
     setSelectedCountry((prev) => (prev === countryName ? "all" : countryName));
-  }, []);
+  }, [navigate]);
 
   const editorialLabel = useMemo(() => {
     if (!activeLabel) {
