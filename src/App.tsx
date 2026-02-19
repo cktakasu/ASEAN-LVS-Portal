@@ -814,7 +814,8 @@ function boxesAlmostEqual(a: ViewBox, b: ViewBox): boolean {
 }
 
 async function loadMapFeatures(): Promise<Feature[]> {
-  const candidates = ["/data/asean_context_10m.geojson", "/data/asean_10m.geojson"];
+  const base = import.meta.env.BASE_URL;
+  const candidates = [`${base}data/asean_context_10m.geojson`, `${base}data/asean_10m.geojson`];
 
   for (const path of candidates) {
     try {
