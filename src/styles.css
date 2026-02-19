@@ -821,6 +821,202 @@ td:first-child {
   }
 }
 
+/* ==========================================
+   T1 — KPI Cards
+   ========================================== */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.kpi-card {
+  background: var(--bg-gray);
+  border-radius: 12px;
+  padding: 20px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-card__label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-sub);
+  text-transform: uppercase;
+}
+
+.kpi-card__value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-dark);
+  line-height: 1.1;
+}
+
+.kpi-card__sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+.kpi-card--highlight .kpi-card__value {
+  color: var(--link);
+}
+
+/* ==========================================
+   T1 — Chart container
+   ========================================== */
+
+.chart-wrap {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.cb-relevance-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+.cb-relevance-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.cb-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ==========================================
+   T1 — Economic News
+   ========================================== */
+
+.news-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.news-item {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-gray);
+  border-radius: 10px;
+  border-left: 3px solid var(--border);
+}
+
+.news-item--high {
+  border-left-color: var(--link);
+}
+
+.news-item--medium {
+  border-left-color: #999;
+}
+
+.news-item__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.news-item__date {
+  font-size: 12px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.news-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.news-item__headline {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-dark);
+}
+
+.news-item__summary {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-sub);
+}
+
+/* Badge */
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge--policy {
+  background: #e8eaf6;
+  color: #3949ab;
+}
+
+.badge--investment {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge--infrastructure {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.badge--trade {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge--other {
+  background: var(--bg-gray);
+  color: var(--text-sub);
+}
+
+.badge--impact-high {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.badge--impact-medium {
+  background: #fff9c4;
+  color: #827717;
+}
+
+.badge--impact-low {
+  background: #f5f5f5;
+  color: #616161;
+}
+
 @media (max-width: 734px) {
   .nav-links {
     display: none;
@@ -886,5 +1082,18 @@ td:first-child {
 
   .content-block {
     padding: 18px 16px;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .news-item {
+    grid-template-columns: 1fr;
+  }
+
+  .news-item__meta {
+    flex-direction: row;
+    align-items: center;
   }
 }
