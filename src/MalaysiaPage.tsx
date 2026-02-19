@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LineChart,
@@ -17,6 +17,21 @@ import {
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
+
+type Coordinate = [number, number];
+
+type Geometry = {
+  type: string;
+  coordinates?: unknown;
+};
+
+type Feature = {
+  properties?: {
+    iso3?: string;
+    name?: string;
+  };
+  geometry?: Geometry;
+};
 
 type CertRow = {
   product: string;
@@ -248,6 +263,100 @@ const IMPACT_LABEL: Record<string, string> = {
 /*  T1 sub-components                                                  */
 /* ------------------------------------------------------------------ */
 
+function MalaysiaMap(): React.JSX.Element {
+  const [geoFeatures, setGeoFeatures] = useState<Feature[]>([]);
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [mapError, setMapError] = useState<string>("");
+
+  useEffect(() => {
+    const loadMapData = async () => {
+      try {
+        const base = import.meta.env.BASE_URL;
+        const res = await fetch(`${base}data/asean_10m.geojson`, { cache: "no-store" });
+        if (!res.ok) throw new Error("地図データの読み込みに失敗しました");
+        const data = (await res.json()) as { features: Feature[] };
+        const malaysiaFeature = data.features.find((f) => f.properties?.iso3 === "MYS");
+        if (malaysiaFeature) {
+          setGeoFeatures([malaysiaFeature]);
+        }
+      } catch (error) {
+        setMapError("地図データを読み込めません");
+      }
+    };
+    void loadMapData();
+  }, []);
+
+  const mapSvg = useMemo(() => {
+    if (geoFeatures.length === 0) return null;
+
+    const feature = geoFeatures[0];
+    if (!feature.geometry || !feature.geometry.coordinates) return null;
+
+    const coords = feature.geometry.coordinates as Coordinate[][][];
+    let pathData = "";
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
+
+    for (const polygon of coords) {
+      for (const ring of polygon) {
+        for (let i = 0; i < ring.length; i++) {
+          const [lon, lat] = ring[i];
+          minX = Math.min(minX, lon);
+          maxX = Math.max(maxX, lon);
+          minY = Math.min(minY, lat);
+          maxY = Math.max(maxY, lat);
+          pathData += `${i === 0 ? "M" : "L"}${lon.toFixed(2)} ${(90 - lat).toFixed(2)} `;
+        }
+        pathData += "Z ";
+      }
+    }
+
+    const width = 800;
+    const height = 500;
+    const padding = 40;
+    const scale = Math.min((width - padding * 2) / (maxX - minX), (height - padding * 2) / (maxY - minY));
+    const offsetX = (width - (maxX - minX) * scale) / 2;
+    const offsetY = (height - (maxY - minY) * scale) / 2;
+
+    return (
+      <svg viewBox={`0 0 ${width} ${height}`} className="malaysia-map" style={{ width: "100%", maxWidth: "800px" }}>
+        <path
+          d={pathData}
+          className="malaysia-shape"
+          style={{
+            fill: selectedRegion ? "#0066cc" : hoveredRegion ? "#3d8bfd" : "#e0e8f5",
+            stroke: "#0066cc",
+            strokeWidth: "1.5",
+            transform: `translate(${offsetX}px, ${offsetY}px) scale(${scale})`,
+            transformOrigin: "top left",
+            transition: "fill 0.2s",
+            cursor: "pointer",
+          }}
+          onMouseEnter={() => setHoveredRegion("Malaysia")}
+          onMouseLeave={() => setHoveredRegion(null)}
+          onClick={() => setSelectedRegion(selectedRegion === "Malaysia" ? null : "Malaysia")}
+        />
+        {(hoveredRegion === "Malaysia" || selectedRegion === "Malaysia") && (
+          <text x="50%" y="45%" textAnchor="middle" className="region-label" style={{ fontSize: "18px", fontWeight: "bold", fill: "#0066cc" }}>
+            MALAYSIA
+          </text>
+        )}
+      </svg>
+    );
+  }, [geoFeatures, hoveredRegion, selectedRegion]);
+
+  return (
+    <div className="malaysia-map-container" style={{ textAlign: "center", margin: "24px 0" }}>
+      <p style={{ marginBottom: "12px", color: "#666", fontSize: "14px" }}>地図をクリックしてマレーシアを選択</p>
+      {mapError ? <p style={{ color: "#c00" }}>{mapError}</p> : mapSvg}
+      {selectedRegion && <p style={{ marginTop: "12px", color: "#0066cc", fontWeight: "bold" }}>✓ {selectedRegion} が選択されました</p>}
+    </div>
+  );
+}
+
 function KpiGrid(): React.JSX.Element {
   const cards = [
     { label: "GDP（名目）",    value: `USD ${T1_KPI.gdp_usd_billion}B`,                 sub: "Nominal GDP (2024)" },
@@ -397,8 +506,16 @@ function EconomicNewsList(): React.JSX.Element {
 function T1CountryProfile(): React.JSX.Element {
   return (
     <>
-      {/* Section 1 — Economic KPIs */}
+      {/* Section 0 — Interactive Map */}
       <section className="content-block fade-in" style={{ marginTop: "24px" }}>
+        <p className="section-kicker">INTERACTIVE MAP</p>
+        <h2>マレーシア地図</h2>
+        <p className="section-subline">Malaysia — Geographic Overview</p>
+        <MalaysiaMap />
+      </section>
+
+      {/* Section 1 — Economic KPIs */}
+      <section className="content-block fade-in">
         <p className="section-kicker">ECONOMIC KPIs</p>
         <h2>経済概況</h2>
         <p className="section-subline">Malaysia — Key Economic Indicators (2024)</p>
