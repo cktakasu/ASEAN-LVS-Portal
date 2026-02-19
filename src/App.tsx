@@ -1007,11 +1007,14 @@ export default function App(): JSX.Element {
   }, []);
 
   const showEditorialLabel = useCallback((countryName: string, runId: number) => {
+    console.log(`[showEditorialLabel] Starting for ${countryName}, runId=${runId}`);
     setActiveLabel({ countryName, phase: "entering" });
     requestAnimationFrame(() => {
       if (runId !== transitionRunRef.current) {
+        console.log(`[showEditorialLabel] Cancelled due to runId mismatch`);
         return;
       }
+      console.log(`[showEditorialLabel] Transitioning to visible phase for ${countryName}`);
       setActiveLabel((prev) => (prev && prev.countryName === countryName ? { countryName, phase: "visible" } : prev));
     });
   }, []);
@@ -1019,6 +1022,7 @@ export default function App(): JSX.Element {
   useEffect(() => {
     const runId = transitionRunRef.current + 1;
     transitionRunRef.current = runId;
+    console.log(`[useEffect] selectedCountry changed to "${selectedCountry}", runId=${runId}`);
 
     const execute = async () => {
       if (labelExitTimerRef.current !== null) {
@@ -1027,27 +1031,35 @@ export default function App(): JSX.Element {
       }
 
       if (selectedCountry === "all") {
+        console.log(`[useEffect] Resetting to all countries`);
         setActiveLabel(null);
         await animateViewBox(FULL_VIEWBOX, RESET_ANIMATION_MS);
         return;
       }
 
+      console.log(`[useEffect] Selected country: ${selectedCountry}`);
       await hideEditorialLabel(runId);
       if (runId !== transitionRunRef.current) {
+        console.log(`[useEffect] Cancelled after hideEditorialLabel due to runId mismatch`);
         return;
       }
 
       const bounds = countryBounds.get(selectedCountry);
+      console.log(`[useEffect] Bounds for ${selectedCountry}:`, bounds);
       if (!bounds) {
+        console.log(`[useEffect] No bounds found, resetting to full view`);
         await animateViewBox(FULL_VIEWBOX);
         return;
       }
 
+      console.log(`[useEffect] Animating viewBox for ${selectedCountry}`);
       await animateViewBox(viewBoxForCountry(selectedCountry, bounds));
       if (runId !== transitionRunRef.current) {
+        console.log(`[useEffect] Cancelled after animateViewBox due to runId mismatch`);
         return;
       }
 
+      console.log(`[useEffect] Calling showEditorialLabel for ${selectedCountry}`);
       showEditorialLabel(selectedCountry, runId);
     };
 
@@ -1078,12 +1090,10 @@ export default function App(): JSX.Element {
 
   const onSelectCountry = useCallback((countryName: string) => {
     setHoveredCountry(null);
-    if (countryName === "マレーシア") {
-      navigate("/malaysia");
-      return;
-    }
+    // マレーシアも他国と同じく selectedCountry を更新
+    // ラベルクリック時に navigate を実行する仕様に変更
     setSelectedCountry((prev) => (prev === countryName ? "all" : countryName));
-  }, [navigate]);
+  }, []);
 
   const editorialLabel = useMemo(() => {
     if (!activeLabel) {
