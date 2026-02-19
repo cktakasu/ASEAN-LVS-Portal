@@ -23,12 +23,9 @@
           if (p) {
             var pathSegments = l.pathname.split('/').filter(Boolean);
             var repoName = pathSegments[0];
-            l.replace(
-              l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-              '/' + repoName + '/' + decodeURIComponent(p) +
-              (params.has('q') ? '?' + params.get('q') : '') +
-              l.hash
-            );
+            var newPath = '/' + repoName + '/' + decodeURIComponent(p);
+            // Use replaceState instead of replace to avoid reloading the page
+            window.history.replaceState(null, '', newPath + l.hash);
           }
         }
       })();
