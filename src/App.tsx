@@ -866,7 +866,9 @@ export default function App(): JSX.Element {
 
     const run = async () => {
       try {
+        console.log("Loading map features...");
         const loadedFeatures = await loadMapFeatures();
+        console.log("Map features loaded:", loadedFeatures.length, "features");
         if (active) {
           setGeoFeatures(loadedFeatures);
           setMapError("");
@@ -874,6 +876,7 @@ export default function App(): JSX.Element {
       } catch (error) {
         if (active) {
           const message = error instanceof Error ? error.message : "地図データの読み込みに失敗しました";
+          console.error("Map loading error:", message, error);
           setMapError(message);
         }
       }

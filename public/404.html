@@ -2,19 +2,49 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Page Redirect</title>
+    <title>Redirecting...</title>
     <script>
-      // Single Page App for GitHub Pages
-      // MIT License https://github.com/rafgraph/spa-github-pages
-      var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1).join('/') + '/?p=' +
-        l.pathname.slice(1).split('/').join('/').replace(/&/g, '~and~') +
-        (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
+      // GitHub Pages SPA redirect
+      // This handles deep links for single-page apps on GitHub Pages
+      (function() {
+        // Get the current location
+        var l = window.location;
+        var pathname = l.pathname;
+
+        // Expected format: /repoName/path/to/page
+        // or on root user/org: /path/to/page
+        var pathSegments = pathname.split('/').filter(Boolean);
+
+        // Determine if we're on a repo or root site
+        var repoName = '';
+        var appPath = '';
+
+        if (pathSegments.length > 0) {
+          // Check if first segment looks like a repo name (has dashes or alphanumeric)
+          // For GitHub user pages, pathname would be just /path
+          // For GitHub project pages, pathname would be /reponame/path
+
+          // Simple heuristic: if second segment exists, first is likely reponame
+          if (pathSegments.length > 1) {
+            repoName = pathSegments[0];
+            appPath = pathSegments.slice(1).join('/');
+          } else {
+            // Single segment - could be repo or app path
+            // For now, assume it's an app path
+            appPath = pathSegments[0];
+          }
+        }
+
+        // Build redirect URL: go to root index.html with path as query param
+        var redirectUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+                          (repoName ? '/' + repoName : '') + '/' +
+                          (appPath ? '?p=' + encodeURIComponent(appPath) : '') +
+                          (l.search ? (appPath ? '&' : '?') + l.search.slice(1) : '') +
+                          l.hash;
+
+        l.replace(redirectUrl);
+      })();
     </script>
   </head>
-  <body></body>
+  <body>Redirecting...</body>
 </html>
