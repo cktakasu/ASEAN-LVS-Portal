@@ -908,11 +908,24 @@ export default function App(): JSX.Element {
 
   const { paths, countryBounds } = useMemo(() => buildMapPaths(geoFeatures), [geoFeatures]);
 
+  // マレーシア（マレーシア）の bounds が未登録の場合、デフォルト値を設定
+  const countryBoundsWithDefault = useMemo(() => {
+    const bounds = new Map(countryBounds);
+    if (!bounds.has("マレーシア") && geoFeatures.length > 0) {
+      // マレーシアの bounds が見つからない場合、ASEAN 全体の bounds を使用
+      // これは、GeoJSON データ読み込みまたは処理に失敗した場合の代替処理
+      const allBounds = { minX: -180, maxX: 180, minY: -90, maxY: 90 };
+      console.warn("Malaysia bounds not found, using default ASEAN bounds");
+      bounds.set("マレーシア", allBounds);
+    }
+    return bounds;
+  }, [countryBounds, geoFeatures]);
+
   useEffect(() => {
-    if (selectedCountry !== "all" && !countryBounds.has(selectedCountry)) {
+    if (selectedCountry !== "all" && !countryBoundsWithDefault.has(selectedCountry)) {
       setSelectedCountry("all");
     }
-  }, [countryBounds, selectedCountry]);
+  }, [countryBoundsWithDefault, selectedCountry]);
 
   const visibleCountryRequirements = useMemo(() => {
     if (selectedCountry === "all") {
@@ -1037,7 +1050,7 @@ export default function App(): JSX.Element {
         return;
       }
 
-      const bounds = countryBounds.get(selectedCountry);
+      const bounds = countryBoundsWithDefault.get(selectedCountry);
       if (!bounds) {
         await animateViewBox(FULL_VIEWBOX);
         return;
@@ -1052,7 +1065,7 @@ export default function App(): JSX.Element {
     };
 
     void execute();
-  }, [animateViewBox, countryBounds, hideEditorialLabel, selectedCountry, showEditorialLabel]);
+  }, [animateViewBox, countryBoundsWithDefault, hideEditorialLabel, selectedCountry, showEditorialLabel]);
 
   const { contextPaths, aseanPaths } = useMemo(() => {
     const context = paths.filter((path) => !path.isAsean);
@@ -1089,7 +1102,7 @@ export default function App(): JSX.Element {
     }
 
     const spec = EDITORIAL_LABELS.get(activeLabel.countryName);
-    const bounds = countryBounds.get(activeLabel.countryName);
+    const bounds = countryBoundsWithDefault.get(activeLabel.countryName);
     if (!spec || !bounds) {
       return null;
     }
@@ -1124,7 +1137,7 @@ export default function App(): JSX.Element {
       phase: activeLabel.phase,
       style,
     };
-  }, [activeLabel, countryBounds, viewBox]);
+  }, [activeLabel, countryBoundsWithDefault, viewBox]);
 
   useEffect(() => {
     const targets = document.querySelectorAll<HTMLElement>(".fade-in");
