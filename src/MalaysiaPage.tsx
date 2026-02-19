@@ -128,57 +128,58 @@ function T1CountryProfile(): React.JSX.Element {
         <p className="section-kicker">ECONOMIC KEY PERFORMANCE INDICATORS</p>
         <p className="section-subline" style={{ fontSize: "28px", color: "inherit", fontWeight: 600, marginBottom: "8px" }}>主要マクロ経済指標 — Malaysia</p>
         <article className="reference-block">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
-            {/* GDP */}
-            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
-              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>GDP（名目）</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>USD {ECONOMY_KPI_2025.gdp_usd_billion.toFixed(1)}B</div>
-              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.gdp_usd_billion > ECONOMY_KPI_2024.gdp_usd_billion ? "#28a745" : "#dc3545" }}>
-                {ECONOMY_KPI_2025.gdp_usd_billion > ECONOMY_KPI_2024.gdp_usd_billion ? "+" : ""}
-                {(ECONOMY_KPI_2025.gdp_usd_billion - ECONOMY_KPI_2024.gdp_usd_billion).toFixed(1)}B vs 前年
-              </div>
-            </div>
-            {/* GDP成長率 */}
-            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
-              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>GDP成長率</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>{ECONOMY_KPI_2025.gdp_growth_pct.toFixed(1)}%</div>
-              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.gdp_growth_pct > ECONOMY_KPI_2024.gdp_growth_pct ? "#28a745" : "#dc3545" }}>
-                {ECONOMY_KPI_2025.gdp_growth_pct > ECONOMY_KPI_2024.gdp_growth_pct ? "+" : ""}
-                {(ECONOMY_KPI_2025.gdp_growth_pct - ECONOMY_KPI_2024.gdp_growth_pct).toFixed(1)}%pt vs 前年
-              </div>
-            </div>
-            {/* 人口 */}
-            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
-              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>人口</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>{ECONOMY_KPI_2025.population_million.toFixed(1)}M人</div>
-              <div style={{ fontSize: "0.8rem", color: "#666" }}>—</div>
-            </div>
-            {/* 1人当たりGDP */}
-            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
-              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>1人当たりGDP</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>USD {ECONOMY_KPI_2025.gdp_per_capita_usd.toLocaleString()}</div>
-              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.gdp_per_capita_usd > ECONOMY_KPI_2024.gdp_per_capita_usd ? "#28a745" : "#dc3545" }}>
-                {ECONOMY_KPI_2025.gdp_per_capita_usd > ECONOMY_KPI_2024.gdp_per_capita_usd ? "+" : ""}
-                {(ECONOMY_KPI_2025.gdp_per_capita_usd - ECONOMY_KPI_2024.gdp_per_capita_usd).toLocaleString()} USD vs 前年
-              </div>
-            </div>
-            {/* FDI流入 */}
-            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
-              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>FDI流入額</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>USD {ECONOMY_KPI_2025.fdi_inflow_usd_billion.toFixed(1)}B</div>
-              <div style={{ fontSize: "0.8rem", color: "#666" }}>—</div>
-            </div>
-            {/* 為替レート */}
-            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
-              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>対USD為替レート</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>1 USD = {ECONOMY_KPI_2025.exchange_rate_to_usd.toFixed(2)} MYR</div>
-              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.exchange_rate_to_usd < ECONOMY_KPI_2024.exchange_rate_to_usd ? "#28a745" : "#dc3545" }}>
-                {ECONOMY_KPI_2025.exchange_rate_to_usd < ECONOMY_KPI_2024.exchange_rate_to_usd ? "MYR高" : "MYR安"}
-              </div>
-            </div>
+          <div className="table-wrap">
+            <table className="definition-table" style={{ minWidth: "600px", tableLayout: "fixed", width: "100%" }}>
+              <colgroup>
+                <col style={{ width: "30%" }} />
+                <col style={{ width: "40%" }} />
+                <col style={{ width: "30%" }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>指標</th>
+                  <th>2025年値</th>
+                  <th>2030年予測</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>GDP（名目）</strong></td>
+                  <td>約{(ECONOMY_KPI_2025.gdp_usd_billion * 140 / 1000).toFixed(1)}兆円</td>
+                  <td style={{ color: "#666" }}>
+                    約{(GDP_HISTORY.find(d => d.year === 2030)!.gdp_usd_billion * 140 / 1000).toFixed(1)}兆円
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>GDP成長率</strong></td>
+                  <td>{ECONOMY_KPI_2025.gdp_growth_pct.toFixed(1)}%</td>
+                  <td style={{ color: "#999" }}>—</td>
+                </tr>
+                <tr>
+                  <td><strong>人口</strong></td>
+                  <td>{(ECONOMY_KPI_2025.population_million * 100).toFixed(0).replace(".0", "")}万人</td>
+                  <td style={{ color: "#999" }}>—</td>
+                </tr>
+                <tr>
+                  <td><strong>1人当たりGDP</strong></td>
+                  <td>約{Math.round(ECONOMY_KPI_2025.gdp_per_capita_usd * 140 / 10000).toLocaleString()}万円</td>
+                  <td style={{ color: "#999" }}>—</td>
+                </tr>
+                <tr>
+                  <td><strong>FDI流入額</strong></td>
+                  <td>約{Math.round(ECONOMY_KPI_2025.fdi_inflow_usd_billion * 140).toLocaleString()}億円</td>
+                  <td style={{ color: "#999" }}>—</td>
+                </tr>
+                <tr>
+                  <td><strong>対USD為替レート</strong></td>
+                  <td>1 USD = {ECONOMY_KPI_2025.exchange_rate_to_usd.toFixed(2)} MYR</td>
+                  <td style={{ color: "#999" }}>—</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
           <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
-            出典: {DATA_SOURCES.kpi}
+            ※ USD/JPY = 140円で換算。2030年予測は IMF World Economic Outlook による。出典: {DATA_SOURCES.kpi}
           </p>
         </article>
       </section>
