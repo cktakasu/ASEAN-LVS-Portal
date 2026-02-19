@@ -1170,7 +1170,7 @@ export default function App(): JSX.Element {
     targets.forEach((target) => observer.observe(target));
 
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   const renderMapBody = () => {
     if (mapError) {
