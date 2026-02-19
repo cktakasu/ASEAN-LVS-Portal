@@ -1,5 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ECONOMY_KPI_2025,
+  ECONOMY_KPI_2024,
+  GDP_HISTORY,
+  INDUSTRY_GDP_2025,
+  ECONOMIC_NEWS_2025,
+  DATA_SOURCES,
+} from "./data/malaysiaEconomyData";
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -85,9 +106,334 @@ const MARKET_NOTES: string[] = [
 /* ------------------------------------------------------------------ */
 
 function T1CountryProfile(): React.JSX.Element {
+  // 経済ニュースフィルター用state
+  const [newsCategoryFilter, setNewsCategoryFilter] = useState<string>("all");
+  const [newsImpactFilter, setNewsImpactFilter] = useState<string>("all");
+
+  // カテゴリ・影響度フィルター用オプション
+  const newsCategories = ["all", "Policy", "Investment", "Trade", "Infrastructure", "Other"];
+  const impactLevels = ["all", "High", "Medium", "Low", "None"];
+
+  // フィルター適用済みニュース
+  const filteredNews = ECONOMIC_NEWS_2025.filter((news) => {
+    if (newsCategoryFilter !== "all" && news.category !== newsCategoryFilter) return false;
+    if (newsImpactFilter !== "all" && news.cb_impact !== newsImpactFilter) return false;
+    return true;
+  });
+
   return (
     <>
-      <section className="content-block fade-in" style={{ marginTop: "24px" }}>
+      {/* 経済 KPI セクション */}
+      <section className="content-block" style={{ marginTop: "24px" }}>
+        <p className="section-kicker">ECONOMIC KEY PERFORMANCE INDICATORS</p>
+        <p className="section-subline" style={{ fontSize: "28px", color: "inherit", fontWeight: 600, marginBottom: "8px" }}>主要マクロ経済指標 — Malaysia</p>
+        <article className="reference-block">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+            {/* GDP */}
+            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
+              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>GDP（名目）</div>
+              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>USD {ECONOMY_KPI_2025.gdp_usd_billion.toFixed(1)}B</div>
+              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.gdp_usd_billion > ECONOMY_KPI_2024.gdp_usd_billion ? "#28a745" : "#dc3545" }}>
+                {ECONOMY_KPI_2025.gdp_usd_billion > ECONOMY_KPI_2024.gdp_usd_billion ? "+" : ""}
+                {(ECONOMY_KPI_2025.gdp_usd_billion - ECONOMY_KPI_2024.gdp_usd_billion).toFixed(1)}B vs 前年
+              </div>
+            </div>
+            {/* GDP成長率 */}
+            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
+              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>GDP成長率</div>
+              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>{ECONOMY_KPI_2025.gdp_growth_pct.toFixed(1)}%</div>
+              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.gdp_growth_pct > ECONOMY_KPI_2024.gdp_growth_pct ? "#28a745" : "#dc3545" }}>
+                {ECONOMY_KPI_2025.gdp_growth_pct > ECONOMY_KPI_2024.gdp_growth_pct ? "+" : ""}
+                {(ECONOMY_KPI_2025.gdp_growth_pct - ECONOMY_KPI_2024.gdp_growth_pct).toFixed(1)}%pt vs 前年
+              </div>
+            </div>
+            {/* 人口 */}
+            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
+              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>人口</div>
+              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>{ECONOMY_KPI_2025.population_million.toFixed(1)}M人</div>
+              <div style={{ fontSize: "0.8rem", color: "#666" }}>—</div>
+            </div>
+            {/* 1人当たりGDP */}
+            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
+              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>1人当たりGDP</div>
+              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>USD {ECONOMY_KPI_2025.gdp_per_capita_usd.toLocaleString()}</div>
+              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.gdp_per_capita_usd > ECONOMY_KPI_2024.gdp_per_capita_usd ? "#28a745" : "#dc3545" }}>
+                {ECONOMY_KPI_2025.gdp_per_capita_usd > ECONOMY_KPI_2024.gdp_per_capita_usd ? "+" : ""}
+                {(ECONOMY_KPI_2025.gdp_per_capita_usd - ECONOMY_KPI_2024.gdp_per_capita_usd).toLocaleString()} USD vs 前年
+              </div>
+            </div>
+            {/* FDI流入 */}
+            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
+              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>FDI流入額</div>
+              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>USD {ECONOMY_KPI_2025.fdi_inflow_usd_billion.toFixed(1)}B</div>
+              <div style={{ fontSize: "0.8rem", color: "#666" }}>—</div>
+            </div>
+            {/* 為替レート */}
+            <div style={{ padding: "16px", border: "1px solid #e0e0e0", borderRadius: "4px", backgroundColor: "#fafafa" }}>
+              <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "8px" }}>対USD為替レート</div>
+              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: "#333" }}>1 USD = {ECONOMY_KPI_2025.exchange_rate_to_usd.toFixed(2)} MYR</div>
+              <div style={{ fontSize: "0.8rem", color: ECONOMY_KPI_2025.exchange_rate_to_usd < ECONOMY_KPI_2024.exchange_rate_to_usd ? "#28a745" : "#dc3545" }}>
+                {ECONOMY_KPI_2025.exchange_rate_to_usd < ECONOMY_KPI_2024.exchange_rate_to_usd ? "MYR高" : "MYR安"}
+              </div>
+            </div>
+          </div>
+          <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
+            出典: {DATA_SOURCES.kpi}
+          </p>
+        </article>
+      </section>
+
+      {/* GDP推移グラフ */}
+      {(() => {
+        // 2列データ変換: actual / forecast を分離し、2024年を予測線の起点として共有
+        const gdpChartData = GDP_HISTORY.map(d => ({
+          year: d.year,
+          actual:   !d.is_forecast ? d.gdp_usd_billion : null,
+          forecast: d.is_forecast ? d.gdp_usd_billion
+                    : (d.year === 2024 ? d.gdp_usd_billion : null), // 接続ポイント
+        }));
+        return (
+          <section className="content-block">
+            <p className="section-kicker">GDP TREND</p>
+            <h2>GDP 推移（実績 + 予測）</h2>
+            <p className="section-subline">2015-2030年度 — 十億USD</p>
+            <article className="reference-block">
+              <div style={{ height: "350px" }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={gdpChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <XAxis dataKey="year" stroke="#666" />
+                    <YAxis stroke="#666" label={{ value: "GDP（十億USD）", angle: -90, position: "insideLeft" }} />
+                    <Tooltip
+                      formatter={(value: any) => {
+                        if (value == null) return "";
+                        return `USD ${(value as number).toFixed(1)}B`;
+                      }}
+                      contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.95)", border: "1px solid #ccc" }}
+                    />
+                    <Legend />
+                    {/* 実績ライン: 2010-2024 実線 */}
+                    <Line
+                      type="monotone"
+                      dataKey="actual"
+                      name="実績"
+                      stroke="#2563eb"
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 6 }}
+                      connectNulls={false}
+                    />
+                    {/* 予測ライン: 2024-2030 破線（2024年を共有して実績と接続） */}
+                    <Line
+                      type="monotone"
+                      dataKey="forecast"
+                      name="予測"
+                      stroke="#2563eb"
+                      strokeWidth={2}
+                      strokeDasharray="5 5"
+                      dot={{ fill: "#2563eb", r: 4 }}
+                      activeDot={{ r: 6 }}
+                      connectNulls={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <p style={{ fontSize: "0.85rem", color: "#666", marginTop: "12px" }}>
+                ※ 2024年まで実績、2025年以降は予測値です。破線は予測を示します。
+              </p>
+              <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "4px" }}>
+                出典: {DATA_SOURCES.gdp}
+              </p>
+            </article>
+          </section>
+        );
+      })()}
+
+      {/* 産業別GDP構成比 */}
+      <section className="content-block">
+        <p className="section-kicker">INDUSTRY COMPOSITION</p>
+        <h2>産業別 GDP 構成比（2025年度）</h2>
+        <p className="section-subline">セクター別のシェアと成長率</p>
+        <article className="reference-block">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
+            {/* ドーナツチャート */}
+            <div style={{ height: "350px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={INDUSTRY_GDP_2025}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={80}
+                    outerRadius={120}
+                    paddingAngle={2}
+                    dataKey="gdp_share_pct"
+                    label={(entry: any) => `${entry.sector}: ${entry.gdp_share_pct}%`}
+                    labelLine={false}
+                  >
+                    {INDUSTRY_GDP_2025.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={
+                        entry.cb_relevance === "High" ? "#dc3545" :
+                        entry.cb_relevance === "Medium" ? "#ffc107" :
+                        "#6c757d"
+                      } />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number | undefined) => value !== undefined ? `${value}%` : ""} contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.95)", border: "1px solid #ccc" }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            {/* テーブル */}
+            <div>
+              <div className="table-wrap">
+                <table className="definition-table">
+                  <thead>
+                    <tr>
+                      <th>産業セクター</th>
+                      <th>GDP比率</th>
+                      <th>成長率</th>
+                      <th>CB関連度</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {INDUSTRY_GDP_2025.map((item) => (
+                      <tr key={item.sector}>
+                        <td><strong>{item.sector}</strong></td>
+                        <td>{item.gdp_share_pct.toFixed(1)}%</td>
+                        <td>{item.growth_rate_pct.toFixed(1)}%</td>
+                        <td>
+                          <span
+                            style={{
+                              padding: "2px 8px",
+                              borderRadius: "4px",
+                              fontSize: "0.8rem",
+                              fontWeight: 600,
+                              backgroundColor:
+                                item.cb_relevance === "High" ? "#dc3545" :
+                                item.cb_relevance === "Medium" ? "#ffc107" :
+                                "#6c757d",
+                              color: item.cb_relevance === "Medium" ? "#333" : "#fff",
+                            }}
+                          >
+                            {item.cb_relevance}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p style={{ fontSize: "0.8rem", color: "#666", marginTop: "12px" }}>
+                ※ CB関連度：低圧遮断器市場との関連性を示します。
+              </p>
+              <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "4px" }}>
+                出典: {DATA_SOURCES.industry}
+              </p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      {/* 主要経済ニュース */}
+      <section className="content-block">
+        <p className="section-kicker">ECONOMIC NEWS & POLICY TRENDS</p>
+        <h2>主要経済ニュース・政策動向</h2>
+        <p className="section-subline">CB市場への影響度分類付き — 2025年</p>
+        <article className="reference-block">
+          {/* フィルター */}
+          <div style={{ display: "flex", gap: "16px", marginBottom: "20px", flexWrap: "wrap" }}>
+            <div>
+              <label style={{ fontSize: "0.85rem", color: "#666", marginRight: "8px" }}>カテゴリ:</label>
+              <select
+                value={newsCategoryFilter}
+                onChange={(e) => setNewsCategoryFilter(e.target.value)}
+                style={{ padding: "6px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.9rem" }}
+              >
+                <option value="all">すべて</option>
+                {newsCategories.slice(1).map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: "0.85rem", color: "#666", marginRight: "8px" }}>CB影響度:</label>
+              <select
+                value={newsImpactFilter}
+                onChange={(e) => setNewsImpactFilter(e.target.value)}
+                style={{ padding: "6px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.9rem" }}
+              >
+                <option value="all">すべて</option>
+                {impactLevels.slice(1).map((level) => (
+                  <option key={level} value={level}>{level}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* ニュースリスト */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {filteredNews.length > 0 ? (
+              filteredNews.map((news) => (
+                <div
+                  key={`${news.date}-${news.headline}`}
+                  style={{
+                    padding: "16px",
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "4px",
+                    backgroundColor: "#fff",
+                    borderLeft: `4px solid ${
+                      news.cb_impact === "High" ? "#dc3545" :
+                      news.cb_impact === "Medium" ? "#ffc107" :
+                      news.cb_impact === "Low" ? "#28a745" :
+                      "#6c757d"
+                    }`,
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                    <h4 style={{ margin: 0, fontSize: "1rem", color: "#333" }}>{news.headline}</h4>
+                    <span
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: "12px",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        backgroundColor:
+                          news.cb_impact === "High" ? "#dc3545" :
+                          news.cb_impact === "Medium" ? "#ffc107" :
+                          news.cb_impact === "Low" ? "#28a745" :
+                          "#6c757d",
+                        color: news.cb_impact === "Medium" ? "#333" : "#fff",
+                        whiteSpace: "nowrap",
+                        marginLeft: "12px",
+                      }}
+                    >
+                      {news.cb_impact}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "0.8rem", color: "#666", marginBottom: "8px" }}>
+                    <span style={{ marginRight: "16px" }}>📅 {news.date}</span>
+                    <span style={{ marginRight: "16px" }}>🏷️ {news.category}</span>
+                    {news.source && <span>📰 {news.source}</span>}
+                  </div>
+                  <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: "1.5", color: "#444" }}>{news.summary}</p>
+                  {news.url && (
+                    <div style={{ marginTop: "8px" }}>
+                      <a href={news.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.85rem", color: "#2563eb" }}>
+                        🔗 記事リンク
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p style={{ color: "#666", fontStyle: "italic" }}>該当するニュースはありません。</p>
+            )}
+          </div>
+        </article>
+      </section>
+
+      {/* 既存：電力インフラ基本情報 */}
+      <section className="content-block" style={{ marginTop: "24px" }}>
         <p className="section-kicker">POWER INFRASTRUCTURE</p>
         <h2>電力インフラ基本情報</h2>
         <p className="section-subline">系統電圧・周波数・プラグ規格・主要電力会社</p>
