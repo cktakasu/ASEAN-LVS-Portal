@@ -1078,12 +1078,10 @@ export default function App(): JSX.Element {
 
   const onSelectCountry = useCallback((countryName: string) => {
     setHoveredCountry(null);
-    if (countryName === "マレーシア") {
-      navigate("/malaysia");
-      return;
-    }
+    // マレーシアも他国と同じく selectedCountry を更新
+    // ラベルクリック時に navigate を実行する仕様に変更
     setSelectedCountry((prev) => (prev === countryName ? "all" : countryName));
-  }, [navigate]);
+  }, []);
 
   const editorialLabel = useMemo(() => {
     if (!activeLabel) {
