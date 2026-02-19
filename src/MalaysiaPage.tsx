@@ -589,7 +589,7 @@ export default function MalaysiaPage(): React.JSX.Element {
   };
 
   return (
-    <main className="fade-in">
+    <div className="fade-in">
       <header className="my-page-header">
         <div className="my-page-header-top">
           <button
@@ -624,6 +624,6 @@ export default function MalaysiaPage(): React.JSX.Element {
       <div className="tab-content">
         {renderTab()}
       </div>
-    </main>
+    </div>
   );
 }
