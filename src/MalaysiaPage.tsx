@@ -580,7 +580,7 @@ export default function MalaysiaPage(): React.JSX.Element {
   };
 
   return (
-    <main className="fade-in">
+    <main>
       <header className="my-page-header">
         <div className="my-page-header-top">
           <button
