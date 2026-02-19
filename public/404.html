@@ -5,23 +5,44 @@
     <title>Redirecting...</title>
     <script>
       // GitHub Pages SPA redirect
+      // This handles deep links for single-page apps on GitHub Pages
       (function() {
+        // Get the current location
         var l = window.location;
-        var pathSegments = l.pathname.split('/').filter(Boolean);
+        var pathname = l.pathname;
 
-        // Repository name is the first segment
-        var repoName = pathSegments[0];
-        // Everything after the repo name is the app path
-        var appPath = pathSegments.slice(1).join('/');
+        // Expected format: /repoName/path/to/page
+        // or on root user/org: /path/to/page
+        var pathSegments = pathname.split('/').filter(Boolean);
 
-        // Redirect to root with path as query param
-        var newUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-                     '/' + repoName + '/?p=' +
-                     (appPath ? encodeURIComponent(appPath) : '') +
-                     (l.search ? '&q=' + l.search.slice(1) : '') +
-                     l.hash;
+        // Determine if we're on a repo or root site
+        var repoName = '';
+        var appPath = '';
 
-        l.replace(newUrl);
+        if (pathSegments.length > 0) {
+          // Check if first segment looks like a repo name (has dashes or alphanumeric)
+          // For GitHub user pages, pathname would be just /path
+          // For GitHub project pages, pathname would be /reponame/path
+
+          // Simple heuristic: if second segment exists, first is likely reponame
+          if (pathSegments.length > 1) {
+            repoName = pathSegments[0];
+            appPath = pathSegments.slice(1).join('/');
+          } else {
+            // Single segment - could be repo or app path
+            // For now, assume it's an app path
+            appPath = pathSegments[0];
+          }
+        }
+
+        // Build redirect URL: go to root index.html with path as query param
+        var redirectUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+                          (repoName ? '/' + repoName : '') + '/' +
+                          (appPath ? '?p=' + encodeURIComponent(appPath) : '') +
+                          (l.search ? (appPath ? '&' : '?') + l.search.slice(1) : '') +
+                          l.hash;
+
+        l.replace(redirectUrl);
       })();
     </script>
   </head>
