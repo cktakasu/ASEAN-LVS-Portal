@@ -13,6 +13,26 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Handle GitHub Pages SPA redirect from 404.html
+      (function() {
+        var l = window.location;
+        if (l.search[1] === 'p') {
+          var params = new URLSearchParams(l.search);
+          var p = params.get('p');
+          if (p) {
+            var pathSegments = l.pathname.split('/').filter(Boolean);
+            var repoName = pathSegments[0];
+            l.replace(
+              l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+              '/' + repoName + '/' + decodeURIComponent(p) +
+              (params.has('q') ? '?' + params.get('q') : '') +
+              l.hash
+            );
+          }
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
