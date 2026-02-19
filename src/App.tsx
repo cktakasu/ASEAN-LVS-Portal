@@ -116,9 +116,9 @@ type IndustrialQuickRow = {
 };
 
 const MAP_WIDTH = 960;
-const MAP_HEIGHT = 620;
+const MAP_HEIGHT = 700;
 const MAP_PADDING = 24;
-const ASEAN_FOCUS_PADDING = 1.0;
+const ASEAN_FOCUS_PADDING = 0.84;
 const COUNTRY_PADDING_FACTOR = 1.22;
 const INDONESIA_PADDING_FACTOR = 0.9;
 const INDONESIA_MIN_SCALE = 1.58;
@@ -645,7 +645,7 @@ function expandBounds(bounds: Bounds, factor: number): Bounds {
 
 function createProjector(features: Feature[], focusFeatures: Feature[], focusPadding = 1): (coord: Coordinate) => Coordinate {
   const baseBounds = collectProjectedBounds(focusFeatures);
-  const bounds = focusPadding > 1 ? expandBounds(baseBounds, focusPadding) : baseBounds;
+  const bounds = focusPadding !== 1 ? expandBounds(baseBounds, focusPadding) : baseBounds;
 
   const dx = bounds.maxX - bounds.minX || 1;
   const dy = bounds.maxY - bounds.minY || 1;
@@ -725,19 +725,49 @@ function mergeBounds(base: Bounds, next: Bounds): Bounds {
 }
 
 function buildMapPaths(features: Feature[]): { paths: MapPath[]; countryBounds: Map<string, Bounds> } {
-  const aseanFeatures = features.filter((feature) => {
+  // ASEAN周辺から大きく外れる国を除外
+  const MAX_CONTEXT_LAT = 30;
+  const MIN_CONTEXT_LON = 60;
+  const MAX_CONTEXT_LON = 155;
+  const filteredFeatures = features.filter((feature) => {
+    const iso3 = feature.properties?.iso3;
+    // ASEAN諸国は常に残す
+    if (iso3 && ISO3_TO_JA.has(iso3)) return true;
+    const polygons = geometryToPolygons(feature.geometry);
+    let maxLat = -90;
+    let minLon = 360;
+    let maxLon = -360;
+    for (const polygon of polygons) {
+      for (const ring of polygon) {
+        if (!Array.isArray(ring)) continue;
+        for (const point of ring) {
+          if (!isCoordinate(point)) continue;
+          if (point[1] > maxLat) maxLat = point[1];
+          if (point[0] < minLon) minLon = point[0];
+          if (point[0] > maxLon) maxLon = point[0];
+        }
+      }
+    }
+    // 緯度フィルタ: 最北端が閾値を超える国は除外
+    if (maxLat >= MAX_CONTEXT_LAT) return false;
+    // 経度フィルタ: ASEAN周辺から大きく外れる国は除外
+    if (minLon < MIN_CONTEXT_LON || maxLon > MAX_CONTEXT_LON) return false;
+    return true;
+  });
+
+  const aseanFeatures = filteredFeatures.filter((feature) => {
     const iso3 = feature.properties?.iso3;
     return Boolean(iso3 && ISO3_TO_JA.has(iso3));
   });
 
-  // 全ての国を表示（コンテキスト国も含める）
-  const focusFeatures = aseanFeatures.length ? aseanFeatures : features;
-  const project = createProjector(features, focusFeatures, ASEAN_FOCUS_PADDING);
+  // フィルタ済みの国を表示（コンテキスト国も含める）
+  const focusFeatures = aseanFeatures.length ? aseanFeatures : filteredFeatures;
+  const project = createProjector(filteredFeatures, focusFeatures, ASEAN_FOCUS_PADDING);
   const paths: MapPath[] = [];
   const countryBounds = new Map<string, Bounds>();
 
-  // 全ての国をパスに追加
-  features.forEach((feature, featureIndex) => {
+  // フィルタ済みの国をパスに追加
+  filteredFeatures.forEach((feature, featureIndex) => {
     const iso3 = feature.properties?.iso3 ?? `F-${featureIndex}`;
     const countryName = ISO3_TO_JA.get(iso3) ?? null;
     const isAsean = Boolean(countryName);
@@ -860,6 +890,17 @@ export default function App(): JSX.Element {
   useEffect(() => {
     activeLabelRef.current = activeLabel;
   }, [activeLabel]);
+
+  // ポータルページ（/）に戻った時に地図の選択状態をリセットする
+  useEffect(() => {
+    if (pathname === "/") {
+      setSelectedCountry("all");
+      setHoveredCountry(null);
+      setActiveLabel(null);
+      setViewBox(FULL_VIEWBOX);
+      viewBoxRef.current = FULL_VIEWBOX;
+    }
+  }, [pathname]);
 
   useEffect(() => {
     let active = true;
@@ -1122,37 +1163,43 @@ export default function App(): JSX.Element {
   }, [activeLabel, countryBounds, viewBox]);
 
   useEffect(() => {
-    const targets = document.querySelectorAll<HTMLElement>(".fade-in");
-    if (targets.length === 0) {
-      return;
-    }
+    // ページ遷移後に一度レンダリングを待ってから監視を開始する
+    const timer = window.setTimeout(() => {
+      const targets = document.querySelectorAll<HTMLElement>(".fade-in");
+      if (targets.length === 0) {
+        return;
+      }
 
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      targets.forEach((target) => target.classList.add("visible"));
-      return;
-    }
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+        targets.forEach((target) => target.classList.add("visible"));
+        return;
+      }
 
-    if (!("IntersectionObserver" in window)) {
-      targets.forEach((target) => target.classList.add("visible"));
-      return;
-    }
+      if (!("IntersectionObserver" in window)) {
+        targets.forEach((target) => target.classList.add("visible"));
+        return;
+      }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
+      // ページ遷移時に visible をリセットして再アニメーション
+      targets.forEach((target) => target.classList.remove("visible"));
 
-    targets.forEach((target) => observer.observe(target));
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
 
-    return () => observer.disconnect();
-  }, []);
+      targets.forEach((target) => observer.observe(target));
+    }, 50);
+
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
 
   const renderMapBody = () => {
     if (mapError) {
@@ -1239,7 +1286,7 @@ export default function App(): JSX.Element {
       </nav>
 
       {!isCountryPage && (
-        <header id="top" className="hero hero--light fade-in">
+        <header id="top" className="hero hero--light">
           <p className="hero-kicker">ASEAN LOW VOLTAGE BUSINESS PORTAL</p>
           <h1>ASEAN低圧配制事業ポータル</h1>
         </header>
@@ -1249,7 +1296,7 @@ export default function App(): JSX.Element {
         <Routes>
           <Route path="/" element={
             <>
-              <section id="map-section" className="hero hero--gray fade-in">
+              <section id="map-section" className="hero hero--gray">
           <div className="map-stage" aria-label="ASEAN map navigation">
             <svg
               id="asean-map-svg"
@@ -1284,7 +1331,7 @@ export default function App(): JSX.Element {
           </div>
         </section>
 
-        <section id="table-section" className="content-block fade-in">
+        <section id="table-section" className="content-block">
           <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
           <h2>ASEAN低圧遮断器 製品別規格認証対応表</h2>
           <p className="section-subline">Product-Category Certification Requirements for Low-Voltage Circuit Breakers in ASEAN</p>

@@ -121,7 +121,7 @@ body {
 .hero {
   width: 100%;
   min-height: auto;
-  padding: 42px 16px 12px;
+  padding: 16px 16px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -217,7 +217,7 @@ body {
 .map-stage {
   width: min(1400px, calc(100vw - 12px));
   margin-top: 12px;
-  height: 750px;
+  height: 720px;
   background: var(--bg-gray);
   overflow: hidden;
   position: relative;

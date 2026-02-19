@@ -585,10 +585,10 @@ export default function MalaysiaPage(): React.JSX.Element {
         <div className="my-page-header-top">
           <button
             className="my-back-btn"
-            onClick={() => navigate(-1)}
-            aria-label="Back to top page"
+            onClick={() => navigate("/")}
+            aria-label="Back to ASEAN overview"
           >
-            Back to ASEAN Overview →
+            ← Back to ASEAN overview
           </button>
           <p className="hero-kicker" style={{ margin: 0 }}>COUNTRY PROFILE — MALAYSIA</p>
         </div>
