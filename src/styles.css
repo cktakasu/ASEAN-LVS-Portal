@@ -800,6 +800,33 @@ td:first-child {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Chart Y-axis transition animations                                 */
+/* ------------------------------------------------------------------ */
+
+.chart-transition-container {
+  opacity: 1;
+  transition: opacity var(--chart-transition-duration, 400ms) var(--editorial-ease);
+}
+
+.chart-transition-container.fading {
+  opacity: 0.4;
+}
+
+.chart-transition-container.visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-transition-container {
+    transition: none;
+  }
+
+  .chart-transition-container.fading {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 1068px) {
   .hero h1 {
     font-size: 32px;

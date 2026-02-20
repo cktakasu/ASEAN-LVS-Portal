@@ -1,0 +1,133 @@
+/* ------------------------------------------------------------------ */
+/*  ASEAN各国 GDP推移データ（比較用）                                   */
+/*  出典: IMF World Economic Outlook（WEO）— AllCountryGDP.xlsx        */
+/*        シート NGDPD（名目GDP、現在価格、十億USD）                    */
+/*  2015-2024: 実績値 / 2025-2030: 予測値                              */
+/* ------------------------------------------------------------------ */
+
+import type { GDPDataPoint } from "./malaysiaEconomyData";
+
+export interface CountryGDP {
+  iso3: string;
+  nameJa: string;
+  color: string;
+  data: GDPDataPoint[];
+}
+
+export const ASEAN_GDP_COMPARISON: CountryGDP[] = [
+  {
+    iso3: "IDN",
+    nameJa: "インドネシア",
+    color: "#dc3545",
+    data: [
+      { year: 2015, gdp_usd_billion: 860.854, is_forecast: false },
+      { year: 2016, gdp_usd_billion: 931.877, is_forecast: false },
+      { year: 2017, gdp_usd_billion: 1015.539, is_forecast: false },
+      { year: 2018, gdp_usd_billion: 1042.272, is_forecast: false },
+      { year: 2019, gdp_usd_billion: 1119.091, is_forecast: false },
+      { year: 2020, gdp_usd_billion: 1059.055, is_forecast: false },
+      { year: 2021, gdp_usd_billion: 1186.505, is_forecast: false },
+      { year: 2022, gdp_usd_billion: 1319.100, is_forecast: false },
+      { year: 2023, gdp_usd_billion: 1371.159, is_forecast: false },
+      { year: 2024, gdp_usd_billion: 1477.572, is_forecast: false },
+      { year: 2025, gdp_usd_billion: 1555.189, is_forecast: true },
+      { year: 2026, gdp_usd_billion: 1651.069, is_forecast: true },
+      { year: 2027, gdp_usd_billion: 1755.767, is_forecast: true },
+      { year: 2028, gdp_usd_billion: 1866.479, is_forecast: true },
+      { year: 2029, gdp_usd_billion: 1969.591, is_forecast: true },
+      { year: 2030, gdp_usd_billion: 2079.139, is_forecast: true },
+    ],
+  },
+  {
+    iso3: "THA",
+    nameJa: "タイ",
+    color: "#28a745",
+    data: [
+      { year: 2015, gdp_usd_billion: 401.296, is_forecast: false },
+      { year: 2016, gdp_usd_billion: 413.368, is_forecast: false },
+      { year: 2017, gdp_usd_billion: 456.357, is_forecast: false },
+      { year: 2018, gdp_usd_billion: 506.611, is_forecast: false },
+      { year: 2019, gdp_usd_billion: 544.261, is_forecast: false },
+      { year: 2020, gdp_usd_billion: 500.462, is_forecast: false },
+      { year: 2021, gdp_usd_billion: 513.166, is_forecast: false },
+      { year: 2022, gdp_usd_billion: 495.407, is_forecast: false },
+      { year: 2023, gdp_usd_billion: 514.946, is_forecast: false },
+      { year: 2024, gdp_usd_billion: 512.194, is_forecast: false },
+      { year: 2025, gdp_usd_billion: 533.452, is_forecast: true },
+      { year: 2026, gdp_usd_billion: 558.478, is_forecast: true },
+      { year: 2027, gdp_usd_billion: 583.942, is_forecast: true },
+      { year: 2028, gdp_usd_billion: 607.946, is_forecast: true },
+      { year: 2029, gdp_usd_billion: 630.653, is_forecast: true },
+      { year: 2030, gdp_usd_billion: 654.084, is_forecast: true },
+    ],
+  },
+  {
+    iso3: "SGP",
+    nameJa: "シンガポール",
+    color: "#fd7e14",
+    data: [
+      { year: 2015, gdp_usd_billion: 307.999, is_forecast: false },
+      { year: 2016, gdp_usd_billion: 318.658, is_forecast: false },
+      { year: 2017, gdp_usd_billion: 343.264, is_forecast: false },
+      { year: 2018, gdp_usd_billion: 376.946, is_forecast: false },
+      { year: 2019, gdp_usd_billion: 376.831, is_forecast: false },
+      { year: 2020, gdp_usd_billion: 348.404, is_forecast: false },
+      { year: 2021, gdp_usd_billion: 396.987, is_forecast: false },
+      { year: 2022, gdp_usd_billion: 466.789, is_forecast: false },
+      { year: 2023, gdp_usd_billion: 497.347, is_forecast: false },
+      { year: 2024, gdp_usd_billion: 525.220, is_forecast: false },
+      { year: 2025, gdp_usd_billion: 548.079, is_forecast: true },
+      { year: 2026, gdp_usd_billion: 578.060, is_forecast: true },
+      { year: 2027, gdp_usd_billion: 612.090, is_forecast: true },
+      { year: 2028, gdp_usd_billion: 647.683, is_forecast: true },
+      { year: 2029, gdp_usd_billion: 683.944, is_forecast: true },
+      { year: 2030, gdp_usd_billion: 721.319, is_forecast: true },
+    ],
+  },
+  {
+    iso3: "PHL",
+    nameJa: "フィリピン",
+    color: "#6f42c1",
+    data: [
+      { year: 2015, gdp_usd_billion: 306.446, is_forecast: false },
+      { year: 2016, gdp_usd_billion: 318.627, is_forecast: false },
+      { year: 2017, gdp_usd_billion: 328.481, is_forecast: false },
+      { year: 2018, gdp_usd_billion: 346.842, is_forecast: false },
+      { year: 2019, gdp_usd_billion: 376.823, is_forecast: false },
+      { year: 2020, gdp_usd_billion: 361.751, is_forecast: false },
+      { year: 2021, gdp_usd_billion: 394.086, is_forecast: false },
+      { year: 2022, gdp_usd_billion: 404.284, is_forecast: false },
+      { year: 2023, gdp_usd_billion: 437.146, is_forecast: false },
+      { year: 2024, gdp_usd_billion: 471.516, is_forecast: false },
+      { year: 2025, gdp_usd_billion: 504.742, is_forecast: true },
+      { year: 2026, gdp_usd_billion: 546.657, is_forecast: true },
+      { year: 2027, gdp_usd_billion: 593.225, is_forecast: true },
+      { year: 2028, gdp_usd_billion: 641.959, is_forecast: true },
+      { year: 2029, gdp_usd_billion: 693.363, is_forecast: true },
+      { year: 2030, gdp_usd_billion: 746.498, is_forecast: true },
+    ],
+  },
+  {
+    iso3: "VNM",
+    nameJa: "ベトナム",
+    color: "#e83e8c",
+    data: [
+      { year: 2015, gdp_usd_billion: 236.795, is_forecast: false },
+      { year: 2016, gdp_usd_billion: 254.491, is_forecast: false },
+      { year: 2017, gdp_usd_billion: 281.213, is_forecast: false },
+      { year: 2018, gdp_usd_billion: 310.428, is_forecast: false },
+      { year: 2019, gdp_usd_billion: 334.645, is_forecast: false },
+      { year: 2020, gdp_usd_billion: 346.616, is_forecast: false },
+      { year: 2021, gdp_usd_billion: 366.138, is_forecast: false },
+      { year: 2022, gdp_usd_billion: 408.802, is_forecast: false },
+      { year: 2023, gdp_usd_billion: 429.718, is_forecast: false },
+      { year: 2024, gdp_usd_billion: 465.814, is_forecast: false },
+      { year: 2025, gdp_usd_billion: 503.697, is_forecast: true },
+      { year: 2026, gdp_usd_billion: 540.430, is_forecast: true },
+      { year: 2027, gdp_usd_billion: 575.652, is_forecast: true },
+      { year: 2028, gdp_usd_billion: 608.619, is_forecast: true },
+      { year: 2029, gdp_usd_billion: 637.093, is_forecast: true },
+      { year: 2030, gdp_usd_billion: 666.786, is_forecast: true },
+    ],
+  },
+];

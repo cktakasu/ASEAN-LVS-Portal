@@ -40,8 +40,9 @@ export interface EconomicNews {
 /* ------------------------------------------------------------------ */
 
 export const DATA_SOURCES = {
-  kpi:      "World Bank, Department of Statistics Malaysia (DOSM), Bank Negara Malaysia",
-  gdp:      "World Bank / IMF World Economic Outlook (2025-2030は IMF 予測値)",
+  kpi:      "IMF World Economic Outlook — Malaysia: 2025 Article IV Consultation（IMF Country Report No. 2025/057）",
+  kpi_note: "USD/JPY＝140円で換算。2030年予測はIMF WEO中期成長率（実質4〜4.3% + インフレ約2%、名目5〜6%/年）を基に試算。Oct 2025 WEOでは2026年以降の成長率が4.3%に微修正されており、予測値は変動する可能性があります。",
+  gdp:      "IMF World Economic Outlook（WEO）/ 2025 Article IV Consultation, IMF Country Report No. 2025/057",
   industry: "Department of Statistics Malaysia (DOSM) — GDP by Kind of Economic Activity 2025",
   news:     "Bernama / The Star / Edge Markets / Suruhanjaya Tenaga (ST) / MATRADE / MDEC — 各公表資料",
 };
@@ -51,7 +52,7 @@ export const DATA_SOURCES = {
 /* ------------------------------------------------------------------ */
 
 export const ECONOMY_KPI_2025: EconomyKPI = {
-  gdp_usd_billion: 430.9,
+  gdp_usd_billion: 470.572, // IMF WEO NGDPD (AllCountryGDP.xlsx)
   gdp_growth_pct: 5.2,
   population_million: 34.3,
   gdp_per_capita_usd: 12560,
@@ -76,24 +77,24 @@ export const ECONOMY_KPI_2024: EconomyKPI = {
 /* ------------------------------------------------------------------ */
 
 export const GDP_HISTORY: GDPDataPoint[] = [
-  // 2015-2024: 過去実績
-  { year: 2015, gdp_usd_billion: 301.0, is_forecast: false },
-  { year: 2016, gdp_usd_billion: 312.0, is_forecast: false },
-  { year: 2017, gdp_usd_billion: 335.0, is_forecast: false },
-  { year: 2018, gdp_usd_billion: 355.0, is_forecast: false },
-  { year: 2019, gdp_usd_billion: 365.0, is_forecast: false },
-  { year: 2020, gdp_usd_billion: 336.6, is_forecast: false }, // コロナ影響
-  { year: 2021, gdp_usd_billion: 337.3, is_forecast: false },
-  { year: 2022, gdp_usd_billion: 372.6, is_forecast: false },
-  { year: 2023, gdp_usd_billion: 380.5, is_forecast: false },
-  { year: 2024, gdp_usd_billion: 390.1, is_forecast: false },
-  // 2025-2030: 予測
-  { year: 2025, gdp_usd_billion: 430.9, is_forecast: true },
-  { year: 2026, gdp_usd_billion: 467.0, is_forecast: true },
-  { year: 2027, gdp_usd_billion: 504.0, is_forecast: true },
-  { year: 2028, gdp_usd_billion: 540.0, is_forecast: true },
-  { year: 2029, gdp_usd_billion: 578.0, is_forecast: true },
-  { year: 2030, gdp_usd_billion: 620.0, is_forecast: true },
+  // 2015-2024: IMF WEO 実績値（出典: AllCountryGDP.xlsx, シート NGDPD）
+  { year: 2015, gdp_usd_billion: 301.355, is_forecast: false },
+  { year: 2016, gdp_usd_billion: 301.256, is_forecast: false },
+  { year: 2017, gdp_usd_billion: 319.109, is_forecast: false },
+  { year: 2018, gdp_usd_billion: 358.783, is_forecast: false },
+  { year: 2019, gdp_usd_billion: 365.178, is_forecast: false },
+  { year: 2020, gdp_usd_billion: 337.456, is_forecast: false }, // コロナ影響
+  { year: 2021, gdp_usd_billion: 373.785, is_forecast: false },
+  { year: 2022, gdp_usd_billion: 407.830, is_forecast: false },
+  { year: 2023, gdp_usd_billion: 399.949, is_forecast: false },
+  { year: 2024, gdp_usd_billion: 422.227, is_forecast: false },
+  // 2025-2030: IMF WEO 予測値（出典: AllCountryGDP.xlsx, シート NGDPD）
+  { year: 2025, gdp_usd_billion: 470.572, is_forecast: true },
+  { year: 2026, gdp_usd_billion: 505.364, is_forecast: true },
+  { year: 2027, gdp_usd_billion: 537.582, is_forecast: true },
+  { year: 2028, gdp_usd_billion: 572.617, is_forecast: true },
+  { year: 2029, gdp_usd_billion: 608.846, is_forecast: true },
+  { year: 2030, gdp_usd_billion: 646.456, is_forecast: true },
 ];
 
 /* ------------------------------------------------------------------ */
