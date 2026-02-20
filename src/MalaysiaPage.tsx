@@ -76,7 +76,9 @@ const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) 
           const usdB = (jpy / usdJpy * 1000).toFixed(1);
           let displayName = p.name;
 
-          if (displayName === "actual") {
+          if (displayName === "malaysia") {
+            displayName = "マレーシア";
+          } else if (displayName === "actual") {
             displayName = "マレーシア（実績）";
           } else if (displayName === "forecast") {
             displayName = "マレーシア（予測）";
@@ -144,17 +146,19 @@ const generateChartData = (
 ): ChartDataItem[] => {
   const toJPY = (b: number) => b * usdJpy / 1000;
 
-  // マレーシアのデータ（実績と予測を分離）
+  // マレーシアのデータ（統合：実績と予測を1つの系列に）
   const malaysiaData = gdpHistory.map(d => ({
     year: d.year,
-    actual: !d.is_forecast ? toJPY(d.gdp_usd_billion) : null,  // 実績のみ（2015-2024）
-    forecast: d.is_forecast || d.year === 2024 ? toJPY(d.gdp_usd_billion) : null,  // 予測（2024-2030、2024年は実績値で繋ぐ）
+    malaysia: toJPY(d.gdp_usd_billion),  // マレーシア統合データ（実績+予測）
+    actual: !d.is_forecast ? toJPY(d.gdp_usd_billion) : null,  // 実績のみ（ツールチップ用）
+    forecast: d.is_forecast || d.year === 2024 ? toJPY(d.gdp_usd_billion) : null,  // 予測（ツールチップ用）
   }));
 
   // 比較国のデータを動的に追加
   return malaysiaData.map((malaysiaItem) => {
     const item: Record<string, number | null> = {
       year: malaysiaItem.year,
+      malaysia: malaysiaItem.malaysia,
       actual: malaysiaItem.actual,
       forecast: malaysiaItem.forecast,
     };
@@ -177,7 +181,6 @@ import {
   ECONOMY_KPI_2025,
   GDP_HISTORY,
   INDUSTRY_GDP_2025,
-  ECONOMIC_NEWS_2025,
   DATA_SOURCES,
 } from "./data/malaysiaEconomyData";
 import { ASEAN_GDP_COMPARISON } from "./data/aseanGdpData";
@@ -192,6 +195,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  ReferenceArea,
+  ReferenceLine,
 } from "recharts";
 
 /* ------------------------------------------------------------------ */
@@ -342,26 +347,11 @@ const MARKET_NOTES: string[] = [
 /* ------------------------------------------------------------------ */
 
 function T1CountryProfile(): React.JSX.Element {
-  // 経済ニュースフィルター用state
-  const [newsCategoryFilter, setNewsCategoryFilter] = useState<string>("all");
-  const [newsImpactFilter, setNewsImpactFilter] = useState<string>("all");
-
   // 他国比較用state
   const [comparisonCountries, setComparisonCountries] = useState<string[]>([]);
 
   // チャートトランジション用カスタムフック
   const [isYAxisTransitioning, chartTransitionClass, triggerTransition] = useChartTransition(400);
-
-  // カテゴリ・影響度フィルター用オプション
-  const newsCategories = ["all", "Policy", "Investment", "Trade", "Infrastructure", "Other"];
-  const impactLevels = ["all", "High", "Medium", "Low", "None"];
-
-  // フィルター適用済みニュース
-  const filteredNews = ECONOMIC_NEWS_2025.filter((news) => {
-    if (newsCategoryFilter !== "all" && news.category !== newsCategoryFilter) return false;
-    if (newsImpactFilter !== "all" && news.cb_impact !== newsImpactFilter) return false;
-    return true;
-  });
 
   return (
     <>
@@ -463,16 +453,8 @@ function T1CountryProfile(): React.JSX.Element {
 
         // Y軸トランジションを考慮した国切替関数
         const toggleCountry = (iso3: string) => {
-          const currentHasCountries = comparisonCountries.length > 0;
-          const willHaveCountries = comparisonCountries.includes(iso3)
-            ? comparisonCountries.length > 1  // 除去後も残るか
-            : true;                           // 追加後は必ずある
-          const willChangeYAxis = currentHasCountries !== willHaveCountries;
-
-          // Y軸が変化する場合のみトランジション発火
-          if (willChangeYAxis) {
-            triggerTransition();
-          }
+          // 常にトランジション発火（滑らかな切り替えのため）
+          triggerTransition();
 
           setComparisonCountries(prev =>
             prev.includes(iso3)
@@ -503,38 +485,36 @@ function T1CountryProfile(): React.JSX.Element {
                       tickFormatter={(v) => `${v}`}
                       label={{ value: "GDP（兆円）", angle: -90, position: "insideLeft" }}
                     />
-                    <GDPChartTooltip usdJpy={USD_JPY} />
-                    {/* マレーシア: 実績（実線）2015-2024 */}
-                    <Line
-                      type="monotone"
-                      dataKey="actual"
-                      name="マレーシア（実績）"
-                      stroke="#2563eb"
-                      strokeWidth={CHART_CONFIG.lineStrokeWidth}
-                      dot={false}
-                      activeDot={{ r: 6 }}
-                      connectNulls={false}
-                      animationBegin={0}
-                      animationDuration={1667}
-                      animationEasing="linear"
+                    {/* 予測期間の背景色（2025-2030） */}
+                    <ReferenceArea
+                      x1={2025}
+                      x2={2030}
+                      fill="rgba(200, 200, 200, 0.6)"
+                      stroke="none"
                     />
-                    {/* マレーシア: 予測（点線）2025-2030（実績完了後に開始） */}
+                    {/* Result / Forecast の境界線（2025年） */}
+                    <ReferenceLine
+                      x={2025}
+                      stroke="#999"
+                      strokeDasharray="3 8"
+                      strokeWidth={1.5}
+                    />
+                    <GDPChartTooltip usdJpy={USD_JPY} />
+                    {/* マレーシア: 統合ライン（実績+予測）2015-2030 */}
                     <Line
                       type="monotone"
-                      dataKey="forecast"
-                      name="マレーシア（予測）"
+                      dataKey="malaysia"
+                      name="マレーシア"
                       stroke="#2563eb"
                       strokeWidth={CHART_CONFIG.lineStrokeWidth}
-                      strokeDasharray={CHART_CONFIG.dashArray}
                       dot={false}
                       activeDot={{ r: 6 }}
-                      connectNulls={false}
-                      animationBegin={1667}
-                      animationDuration={833}
-                      animationEasing="linear"
+                      animationBegin={isYAxisTransitioning ? 500 : 0}
+                      animationDuration={900}
+                      animationEasing="ease-out"
                     />
                     {/* 比較国のライン */}
-                    {comparisonCountries.map((iso3, index) => {
+                    {comparisonCountries.map((iso3) => {
                       const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
                       if (!country) return null;
                       return (
@@ -547,45 +527,115 @@ function T1CountryProfile(): React.JSX.Element {
                           strokeWidth={1.5}
                           dot={false}
                           activeDot={{ r: 5 }}
-                          connectNulls={false}
-                          animationBegin={500 + (index * 200)}
-                          animationDuration={1500}
-                          animationEasing="ease-in-out"
+                          animationBegin={isYAxisTransitioning ? 500 : 0}
+                          animationDuration={900}
+                          animationEasing="ease-out"
                         />
                       );
                     })}
                   </LineChart>
                 </ResponsiveContainer>
-                {/* カスタム凡例 - グラフ内右下に絶対配置 */}
+                {/* Result / Forecast バッジ */}
+                {/* Result (2015-2025) - 正確な中央位置: 36.5% */}
                 <div style={{
                   position: "absolute",
-                  bottom: `${CHART_CONFIG.legend.bottom}px`,
-                  right: `${CHART_CONFIG.legend.right}px`,
-                  ...STYLES.flex.centerColumn,
-                  gap: SPACING.sm,
-                  padding: `${SPACING.sm} ${SPACING.md}`,
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  borderRadius: "6px",
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-                  border: `1px solid ${COLOR.gray}`,
-                  pointerEvents: "none"
+                  top: "10px",
+                  left: "36.5%",
+                  transform: "translateX(-50%)",
+                  padding: "4px 14px",
+                  backgroundColor: "rgba(37, 99, 235, 0.8)",
+                  borderRadius: "999px",
+                  fontFamily: "'Roboto Condensed', sans-serif",
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  color: "#fff",
+                  textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000",
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
                 }}>
-                  {/* マレーシア（実績） */}
-                  <LegendItem color={COLOR.primary} label="マレーシア（実績）" isSolid={true} />
-                  {/* マレーシア（予測） */}
-                  <LegendItem color={COLOR.primary} label="マレーシア（予測）" isSolid={false} />
-                  {/* 比較国 */}
-                  {comparisonCountries.map(iso3 => {
-                    const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
-                    if (!country) return null;
-                    return <LegendItem key={iso3} color={country.color} label={country.nameJa} isSolid={true} />;
-                  })}
+                  Result
+                </div>
+                {/* Forecast (2025-2030) - 正確な中央位置: 82% */}
+                <div style={{
+                  position: "absolute",
+                  top: "10px",
+                  left: "82%",
+                  transform: "translateX(-50%)",
+                  padding: "4px 14px",
+                  backgroundColor: "rgba(100, 116, 139, 0.8)",
+                  borderRadius: "999px",
+                  fontFamily: "'Roboto Condensed', sans-serif",
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  color: "#fff",
+                  textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000",
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                }}>
+                  Forecast
                 </div>
               </div>
-              {/* グラフ注釈 */}
-              <p style={{ ...STYLES.fontSize.medium, ...STYLES.color.secondary, marginTop: "16px", lineHeight: "1.7" }}>
-                <span style={{ color: COLOR.primary, fontWeight: 600 }}>●</span> マレーシア: 実線（2015–2024年 実績値）／点線（2025–2030年 IMF WEO予測値）
+              {/* マレーシア注釈 - チェックボックスの上 */}
+              <p style={{ ...STYLES.fontSize.medium, ...STYLES.color.secondary, marginTop: "16px", marginBottom: "8px", lineHeight: "1.7", paddingLeft: "80px" }}>
+                <span style={{ color: COLOR.primary, fontWeight: 600 }}>●</span> マレーシア: 2015–2024年（実績値）、2025–2030年（IMF WEO予測値）
               </p>
+              {/* 比較国選択チェックボックス */}
+              <div style={{ ...STYLES.margin.lg, paddingLeft: "80px" }}>
+                <div style={{ ...STYLES.flex.wrap, gap: "16px" }}>
+                  {ASEAN_GDP_COMPARISON.map((country) => (
+                    <label
+                      key={country.iso3}
+                      style={{
+                        ...STYLES.flex.center,
+                        gap: "6px",
+                        fontSize: FONT_SIZE.large,
+                        cursor: "pointer",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={comparisonCountries.includes(country.iso3)}
+                        onChange={() => toggleCountry(country.iso3)}
+                        style={{ cursor: "pointer" }}
+                      />
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: "10px",
+                          height: "10px",
+                          borderRadius: "50%",
+                          backgroundColor: country.color,
+                        }}
+                      />
+                      {country.nameJa}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              {/* 凡例 - グラフ外に配置 */}
+              <div style={{
+                ...STYLES.flex.center,
+                gap: "16px",
+                flexWrap: "wrap",
+                padding: "10px 14px",
+                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                borderRadius: "6px",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                border: `1px solid ${COLOR.gray}`,
+                marginBottom: "16px",
+              }}>
+                {/* マレーシア */}
+                <LegendItem color={COLOR.primary} label="マレーシア" isSolid={true} />
+                {/* 比較国 */}
+                {comparisonCountries.map(iso3 => {
+                  const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
+                  if (!country) return null;
+                  return <LegendItem key={iso3} color={country.color} label={country.nameJa} isSolid={true} />;
+                })}
+              </div>
+              {/* グラフ注釈 */}
               {comparisonCountries.length > 0 && (
                 <p style={{ ...STYLES.fontSize.medium, ...STYLES.color.secondary, marginTop: "8px", lineHeight: "1.7" }}>
                   {comparisonCountries.map(iso3 => {
@@ -607,42 +657,6 @@ function T1CountryProfile(): React.JSX.Element {
               </p>
             </article>
 
-            {/* 比較国選択チェックボックス */}
-            <div style={{ ...STYLES.margin.lg }}>
-              <p style={{ ...STYLES.fontSize.medium, ...STYLES.color.secondary, marginBottom: "8px" }}>
-                他国と比較（チェックで表示）:
-              </p>
-              <div style={{ ...STYLES.flex.wrap, gap: "16px" }}>
-                {ASEAN_GDP_COMPARISON.map((country) => (
-                  <label
-                    key={country.iso3}
-                    style={{
-                      ...STYLES.flex.center,
-                      gap: "6px",
-                      fontSize: FONT_SIZE.large,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={comparisonCountries.includes(country.iso3)}
-                      onChange={() => toggleCountry(country.iso3)}
-                      style={{ cursor: "pointer" }}
-                    />
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: "10px",
-                        height: "10px",
-                        borderRadius: "50%",
-                        backgroundColor: country.color,
-                      }}
-                    />
-                    {country.nameJa}
-                  </label>
-                ))}
-              </div>
-            </div>
           </section>
         );
       })()}
@@ -728,104 +742,6 @@ function T1CountryProfile(): React.JSX.Element {
                 出典: {DATA_SOURCES.industry}
               </p>
             </div>
-          </div>
-        </article>
-      </section>
-
-      {/* 主要経済ニュース */}
-      <section className="content-block">
-        <p className="section-kicker">ECONOMIC NEWS & POLICY TRENDS</p>
-        <h2 style={{ fontSize: "28px" }}>主要経済ニュース・政策動向</h2>
-        <p className="section-subline">CB市場への影響度分類付き — 2025年</p>
-        <article className="reference-block">
-          {/* フィルター */}
-          <div style={{ display: "flex", gap: "16px", marginBottom: "20px", flexWrap: "wrap" }}>
-            <div>
-              <label style={{ fontSize: "0.85rem", color: "#666", marginRight: "8px" }}>カテゴリ:</label>
-              <select
-                value={newsCategoryFilter}
-                onChange={(e) => setNewsCategoryFilter(e.target.value)}
-                style={{ padding: "6px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.9rem" }}
-              >
-                <option value="all">すべて</option>
-                {newsCategories.slice(1).map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label style={{ fontSize: "0.85rem", color: "#666", marginRight: "8px" }}>CB影響度:</label>
-              <select
-                value={newsImpactFilter}
-                onChange={(e) => setNewsImpactFilter(e.target.value)}
-                style={{ padding: "6px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.9rem" }}
-              >
-                <option value="all">すべて</option>
-                {impactLevels.slice(1).map((level) => (
-                  <option key={level} value={level}>{level}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* ニュースリスト */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {filteredNews.length > 0 ? (
-              filteredNews.map((news) => (
-                <div
-                  key={`${news.date}-${news.headline}`}
-                  style={{
-                    padding: "16px",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "4px",
-                    backgroundColor: "#fff",
-                    borderLeft: `4px solid ${
-                      news.cb_impact === "High" ? "#dc3545" :
-                      news.cb_impact === "Medium" ? "#ffc107" :
-                      news.cb_impact === "Low" ? "#28a745" :
-                      "#6c757d"
-                    }`,
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-                    <h4 style={{ margin: 0, fontSize: "1rem", color: "#333" }}>{news.headline}</h4>
-                    <span
-                      style={{
-                        padding: "3px 10px",
-                        borderRadius: "12px",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        backgroundColor:
-                          news.cb_impact === "High" ? "#dc3545" :
-                          news.cb_impact === "Medium" ? "#ffc107" :
-                          news.cb_impact === "Low" ? "#28a745" :
-                          "#6c757d",
-                        color: news.cb_impact === "Medium" ? "#333" : "#fff",
-                        whiteSpace: "nowrap",
-                        marginLeft: "12px",
-                      }}
-                    >
-                      {news.cb_impact}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: "0.8rem", color: "#666", marginBottom: "8px" }}>
-                    <span style={{ marginRight: "16px" }}>📅 {news.date}</span>
-                    <span style={{ marginRight: "16px" }}>🏷️ {news.category}</span>
-                    {news.source && <span>📰 {news.source}</span>}
-                  </div>
-                  <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: "1.5", color: "#444" }}>{news.summary}</p>
-                  {news.url && (
-                    <div style={{ marginTop: "8px" }}>
-                      <a href={news.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.85rem", color: "#2563eb" }}>
-                        🔗 記事リンク
-                      </a>
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p style={{ color: "#666", fontStyle: "italic" }}>該当するニュースはありません。</p>
-            )}
           </div>
         </article>
       </section>
