@@ -53,10 +53,10 @@ export const DATA_SOURCES = {
 
 export const ECONOMY_KPI_2025: EconomyKPI = {
   gdp_usd_billion: 470.572, // IMF WEO NGDPD (AllCountryGDP.xlsx)
-  gdp_growth_pct: 5.2,
-  population_million: 34.3,
-  gdp_per_capita_usd: 12560,
-  fdi_inflow_usd_billion: 16.9,
+  gdp_growth_pct: 5.1,      // BNM / DOSM 2024年通年確定値（2025年2月発表）。旧値5.2%はIMF WEO Oct 2024予測値
+  population_million: 34.1, // DOSM "Current Population Estimates 2024" 中間推計 3,410万人
+  gdp_per_capita_usd: 11867, // 世界銀行確定値（出典表記 WB/DOSM と整合）
+  fdi_inflow_usd_billion: 11.5, // DOSM確定値 RM51.5B ÷ 平均レート4.4 ≒ US$11.5B
   exchange_rate_to_usd: 4.45,
   inflation_pct: 2.5,
 };
@@ -88,13 +88,13 @@ export const GDP_HISTORY: GDPDataPoint[] = [
   { year: 2022, gdp_usd_billion: 407.830, is_forecast: false },
   { year: 2023, gdp_usd_billion: 399.949, is_forecast: false },
   { year: 2024, gdp_usd_billion: 422.227, is_forecast: false },
-  // 2025-2030: IMF WEO 予測値（出典: AllCountryGDP.xlsx, シート NGDPD）
-  { year: 2025, gdp_usd_billion: 470.572, is_forecast: true },
-  { year: 2026, gdp_usd_billion: 505.364, is_forecast: true },
-  { year: 2027, gdp_usd_billion: 537.582, is_forecast: true },
-  { year: 2028, gdp_usd_billion: 572.617, is_forecast: true },
-  { year: 2029, gdp_usd_billion: 608.846, is_forecast: true },
-  { year: 2030, gdp_usd_billion: 646.456, is_forecast: true },
+  // 2025-2030: IMF WEO 予測値（出典: IMF Article IV Consultation 2025/057、リンギット建てGDPを為替レート4.35RM/USDで換算）
+  { year: 2025, gdp_usd_billion: 470.572, is_forecast: true }, // IMF WEO Oct 2025
+  { year: 2026, gdp_usd_billion: 505.364, is_forecast: true }, // IMF WEO Oct 2025
+  { year: 2027, gdp_usd_billion: 537.582, is_forecast: true }, // 実質4.0%成長 + インフレ2%前提
+  { year: 2028, gdp_usd_billion: 572.617, is_forecast: true }, // 実質4.0%成長 + インフレ2%前提
+  { year: 2029, gdp_usd_billion: 608.846, is_forecast: true }, // 実質4.0%成長 + インフレ2%前提
+  { year: 2030, gdp_usd_billion: 647.126, is_forecast: true }, // IMF Article IV CR 2025/057: RM2,817B ÷ 4.35 = US$647.1B
 ];
 
 /* ------------------------------------------------------------------ */

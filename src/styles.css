@@ -807,6 +807,45 @@ td:first-child {
 .chart-transition-container {
   opacity: 1;
   transition: opacity var(--chart-transition-duration, 400ms) var(--editorial-ease);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  outline: none !important;
+}
+
+.chart-transition-container:focus,
+.chart-transition-container:focus-visible {
+  outline: none !important;
+}
+
+.chart-transition-container svg {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  outline: none !important;
+}
+
+.chart-transition-container svg:focus,
+.chart-transition-container svg:focus-visible {
+  outline: none !important;
+}
+
+.chart-transition-container svg text,
+.chart-transition-container svg tspan {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  outline: none !important;
+}
+
+.chart-transition-container svg text:focus,
+.chart-transition-container svg text:focus-visible,
+.chart-transition-container svg tspan:focus,
+.chart-transition-container svg tspan:focus-visible {
+  outline: none !important;
 }
 
 .chart-transition-container.fading {
