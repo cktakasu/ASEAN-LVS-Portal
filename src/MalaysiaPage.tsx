@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* ------------------------------------------------------------------ */
@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 
 import type {
   ChartDataItem,
-  CountryGDP,
   TooltipPayloadItem,
   TooltipProps,
   CertRow,
@@ -99,7 +98,8 @@ const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) 
     );
   };
 
-  return <Tooltip content={renderTooltip} />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <Tooltip content={renderTooltip as any} />;
 });
 
 GDPChartTooltip.displayName = "GDPChartTooltip";
@@ -132,11 +132,6 @@ const generateYTicks = (maxY: number): number[] => {
   return ticks;
 };
 
-// 価値が定義されているかチェック
-const isDefined = (value: number | undefined): value is number => {
-  return value !== undefined && value !== null && !isNaN(value);
-};
-
 // チャートデータを生成（型安全・最適化版）
 const generateChartData = (
   gdpHistory: typeof GDP_HISTORY,
@@ -156,7 +151,7 @@ const generateChartData = (
 
   // 比較国のデータを動的に追加
   return malaysiaData.map((malaysiaItem) => {
-    const item: Record<string, number | null> = {
+    const item: ChartDataItem = {
       year: malaysiaItem.year,
       malaysia: malaysiaItem.malaysia,
       actual: malaysiaItem.actual,
@@ -197,7 +192,6 @@ import {
   ResponsiveContainer,
   ReferenceArea,
   ReferenceLine,
-  Legend,
 } from "recharts";
 
 /* ------------------------------------------------------------------ */
@@ -288,6 +282,74 @@ const CHART_CONFIG = {
 } as const;
 
 /* ------------------------------------------------------------------ */
+/*  CB Relevance Color                                                 */
+/* ------------------------------------------------------------------ */
+
+const cbRelevanceColor = (relevance: string): string =>
+  relevance === "High" ? "#dc3545" :
+  relevance === "Medium" ? "#d97706" :
+  "#6c757d";
+
+/* ------------------------------------------------------------------ */
+/*  ドーナツチャート用カスタムラベル（リード線付き）                  */
+/* ------------------------------------------------------------------ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const DonutLabelWithLeaderLine: React.FC<any> = ({
+  cx,
+  cy,
+  midAngle,
+  outerRadius,
+  payload,
+}) => {
+  if (
+    cx === undefined ||
+    cy === undefined ||
+    midAngle === undefined ||
+    outerRadius === undefined ||
+    !payload?.sector ||
+    payload.gdp_share_pct === undefined ||
+    !payload.cb_relevance
+  ) {
+    return null;
+  }
+
+  const RADIAN = Math.PI / 180;
+  const leaderLineLength = 20;
+  const horizontalLineLength = 25;
+  const labelOffset = 6;
+
+  const angleRad = -midAngle * RADIAN;
+  const isRight = Math.cos(angleRad) >= 0;
+
+  const lineStartX = cx + outerRadius * Math.cos(angleRad);
+  const lineStartY = cy + outerRadius * Math.sin(angleRad);
+  const elbowX = cx + (outerRadius + leaderLineLength) * Math.cos(angleRad);
+  const elbowY = cy + (outerRadius + leaderLineLength) * Math.sin(angleRad);
+  const lineEndX = isRight ? elbowX + horizontalLineLength : elbowX - horizontalLineLength;
+  const lineEndY = elbowY;
+
+  const textAnchor = isRight ? "start" : "end";
+  const textX = isRight ? lineEndX + labelOffset : lineEndX - labelOffset;
+  const textY = elbowY;
+  const color = cbRelevanceColor(payload.cb_relevance);
+
+  return (
+    <g>
+      <line x1={lineStartX} y1={lineStartY} x2={elbowX} y2={elbowY} stroke={color} strokeWidth={1.5} opacity={0.8} />
+      <line x1={elbowX} y1={elbowY} x2={lineEndX} y2={lineEndY} stroke={color} strokeWidth={1.5} opacity={0.8} />
+      <circle cx={lineEndX} cy={lineEndY} r={3} fill={color} />
+      <text x={textX} y={textY - 9} textAnchor={textAnchor} dominantBaseline="middle" fontSize="14px" fill={color} fontWeight={600}>
+        {payload.sector}
+      </text>
+      <text x={textX} y={textY + 10} textAnchor={textAnchor} dominantBaseline="middle" fontSize="13px" fill={color} opacity={0.85} fontWeight={500}>
+        {payload.gdp_share_pct.toFixed(1)}%
+      </text>
+    </g>
+  );
+};
+
+/* ------------------------------------------------------------------ */
 /*  Tab definitions                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -357,17 +419,17 @@ function T1CountryProfile(): React.JSX.Element {
   return (
     <>
       {/* 経済 KPI セクション */}
-      <section className="content-block" style={{ marginTop: "24px" }}>
+      <section className="content-block content-block--major">
         <p className="section-kicker">ECONOMIC KEY PERFORMANCE INDICATORS</p>
         <p className="section-subline" style={{ fontSize: "28px", color: "inherit", fontWeight: 600, marginBottom: "8px" }}>主要マクロ経済指標 — Malaysia</p>
         <article className="reference-block">
           <div className="table-wrap">
             <table className="definition-table" style={{ minWidth: "700px", tableLayout: "fixed", width: "100%" }}>
               <colgroup>
-                <col style={{ width: "18%" }} />
-                <col style={{ width: "24%" }} />
-                <col style={{ width: "24%" }} />
-                <col style={{ width: "34%" }} />
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "28%" }} />
+                <col style={{ width: "28%" }} />
+                <col style={{ width: "30%" }} />
               </colgroup>
               <thead>
                 <tr>
@@ -379,16 +441,18 @@ function T1CountryProfile(): React.JSX.Element {
               </thead>
               <tbody>
                 {(() => {
-                  const gdp2024 = GDP_HISTORY.find(d => d.year === 2024)!;
+                  const gdp2024 = GDP_HISTORY.find(d => d.year === 2024);
+                  const gdp2030 = GDP_HISTORY.find(d => d.year === 2030);
+                  if (!gdp2024 || !gdp2030) return null;
                   return (
                     <>
                       <tr>
                         <td><strong>GDP（名目）</strong></td>
                         <td>
-                          US${gdp2024.gdp_usd_billion.toFixed(1)}B / 約{(gdp2024.gdp_usd_billion * 140 / 1000).toFixed(1)}兆円
+                          約{(gdp2024.gdp_usd_billion * 140 / 1000).toFixed(1)}兆円 / (USD ${gdp2024.gdp_usd_billion.toFixed(1)}B)
                         </td>
                         <td style={{ color: "#444" }}>
-                          US${GDP_HISTORY.find(d => d.year === 2030)!.gdp_usd_billion.toFixed(1)}B / 約{(GDP_HISTORY.find(d => d.year === 2030)!.gdp_usd_billion * 140 / 1000).toFixed(1)}兆円
+                          約{(gdp2030.gdp_usd_billion * 140 / 1000).toFixed(1)}兆円 / (USD ${gdp2030.gdp_usd_billion.toFixed(1)}B)
                         </td>
                         <td style={{ fontSize: "0.8rem", color: "#666" }}>IMF WEO CR 2025/057</td>
                       </tr>
@@ -404,19 +468,30 @@ function T1CountryProfile(): React.JSX.Element {
                         <td><strong>人口</strong></td>
                         <td>{(ECONOMY_KPI_2025.population_million * 100).toFixed(0).replace(".0", "")}万人</td>
                         <td style={{ color: "#999" }}>—</td>
-                        <td style={{ fontSize: "0.8rem", color: "#666" }}>Department of Statistics Malaysia (DOSM)</td>
+                        <td style={{ fontSize: "0.8rem", color: "#666" }}>Department of Statistics Malaysia</td>
                       </tr>
                       <tr>
                         <td><strong>1人当たりGDP</strong></td>
                         <td>約{Math.round(ECONOMY_KPI_2025.gdp_per_capita_usd * 140 / 10000).toLocaleString()}万円</td>
                         <td style={{ color: "#999" }}>—</td>
-                        <td style={{ fontSize: "0.8rem", color: "#666" }}>World Bank / Department of Statistics Malaysia (DOSM)</td>
+                        <td style={{ fontSize: "0.8rem", color: "#666" }}>World Bank</td>
                       </tr>
                       <tr>
                         <td><strong>FDI流入額</strong></td>
                         <td>約{Math.round(ECONOMY_KPI_2025.fdi_inflow_usd_billion * 140).toLocaleString()}億円</td>
                         <td style={{ color: "#999" }}>—</td>
-                        <td style={{ fontSize: "0.8rem", color: "#666" }}>Department of Statistics Malaysia (DOSM)</td>
+                        <td style={{ fontSize: "0.8rem", color: "#666" }}>Department of Statistics Malaysia</td>
+                      </tr>
+                      <tr>
+                        <td><strong>主要貿易相手国</strong></td>
+                        <td>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "2px", fontSize: "0.82rem" }}>
+                            <span>輸出先: 1.シンガポール 2.米国 3.中国</span>
+                            <span>輸入元: 1.中国 2.シンガポール 3.米国</span>
+                          </div>
+                        </td>
+                        <td style={{ color: "#999" }}>—</td>
+                        <td style={{ fontSize: "0.8rem", color: "#666" }}>MATRADE 2024</td>
                       </tr>
                     </>
                   );
@@ -465,7 +540,7 @@ function T1CountryProfile(): React.JSX.Element {
         };
 
         return (
-          <section className="content-block" style={{ maxWidth: "1280px" }}>
+          <section className="content-block content-block--wide">
             <p className="section-kicker">GDP TREND</p>
             <h2 style={{ fontSize: "28px" }}>GDP 推移（実績 + 予測）</h2>
             <p className="section-subline">2015-2030年度 / 単位：兆円（名目GDP・140円/USD）</p>
@@ -476,7 +551,7 @@ function T1CountryProfile(): React.JSX.Element {
             >
               <div style={{ height: `${CHART_CONFIG.height}px`, position: "relative", outline: "none", userSelect: "none", WebkitUserSelect: "none" }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={CHART_CONFIG.margin} style={{ outline: "none", userSelect: "none", WebkitUserSelect: "none" }} isAnimationActive={true}>
+                  <LineChart data={chartData} margin={CHART_CONFIG.margin} style={{ outline: "none", userSelect: "none", WebkitUserSelect: "none" }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                     <XAxis dataKey="year" stroke="#666" tick={{ dy: 12 }} />
                     <YAxis
@@ -649,12 +724,12 @@ function T1CountryProfile(): React.JSX.Element {
       })()}
 
       {/* 産業別GDP構成比 */}
-      <section className="content-block">
+      <section className="content-block content-block--wide">
         <p className="section-kicker">INDUSTRY COMPOSITION</p>
         <h2 style={{ fontSize: "28px" }}>産業別 GDP 構成比（2025年度）</h2>
         <p className="section-subline">セクター別のシェアと成長率</p>
         <article className="reference-block">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", alignItems: "start" }}>
+          <div className="industry-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", alignItems: "start" }}>
             {/* テーブル */}
             <div style={{ minWidth: 0 }}>
               <div className="table-wrap">
@@ -668,7 +743,7 @@ function T1CountryProfile(): React.JSX.Element {
                     <tr>
                       <th>産業セクター</th>
                       <th>GDP比率</th>
-                      <th>CB関連度</th>
+                      <th>遮断器需要連動</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -683,11 +758,8 @@ function T1CountryProfile(): React.JSX.Element {
                               borderRadius: "4px",
                               fontSize: "0.8rem",
                               fontWeight: 600,
-                              backgroundColor:
-                                item.cb_relevance === "High" ? "#dc3545" :
-                                item.cb_relevance === "Medium" ? "#ffc107" :
-                                "#6c757d",
-                              color: item.cb_relevance === "Medium" ? "#333" : "#fff",
+                              backgroundColor: cbRelevanceColor(item.cb_relevance),
+                              color: "#fff",
                             }}
                           >
                             {item.cb_relevance}
@@ -699,44 +771,38 @@ function T1CountryProfile(): React.JSX.Element {
                 </table>
               </div>
               <p style={{ fontSize: "0.8rem", color: "#666", marginTop: "12px" }}>
-                ※ CB関連度：低圧遮断器市場との関連性を示します。
+                ※ 遮断器需要連動：低圧遮断器市場との関連性を示します。
               </p>
               <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "4px" }}>
                 出典: {DATA_SOURCES.industry}
               </p>
             </div>
             {/* ドーナツチャート */}
-            <div style={{ height: "380px", overflow: "hidden" }}>
+            <div style={{ height: "360px" }} className="chart-transition-container">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart margin={{ top: 0, right: 50, bottom: 20, left: 50 }}>
                   <Pie
                     data={INDUSTRY_GDP_2025}
                     cx="50%"
                     cy="45%"
-                    innerRadius={70}
-                    outerRadius={110}
-                    paddingAngle={2}
+                    innerRadius={45}
+                    outerRadius={85}
+                    paddingAngle={3}
                     dataKey="gdp_share_pct"
-                    label={false}
+                    label={<DonutLabelWithLeaderLine />}
                     labelLine={false}
+                    isAnimationActive={false}
+                    style={{ cursor: "default", pointerEvents: "none" }}
                   >
                     {INDUSTRY_GDP_2025.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={
-                        entry.cb_relevance === "High" ? "#dc3545" :
-                        entry.cb_relevance === "Medium" ? "#ffc107" :
-                        "#6c757d"
-                      } />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={cbRelevanceColor(entry.cb_relevance)}
+                        stroke="#fff"
+                        strokeWidth={2}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number | undefined) => value !== undefined ? `${value}%` : ""} contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.95)", border: "1px solid #ccc" }} />
-                  <Legend
-                    formatter={(value: string, entry: any) =>
-                      `${entry.payload.sector}  ${entry.payload.gdp_share_pct}%`
-                    }
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{ fontSize: "0.75rem", paddingTop: "8px", lineHeight: "1.6" }}
-                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -744,36 +810,9 @@ function T1CountryProfile(): React.JSX.Element {
         </article>
       </section>
 
-      {/* 既存：電力インフラ基本情報 */}
-      <section className="content-block" style={{ marginTop: "24px" }}>
-        <p className="section-kicker">POWER INFRASTRUCTURE</p>
-        <h2 style={{ fontSize: "28px" }}>電力インフラ基本情報</h2>
-        <p className="section-subline">系統電圧・周波数・プラグ規格・主要電力会社</p>
-        <article className="reference-block">
-          <div className="table-wrap">
-            <table className="definition-table">
-              <thead>
-                <tr>
-                  <th>項目</th>
-                  <th>内容</th>
-                </tr>
-              </thead>
-              <tbody>
-                {POWER_INFO.map((item) => (
-                  <tr key={item.label}>
-                    <td><strong>{item.label}</strong></td>
-                    <td>{item.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-      </section>
-
-      <section className="content-block fade-in">
+      <section className="content-block content-block--wide fade-in">
         <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
-        <h2 style={{ fontSize: "28px" }}>製品別 認証要件</h2>
+        <h2 style={{ fontSize: "28px" }}>機種別規格認証</h2>
         <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
         <article className="reference-block">
           <h3>認証要件一覧</h3>
@@ -816,10 +855,37 @@ function T1CountryProfile(): React.JSX.Element {
         <article className="reference-block">
           <h3>SIRIM認証プロセス</h3>
           <ol className="notes-list">
-            {SIRIM_PROCESS.map((step) => (
-              <li key={step}>{step}</li>
+            {SIRIM_PROCESS.map((step, index) => (
+              <li key={`sirim-${index}`}>{step}</li>
             ))}
           </ol>
+        </article>
+      </section>
+
+      {/* 既存：電力インフラ基本情報 */}
+      <section className="content-block content-block--major">
+        <p className="section-kicker">POWER INFRASTRUCTURE</p>
+        <h2 style={{ fontSize: "28px" }}>電力インフラ基本情報</h2>
+        <p className="section-subline">系統電圧・周波数・プラグ規格・主要電力会社</p>
+        <article className="reference-block">
+          <div className="table-wrap">
+            <table className="definition-table">
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                {POWER_INFO.map((item) => (
+                  <tr key={item.label}>
+                    <td><strong>{item.label}</strong></td>
+                    <td>{item.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </article>
       </section>
 
@@ -854,8 +920,8 @@ function T1CountryProfile(): React.JSX.Element {
         <h2 style={{ fontSize: "28px" }}>市場・実務ノート</h2>
         <article className="reference-block">
           <ol className="notes-list">
-            {MARKET_NOTES.map((note) => (
-              <li key={note}>{note}</li>
+            {MARKET_NOTES.map((note, index) => (
+              <li key={`market-note-${index}`}>{note}</li>
             ))}
           </ol>
         </article>
@@ -866,7 +932,7 @@ function T1CountryProfile(): React.JSX.Element {
 
 function TabPlaceholder({ tab }: { tab: TabDef }): React.JSX.Element {
   return (
-    <section className="content-block fade-in" style={{ marginTop: "24px", textAlign: "center" }}>
+    <section className="content-block content-block--major fade-in" style={{ textAlign: "center" }}>
       <p className="section-kicker">{tab.label.toUpperCase()}</p>
       <h2 style={{ fontSize: "28px" }}>{tab.sublabel}</h2>
       <p className="section-subline" style={{ marginTop: "16px" }}>

@@ -1,39 +1,15 @@
 /* ------------------------------------------------------------------ */
-/*  Types                                                              */
+/*  Types (re-exported from canonical definitions)                     */
 /* ------------------------------------------------------------------ */
 
-export interface EconomyKPI {
-  gdp_usd_billion: number;
-  gdp_growth_pct: number;
-  population_million: number;
-  gdp_per_capita_usd: number;
-  fdi_inflow_usd_billion: number;
-  exchange_rate_to_usd: number;
-  inflation_pct: number;
-}
+export type {
+  EconomyKPI,
+  GDPDataPoint,
+  IndustryGDP,
+  EconomicNews,
+} from "../types/economy";
 
-export interface GDPDataPoint {
-  year: number;
-  gdp_usd_billion: number;
-  is_forecast: boolean;
-}
-
-export interface IndustryGDP {
-  sector: string;
-  gdp_share_pct: number;
-  growth_rate_pct: number;
-  cb_relevance: "High" | "Medium" | "Low";
-}
-
-export interface EconomicNews {
-  date: string;
-  headline: string;
-  category: "Policy" | "Investment" | "Trade" | "Infrastructure" | "Other";
-  cb_impact: "High" | "Medium" | "Low" | "None";
-  summary: string;
-  url?: string;
-  source?: string;
-}
+import type { EconomyKPI, GDPDataPoint, IndustryGDP, EconomicNews } from "../types/economy";
 
 /* ------------------------------------------------------------------ */
 /*  データ出典                                                          */
@@ -43,7 +19,7 @@ export const DATA_SOURCES = {
   kpi:      "IMF World Economic Outlook — Malaysia: 2025 Article IV Consultation（IMF Country Report No. 2025/057）",
   kpi_note: "USD/JPY＝140円で換算。2030年予測はIMF WEO中期成長率（実質4〜4.3% + インフレ約2%、名目5〜6%/年）を基に試算。Oct 2025 WEOでは2026年以降の成長率が4.3%に微修正されており、予測値は変動する可能性があります。",
   gdp:      "IMF World Economic Outlook（WEO）/ 2025 Article IV Consultation, IMF Country Report No. 2025/057",
-  industry: "Department of Statistics Malaysia (DOSM) — GDP by Kind of Economic Activity 2025",
+  industry: "United Nations — National Accounts Official Country Data（UN SNA Main Aggregates基準）2024",
   news:     "Bernama / The Star / Edge Markets / Suruhanjaya Tenaga (ST) / MATRADE / MDEC — 各公表資料",
 };
 
@@ -56,7 +32,7 @@ export const ECONOMY_KPI_2025: EconomyKPI = {
   gdp_growth_pct: 5.1,      // BNM / DOSM 2024年通年確定値（2025年2月発表）。旧値5.2%はIMF WEO Oct 2024予測値
   population_million: 34.1, // DOSM "Current Population Estimates 2024" 中間推計 3,410万人
   gdp_per_capita_usd: 11867, // 世界銀行確定値（出典表記 WB/DOSM と整合）
-  fdi_inflow_usd_billion: 11.5, // DOSM確定値 RM51.5B ÷ 平均レート4.4 ≒ US$11.5B
+  fdi_inflow_usd_billion: 11.5, // DOSM確定値 RM51.5B ÷ 平均レート4.4 ≒ USD 11.5B
   exchange_rate_to_usd: 4.45,
   inflation_pct: 2.5,
 };
@@ -94,7 +70,7 @@ export const GDP_HISTORY: GDPDataPoint[] = [
   { year: 2027, gdp_usd_billion: 537.582, is_forecast: true }, // 実質4.0%成長 + インフレ2%前提
   { year: 2028, gdp_usd_billion: 572.617, is_forecast: true }, // 実質4.0%成長 + インフレ2%前提
   { year: 2029, gdp_usd_billion: 608.846, is_forecast: true }, // 実質4.0%成長 + インフレ2%前提
-  { year: 2030, gdp_usd_billion: 647.126, is_forecast: true }, // IMF Article IV CR 2025/057: RM2,817B ÷ 4.35 = US$647.1B
+  { year: 2030, gdp_usd_billion: 647.126, is_forecast: true }, // IMF Article IV CR 2025/057: RM2,817B ÷ 4.35 = USD 647.1B
 ];
 
 /* ------------------------------------------------------------------ */
@@ -103,33 +79,45 @@ export const GDP_HISTORY: GDPDataPoint[] = [
 
 export const INDUSTRY_GDP_2025: IndustryGDP[] = [
   {
-    sector: "サービス業",
-    gdp_share_pct: 54.2,
-    growth_rate_pct: 5.8,
-    cb_relevance: "Medium",
-  },
-  {
-    sector: "製造業",
-    gdp_share_pct: 24.8,
-    growth_rate_pct: 5.2,
-    cb_relevance: "High",
-  },
-  {
-    sector: "建設",
-    gdp_share_pct: 5.6,
-    growth_rate_pct: 6.5,
-    cb_relevance: "High",
-  },
-  {
-    sector: "農業",
-    gdp_share_pct: 8.1,
+    sector: "農林水産業",
+    gdp_share_pct: 8.26,
     growth_rate_pct: 2.8,
     cb_relevance: "Low",
   },
   {
     sector: "採掘・公益事業",
-    gdp_share_pct: 7.3,
+    gdp_share_pct: 10.66,
     growth_rate_pct: 3.5,
+    cb_relevance: "High",
+  },
+  {
+    sector: "製造業",
+    gdp_share_pct: 22.76,
+    growth_rate_pct: 5.2,
+    cb_relevance: "High",
+  },
+  {
+    sector: "建設業",
+    gdp_share_pct: 4.09,
+    growth_rate_pct: 6.5,
+    cb_relevance: "High",
+  },
+  {
+    sector: "卸売・小売・サービス業",
+    gdp_share_pct: 21.27,
+    growth_rate_pct: 5.8,
+    cb_relevance: "Medium",
+  },
+  {
+    sector: "運輸・通信業",
+    gdp_share_pct: 9.75,
+    growth_rate_pct: 4.2,
+    cb_relevance: "Medium",
+  },
+  {
+    sector: "その他サービス業",
+    gdp_share_pct: 23.20,
+    growth_rate_pct: 5.5,
     cb_relevance: "Medium",
   },
 ];

@@ -12,36 +12,48 @@ export interface EconomyKPI {
   gdp_per_capita_usd: number;
   fdi_inflow_usd_billion: number;
   exchange_rate_to_usd: number;
+  inflation_pct: number;
+}
+
+/**
+ * GDPデータポイント（実績・予測フラグ付き）
+ */
+export interface GDPDataPoint {
+  year: number;
+  gdp_usd_billion: number;
+  is_forecast: boolean;
 }
 
 /**
  * 産業別GDPデータ
  */
 export interface IndustryGDP {
-  industry: string;
+  sector: string;
   gdp_share_pct: number;
-  gdp_usd_billion: number;
+  growth_rate_pct: number;
+  cb_relevance: "High" | "Medium" | "Low";
 }
 
 /**
  * 経済ニュース記事
  */
 export interface EconomicNews {
-  id: string;
   date: string;
-  category: string;
   headline: string;
+  category: "Policy" | "Investment" | "Trade" | "Infrastructure" | "Other";
+  cb_impact: "High" | "Medium" | "Low" | "None";
   summary: string;
-  url: string;
-  impact_level: "high" | "medium" | "low";
+  url?: string;
+  source?: string;
 }
 
 /**
  * データソース情報
  */
 export interface DataSources {
-  gdp: string;
+  kpi: string;
   kpi_note: string;
+  gdp: string;
   industry: string;
   news: string;
 }

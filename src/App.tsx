@@ -1164,6 +1164,7 @@ export default function App(): JSX.Element {
 
   useEffect(() => {
     // ページ遷移後に一度レンダリングを待ってから監視を開始する
+    let observer: IntersectionObserver | null = null;
     const timer = window.setTimeout(() => {
       const targets = document.querySelectorAll<HTMLElement>(".fade-in");
       if (targets.length === 0) {
@@ -1183,22 +1184,25 @@ export default function App(): JSX.Element {
       // ページ遷移時に visible をリセットして再アニメーション
       targets.forEach((target) => target.classList.remove("visible"));
 
-      const observer = new IntersectionObserver(
+      observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               entry.target.classList.add("visible");
-              observer.unobserve(entry.target);
+              observer?.unobserve(entry.target);
             }
           });
         },
         { threshold: 0.15 }
       );
 
-      targets.forEach((target) => observer.observe(target));
+      targets.forEach((target) => observer!.observe(target));
     }, 50);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      observer?.disconnect();
+    };
   }, [pathname]);
 
   const renderMapBody = () => {

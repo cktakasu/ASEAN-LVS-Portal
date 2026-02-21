@@ -2,20 +2,7 @@
 /*  Chart Type Definitions                                             */
 /* ------------------------------------------------------------------ */
 
-/**
- * GDPデータポイント
- */
-export interface GDPDataPoint {
-  year: number;
-  gdp_usd_billion: number;
-}
-
-/**
- * マレーシアGDPデータ（実績・予測フラグ付き）
- */
-export interface MalaysiaGDPDataPoint extends GDPDataPoint {
-  is_forecast: boolean;
-}
+import type { GDPDataPoint } from "./economy";
 
 /**
  * チャート描画用データアイテム

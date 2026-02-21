@@ -5,14 +5,9 @@
 /*  2015-2024: 実績値 / 2025-2030: 予測値                              */
 /* ------------------------------------------------------------------ */
 
-import type { GDPDataPoint } from "./malaysiaEconomyData";
+export type { CountryGDP } from "../types/chart";
 
-export interface CountryGDP {
-  iso3: string;
-  nameJa: string;
-  color: string;
-  data: GDPDataPoint[];
-}
+import type { CountryGDP } from "../types/chart";
 
 export const ASEAN_GDP_COMPARISON: CountryGDP[] = [
   {
