@@ -9,6 +9,7 @@ export type {
   EconomicNews,
 } from "../types/economy";
 
+import type { CertRow, InfoItem } from "../types/certification";
 import type { EconomyKPI, GDPDataPoint, IndustryGDP, EconomicNews } from "../types/economy";
 
 /* ------------------------------------------------------------------ */
@@ -199,4 +200,47 @@ export const ECONOMIC_NEWS_2025: EconomicNews[] = [
     url: "https://example.com/news/sme-digital",
     source: "MDEC",
   },
+];
+
+/* ------------------------------------------------------------------ */
+/*  T1定数データ                                                       */
+/* ------------------------------------------------------------------ */
+
+export const CERT_ROWS: CertRow[] = [
+  { product: "ACB",  requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様で要求多し" },
+  { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様でSIRIM CoA要求" },
+  { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+];
+
+export const POWER_INFO: InfoItem[] = [
+  { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
+  { label: "周波数",           value: "50 Hz" },
+  { label: "主要電力会社",     value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
+  { label: "サバ・サラワク",   value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
+  { label: "プラグ形状",       value: "Type G（英国型 BS 1363）" },
+  { label: "配電方式",         value: "TN-S / TN-C-S（半島）、地域によりTT" },
+];
+
+export const SIRIM_PROCESS: string[] = [
+  "SIRIM QAS International へ申請書・製品仕様書・試験報告書（認定ラボ発行）を提出",
+  "MS規格（MS IEC 60898 / 61008 / 61009 等）に基づく製品評価",
+  "CoA（Certificate of Approval）発行",
+  "ST（Suruhanjaya Tenaga / Energy Commission）への届出・登録",
+  "ST-SIRIM CoAマーク付き製品として出荷可能",
+];
+
+export const REGIONAL_DIFF: InfoItem[] = [
+  { label: "半島マレーシア",         value: "TNB系統。MS規格・SIRIM CoA体制が最も整備されており、ST登録が実質必須。" },
+  { label: "サバ（ボルネオ北部）",   value: "SESBが管轄。系統容量は半島より小さく、プロジェクト仕様でIECまたはBS準拠を要求するケースが多い。" },
+  { label: "サラワク（ボルネオ北西）", value: "SEBが独立運営。半島とは別制度。認証要件をSEB仕様で個別確認要。" },
+];
+
+export const MARKET_NOTES: string[] = [
+  "住宅向けMCB・RCCB・RCBOはST-SIRIM CoAが強制要件。SIRIM QAS以外の認証機関では取得不可。",
+  "産業用ACB・MCCBは強制認証対象外だが、PLCやTNBの入札仕様で「SIRIM CoAまたはCBスキーム証明書提出」を要求するケースが多い。",
+  "CBスキーム（IEC CB Scheme）証明書があれば、SIRIM試験の一部省略が可能な場合がある。事前にSIRIM QASに確認要。",
+  "HS分類：8536.20（MCB）、8536.10（RCCB/RCBO含む遮断器類）。輸入時に認証番号を税関申告書に記載する実務が定着している。",
+  "IEC 60947-2準拠のMCCBでもプロジェクトによってはBS EN 60947-2相当の試験報告書を追加要求されることがある（英国系エンジニアリング会社案件）。",
 ];

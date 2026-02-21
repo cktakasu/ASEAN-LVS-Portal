@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* ------------------------------------------------------------------ */
@@ -528,7 +528,7 @@ function T1CountryProfile(): React.JSX.Element {
         );
 
         // Y軸トランジションを考慮した国切替関数
-        const toggleCountry = (iso3: string) => {
+        const toggleCountry = useCallback((iso3: string) => {
           // 常にトランジション発火（滑らかな切り替えのため）
           triggerTransition();
 
@@ -537,7 +537,7 @@ function T1CountryProfile(): React.JSX.Element {
               ? prev.filter(c => c !== iso3)
               : [...prev, iso3]
           );
-        };
+        }, [triggerTransition]);
 
         return (
           <section className="content-block content-block--wide">
