@@ -1148,8 +1148,8 @@ function T2MarketAndDemand(): React.JSX.Element {
                 <col style={{ width: "20%" }} />
                 <col style={{ width: "30%" }} />
                 <col style={{ width: "10%" }} />
-                <col style={{ width: "22%" }} />
-                <col style={{ width: "18%" }} />
+                <col style={{ width: "30%" }} />
+                <col style={{ width: "10%" }} />
               </colgroup>
               <thead>
                 <tr>
