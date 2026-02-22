@@ -382,20 +382,21 @@ const TABS: TabDef[] = [
 /* ------------------------------------------------------------------ */
 
 const CERT_ROWS: CertRow[] = [
-  { product: "ACB",  requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様で要求多し" },
-  { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様でSIRIM CoA要求" },
-  { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
-  { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
-  { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "ACB",  requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "法的義務なし。規制品目リスト（GP/ST/No.37/2024）に対象外。プロジェクト入札でSIRIM認証要求が多い" },
+  { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "法的義務なし。規制品目リストに対象外。配電盤用途でプロジェクト入札時にSIRIM認証要求が多い" },
+  { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "Electricity Regulations 1994 Reg.97およびGP/ST/No.37/2024 カテゴリ10でCoA義務。違反は最大RM100万罰金または10年禁固" },
+  { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "Electricity Regulations 1994 Reg.97およびGP/ST/No.37/2024 カテゴリ10でCoA義務。違反は最大RM100万罰金または10年禁固" },
+  { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "Electricity Regulations 1994 Reg.97およびGP/ST/No.37/2024 カテゴリ10でCoA義務。違反は最大RM100万罰金または10年禁固" },
 ];
 
 const POWER_INFO: InfoItem[] = [
-  { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
-  { label: "周波数",           value: "50 Hz" },
-  { label: "主要電力会社",     value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
-  { label: "サバ・サラワク",   value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
-  { label: "プラグ形状",       value: "Type G（英国型 BS 1363）" },
-  { label: "配電方式",         value: "TN-S / TN-C-S（半島）、地域によりTT" },
+  { label: "系統電圧（低圧）", value: "230 V（単相）/ 400 V（三相）※ MS IEC 60038準拠、2008年1月以降の公称値。実運用上は240V/415V付近で供給されるケースも多い。" },
+  { label: "周波数",           value: "50 Hz（±1%）" },
+  { label: "主要電力会社（半島）",     value: "Tenaga Nasional Berhad（TNB）― 半島マレーシアの発電・送電・配電を一貫して担うマレーシア最大の電力会社。" },
+  { label: "主要電力会社（サバ州）",   value: "Sabah Electricity Sdn. Bhd.（SESB）― サバ州・ラブアン連邦直轄領。TNBの子会社（TNB 80%・サバ州政府 20%出資）。主要電源は天然ガス・ディーゼル。半島・サラワクとグリッド非接続（独立系統）。" },
+  { label: "主要電力会社（サラワク州）", value: "Sarawak Energy Berhad（SEB）― サラワク州。サラワク州政府が100%出資する独立電力会社。水力発電中心（バクン 2,400MW 等）、発電設備を100%自社保有。2025年12月にサバとの275kV送電線（ラワス〜メンガロン）が初連系。" },
+  { label: "プラグ形状",       value: "Type G（BS 1363 / MS 589-1）" },
+  { label: "配電方式",         value: "TT（標準）。大規模需要家（1MVA超・自家変電所保有）にはTN-S推奨。TN-C-Sは非推奨。" },
 ];
 
 const SIRIM_PROCESS: string[] = [
@@ -832,7 +833,14 @@ function T1CountryProfile(): React.JSX.Element {
         <article className="reference-block">
           <h3>認証要件一覧</h3>
           <div className="table-wrap">
-            <table className="requirements-table">
+            <table className="requirements-table" style={{ tableLayout: "fixed", width: "100%" }}>
+              <colgroup>
+                <col style={{ width: "8%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "15%" }} />
+                <col style={{ width: "49%" }} />
+              </colgroup>
               <thead>
                 <tr>
                   <th>製品</th>
@@ -845,7 +853,7 @@ function T1CountryProfile(): React.JSX.Element {
               <tbody>
                 {CERT_ROWS.map((row) => (
                   <tr key={row.product}>
-                    <td><strong>{row.product}</strong></td>
+                    <td style={{ textAlign: "center" }}><strong>{row.product}</strong></td>
                     <td
                       style={{
                         color: row.requirement === "必須" ? "#c00" : row.requirement === "条件付き" ? "#885500" : "inherit",
