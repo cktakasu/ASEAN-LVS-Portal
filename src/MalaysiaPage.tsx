@@ -1225,43 +1225,37 @@ function T2MarketAndDemand(): React.JSX.Element {
                               padding: "12px 16px",
                               border: "1px solid #dee2e6",
                               backgroundColor: "#fafbfc",
-                              borderBottom: "2px solid #dee2e6"
+                              borderBottom: "2px solid #dee2e6",
+                              whiteSpace: "normal",
+                              wordBreak: "normal",
                             }}
                           >
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                              {/* 左カラム: 概要 */}
-                              <div>
-                                <h4 style={{
-                                  margin: "0 0 8px",
-                                  fontSize: "0.9rem",
-                                  fontWeight: 600,
-                                  color: "#495057"
-                                }}>
-                                  セクター概要
-                                </h4>
-                                <p style={{
-                                  margin: 0,
-                                  fontSize: "0.85rem",
-                                  lineHeight: "1.6",
-                                  wordBreak: "break-word",
-                                  overflowWrap: "break-word",
-                                  whiteSpace: "pre-wrap",
-                                  color: "#6c757d"
-                                }}>
-                                  {sector.sector_overview}
-                                </p>
-                              </div>
-
-                              {/* 右カラム: 出典情報 */}
-                              <div style={{ display: "flex", alignItems: "flex-end" }}>
-                                <p style={{
-                                  margin: 0,
-                                  fontSize: "0.75rem",
-                                  color: "#adb5bd"
-                                }}>
-                                  出典: {sector.source}
-                                </p>
-                              </div>
+                            <div>
+                              {/* 概要テキスト（全幅） */}
+                              <h4 style={{
+                                margin: "0 0 8px",
+                                fontSize: "0.9rem",
+                                fontWeight: 600,
+                                color: "#495057"
+                              }}>
+                                セクター概要
+                              </h4>
+                              <p style={{
+                                margin: "0 0 10px",
+                                fontSize: "0.85rem",
+                                lineHeight: "1.7",
+                                color: "#6c757d"
+                              }}>
+                                {sector.sector_overview}
+                              </p>
+                              {/* 出典（フッター） */}
+                              <p style={{
+                                margin: 0,
+                                fontSize: "0.75rem",
+                                color: "#adb5bd"
+                              }}>
+                                出典: {sector.source}
+                              </p>
                             </div>
                           </td>
                         </tr>
