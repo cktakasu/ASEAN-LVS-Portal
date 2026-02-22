@@ -26,6 +26,9 @@ export interface SectorFocus {
   sector_market_size: string;     // セクター市場規模（単位含む）
   cb_relevance: "High" | "Medium" | "Low";  // LV-CB需要との関連度
   concentration_region?: string;  // 需要集中地域
+  growth_outlook: "very_high" | "high" | "medium" | "low";  // 成長見通し（4段階）
+  cb_demand_per_project: string;  // 案件あたりCB需要
+  overall_rating: number;         // 総合評価（1-5星評価）
   year: number;
   source: string;
   notes?: string;

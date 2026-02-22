@@ -1027,6 +1027,25 @@ function T2MarketAndDemand(): React.JSX.Element {
   const relevanceBadgeColor = (relevance: string) =>
     relevance === "High" ? "#dc3545" : relevance === "Medium" ? "#d97706" : "#6c757d";
 
+  // 成長見通しアイコン表示
+  const growthOutlookIcon = (outlook: string) => {
+    const icons = {
+      very_high: { symbol: "◎", color: "#28a745", label: "Very High" },
+      high: { symbol: "○", color: "#4A90D9", label: "High" },
+      medium: { symbol: "○", color: "#d97706", label: "Medium" },
+      low: { symbol: "△", color: "#dc3545", label: "Low" },
+    };
+    return icons[outlook as keyof typeof icons] || icons.medium;
+  };
+
+  // 星評価表示
+  const starRating = (rating: number) => {
+    return "★".repeat(rating) + "☆".repeat(5 - rating);
+  };
+
+  // 展開行管理用State
+  const [expandedSector, setExpandedSector] = useState<string | null>(null);
+
   return (
     <>
       {/* ============================================================ */}
@@ -1172,66 +1191,182 @@ function T2MarketAndDemand(): React.JSX.Element {
         <h2 style={{ fontSize: "28px" }}>注目市場</h2>
         <p className="section-subline">LV遮断器の販売先として注目すべきセクター</p>
 
-        {/* セクターカードパネル */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px", marginTop: "24px" }}>
-          {CB_SECTOR_FOCUS.map((sector) => (
-            <article
-              key={sector.sector_name}
-              style={{
-                padding: "20px",
-                borderRadius: "10px",
-                border: "1px solid #e9ecef",
-                background: "#fff",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              }}
-            >
-              {/* セクター名 + 関連度バッジ */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "#212529" }}>
-                  {sector.sector_name}
-                </h3>
-                <span
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: "999px",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    color: "#fff",
-                    backgroundColor: relevanceBadgeColor(sector.cb_relevance),
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                  }}
-                >
-                  {sector.cb_relevance}
-                </span>
-              </div>
+        {/* セクター比較テーブル */}
+        <article className="reference-block" style={{ marginTop: "24px" }}>
+          <div className="table-wrap">
+            <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
+              <colgroup>
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "12%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "20%" }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600 }}>セクター</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600 }}>市場規模</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "center", fontWeight: 600 }}>成長見通し</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600 }}>案件あたり需要</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600 }}>集中地域</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "center", fontWeight: 600 }}>総合評価</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CB_SECTOR_FOCUS.map((sector) => {
+                  const growthIcon = growthOutlookIcon(sector.growth_outlook);
+                  const isExpanded = expandedSector === sector.sector_name;
 
-              {/* セクター概要 */}
-              <p style={{ margin: "0 0 12px", fontSize: "0.92rem", lineHeight: "1.7", color: "#495057" }}>
-                {sector.sector_overview}
-              </p>
+                  return (
+                    <React.Fragment key={sector.sector_name}>
+                      {/* メインテーブル行 */}
+                      <tr
+                        style={{
+                          cursor: "pointer",
+                          backgroundColor: isExpanded ? "#f8f9fa" : "transparent"
+                        }}
+                        onClick={() => setExpandedSector(isExpanded ? null : sector.sector_name)}
+                      >
+                        <td style={{ padding: "12px 10px", border: "1px solid #dee2e6", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            {sector.sector_name}
+                            <span style={{
+                              fontSize: "0.7rem",
+                              color: isExpanded ? "#FF6600" : "#999",
+                              transition: "transform 0.2s"
+                            }}>
+                              {isExpanded ? "▼" : "▶"}
+                            </span>
+                          </div>
+                        </td>
+                        <td style={{ padding: "12px 10px", border: "1px solid #dee2e6" }}>
+                          {parseAndConvertSectorMarketSize(sector.sector_market_size)}
+                        </td>
+                        <td style={{ padding: "12px 10px", border: "1px solid #dee2e6", textAlign: "center" }}>
+                          <span
+                            style={{
+                              fontSize: "1.1rem",
+                              color: growthIcon.color,
+                              fontWeight: 600
+                            }}
+                            title={growthIcon.label}
+                          >
+                            {growthIcon.symbol}
+                          </span>
+                        </td>
+                        <td style={{ padding: "12px 10px", border: "1px solid #dee2e6" }}>
+                          {sector.cb_demand_per_project}
+                        </td>
+                        <td style={{ padding: "12px 10px", border: "1px solid #dee2e6" }}>
+                          {sector.concentration_region || "—"}
+                        </td>
+                        <td style={{ padding: "12px 10px", border: "1px solid #dee2e6", textAlign: "center" }}>
+                          <span style={{
+                            fontSize: "0.95rem",
+                            color: "#FF6600",
+                            letterSpacing: "2px"
+                          }}>
+                            {starRating(sector.overall_rating)}
+                          </span>
+                        </td>
+                      </tr>
 
-              {/* 市場規模 */}
-              <div style={{ marginBottom: "12px" }}>
-                <span style={{ fontSize: "0.78rem", color: "#6c757d", fontWeight: 600 }}>市場規模: </span>
-                <span style={{ fontSize: "0.9rem", color: "#212529", fontWeight: 600 }}>{parseAndConvertSectorMarketSize(sector.sector_market_size)}</span>
-              </div>
+                      {/* 展開詳細行 */}
+                      {isExpanded && (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            style={{
+                              padding: "16px 20px",
+                              border: "1px solid #dee2e6",
+                              backgroundColor: "#fafbfc",
+                              borderBottom: "2px solid #dee2e6"
+                            }}
+                          >
+                            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "20px" }}>
+                              {/* 左カラム: 概要 */}
+                              <div>
+                                <h4 style={{
+                                  margin: "0 0 8px",
+                                  fontSize: "0.95rem",
+                                  fontWeight: 600,
+                                  color: "#495057"
+                                }}>
+                                  セクター概要
+                                </h4>
+                                <p style={{
+                                  margin: 0,
+                                  fontSize: "0.88rem",
+                                  lineHeight: "1.7",
+                                  color: "#6c757d"
+                                }}>
+                                  {sector.sector_overview}
+                                </p>
+                              </div>
 
-              {/* 集中地域 */}
-              {sector.concentration_region && (
-                <div style={{ marginBottom: "12px" }}>
-                  <span style={{ fontSize: "0.78rem", color: "#6c757d", fontWeight: 600 }}>集中地域: </span>
-                  <span style={{ fontSize: "0.88rem", color: "#495057" }}>{sector.concentration_region}</span>
-                </div>
-              )}
+                              {/* 右カラム: 詳細情報 */}
+                              <div>
+                                <div style={{ marginBottom: "12px" }}>
+                                  <span style={{ fontSize: "0.78rem", color: "#6c757d", fontWeight: 600 }}>
+                                    CB関連度:
+                                  </span>
+                                  <span
+                                    style={{
+                                      marginLeft: "8px",
+                                      padding: "3px 8px",
+                                      borderRadius: "999px",
+                                      fontSize: "0.7rem",
+                                      fontWeight: 700,
+                                      color: "#fff",
+                                      backgroundColor: relevanceBadgeColor(sector.cb_relevance),
+                                      textTransform: "uppercase",
+                                    }}
+                                  >
+                                    {sector.cb_relevance}
+                                  </span>
+                                </div>
+                                <p style={{
+                                  margin: "8px 0 0 0",
+                                  fontSize: "0.75rem",
+                                  color: "#adb5bd"
+                                }}>
+                                  出典: {sector.source}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
-              {/* 出典 */}
-              <p style={{ margin: "8px 0 0", fontSize: "0.75rem", color: "#adb5bd" }}>
-                出典: {sector.source}
-              </p>
-            </article>
-          ))}
-        </div>
+          {/* テーブル凡例 */}
+          <div style={{
+            marginTop: "16px",
+            padding: "12px 16px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "6px",
+            fontSize: "0.82rem"
+          }}>
+            <p style={{ margin: "0 0 6px", fontWeight: 600, color: "#495057" }}>
+              成長見通し凡例:
+            </p>
+            <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+              <span style={{ color: "#28a745" }}><strong>◎</strong> Very High (成長率 8%+)</span>
+              <span style={{ color: "#4A90D9" }}><strong>○</strong> High (成長率 5-8%)</span>
+              <span style={{ color: "#d97706" }}><strong>○</strong> Medium (成長率 3-5%)</span>
+              <span style={{ color: "#dc3545" }}><strong>△</strong> Low (成長率 3%未満)</span>
+            </div>
+            <p style={{ margin: "8px 0 0 0", fontSize: "0.78rem", color: "#6c757d" }}>
+              ※ 各行をクリックすると詳細情報が表示されます
+            </p>
+          </div>
+        </article>
       </section>
 
       {/* ============================================================ */}
