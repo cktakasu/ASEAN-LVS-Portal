@@ -1,6 +1,9 @@
 /* ------------------------------------------------------------------ */
 /*  T2 Market & Demand — Malaysia LV CB Market Data                   */
 /*  出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"    */
+/*  CAGR: 6.8% (2025-2031) — 6Wresearch公表値（全CB帯対象）          */
+/*  URL: https://www.6wresearch.com/industry-report/                  */
+/*       malaysia-circuit-breaker-market-outlook                      */
 /* ------------------------------------------------------------------ */
 
 import type {
@@ -16,54 +19,56 @@ import type {
 /**
  * マレーシア LV CB 市場規模（年次）
  * スコープ: LV CB only, excl. fuses, excl. MV/HV
- * CAGR: 約 6.0%（2025-2031）
+ * CAGR: 6.8%（2025-2031）— 6Wresearch公表値（全CB帯対象）
  * 出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"
+ *       https://www.6wresearch.com/industry-report/malaysia-circuit-breaker-market-outlook
+ * 注意: 2020-2024年の中央値は6Wresearch歴史的推計値。Low/Highレンジは一次出典なし（非表示）。
  */
 export const CB_MARKET_DATA: MarketDataPoint[] = [
   {
     year: 2020,
     market_size_usd_million: 110,
-    market_size_low_usd_million: 95,
-    market_size_high_usd_million: 125,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
-    source: "6Wresearch 2025 (historical estimate; range reflects inter-source variance)",
+    source: "6Wresearch 2025 (historical estimate)",
   },
   {
     year: 2021,
     market_size_usd_million: 118,
-    market_size_low_usd_million: 103,
-    market_size_high_usd_million: 133,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
-    source: "6Wresearch 2025 (historical estimate; range reflects inter-source variance)",
+    source: "6Wresearch 2025",
   },
   {
     year: 2022,
     market_size_usd_million: 128,
-    market_size_low_usd_million: 112,
-    market_size_high_usd_million: 144,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
-    source: "6Wresearch 2025 (historical estimate; range reflects inter-source variance)",
+    source: "6Wresearch 2025",
   },
   {
     year: 2023,
     market_size_usd_million: 138,
-    market_size_low_usd_million: 120,
-    market_size_high_usd_million: 156,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
-    source: "6Wresearch 2025 (historical estimate; range reflects inter-source variance)",
+    source: "6Wresearch 2025",
   },
   {
     year: 2024,
     market_size_usd_million: 144,
-    market_size_low_usd_million: 126,
-    market_size_high_usd_million: 162,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
-    source: "6Wresearch 2025 (historical estimate; range reflects inter-source variance)",
+    source: "6Wresearch 2025",
   },
   {
     year: 2025,
@@ -76,54 +81,60 @@ export const CB_MARKET_DATA: MarketDataPoint[] = [
   },
   {
     year: 2026,
-    market_size_usd_million: 159,
-    market_size_low_usd_million: 138,
-    market_size_high_usd_million: 180,
+    // 150 × 1.068^1 = 160.2 → 160 (CAGR 6.8% per 6Wresearch)
+    market_size_usd_million: 160,
+    market_size_low_usd_million: 139,
+    market_size_high_usd_million: 181,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2027,
-    market_size_usd_million: 169,
-    market_size_low_usd_million: 146,
-    market_size_high_usd_million: 193,
+    // 150 × 1.068^2 = 171.1 → 171
+    market_size_usd_million: 171,
+    market_size_low_usd_million: 148,
+    market_size_high_usd_million: 195,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2028,
-    market_size_usd_million: 179,
-    market_size_low_usd_million: 155,
-    market_size_high_usd_million: 205,
+    // 150 × 1.068^3 = 182.7 → 183
+    market_size_usd_million: 183,
+    market_size_low_usd_million: 158,
+    market_size_high_usd_million: 210,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2029,
-    market_size_usd_million: 190,
-    market_size_low_usd_million: 165,
-    market_size_high_usd_million: 218,
+    // 150 × 1.068^4 = 195.2 → 195
+    market_size_usd_million: 195,
+    market_size_low_usd_million: 169,
+    market_size_high_usd_million: 224,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2030,
-    market_size_usd_million: 202,
-    market_size_low_usd_million: 175,
-    market_size_high_usd_million: 231,
+    // 150 × 1.068^5 = 208.4 → 208
+    market_size_usd_million: 208,
+    market_size_low_usd_million: 180,
+    market_size_high_usd_million: 238,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2031,
-    market_size_usd_million: 213,
-    market_size_low_usd_million: 185,
-    market_size_high_usd_million: 244,
+    // 150 × 1.068^6 = 222.6 → 223 → CAGR実測: (223/150)^(1/6)-1 ≈ 6.83%
+    market_size_usd_million: 223,
+    market_size_low_usd_million: 194,
+    market_size_high_usd_million: 255,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
