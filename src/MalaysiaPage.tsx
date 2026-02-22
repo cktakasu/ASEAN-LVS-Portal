@@ -1145,11 +1145,11 @@ function T2MarketAndDemand(): React.JSX.Element {
           <div className="table-wrap">
             <table className="definition-table" style={{ width: "100%", fontSize: "0.85rem", tableLayout: "fixed" }}>
               <colgroup>
-                <col style={{ width: "15%" }} />
-                <col style={{ width: "22%" }} />
+                <col style={{ width: "20%" }} />
+                <col style={{ width: "30%" }} />
                 <col style={{ width: "10%" }} />
+                <col style={{ width: "22%" }} />
                 <col style={{ width: "18%" }} />
-                <col style={{ width: "35%" }} />
               </colgroup>
               <thead>
                 <tr>
