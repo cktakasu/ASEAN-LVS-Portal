@@ -19,6 +19,7 @@ import type {
 /* ------------------------------------------------------------------ */
 
 import { useChartTransition } from "./hooks";
+import { ForecastBadge, ForecastReferenceArea } from "./components/charts";
 
 /* ------------------------------------------------------------------ */
 /*  Legend Component                                                   */
@@ -570,19 +571,7 @@ function T1CountryProfile(): React.JSX.Element {
                       label={{ value: "GDP（兆円）", angle: -90, position: "insideLeft" }}
                     />
                     {/* 予測期間の背景色（2025-2030） */}
-                    <ReferenceArea
-                      x1={2025}
-                      x2={2030}
-                      fill="rgba(200, 200, 200, 0.6)"
-                      stroke="none"
-                    />
-                    {/* Result / Forecast の境界線（2025年） */}
-                    <ReferenceLine
-                      x={2025}
-                      stroke="#999"
-                      strokeDasharray="3 8"
-                      strokeWidth={1.5}
-                    />
+                    <ForecastReferenceArea boundaryYear={2025} forecastEndYear={2030} />
                     <GDPChartTooltip usdJpy={USD_JPY} />
                     {/* マレーシア: 統合ライン（実績+予測）2015-2030 */}
                     <Line
@@ -619,47 +608,9 @@ function T1CountryProfile(): React.JSX.Element {
                     })}
                   </LineChart>
                 </ResponsiveContainer>
-                {/* Result / Forecast バッジ */}
-                {/* Result (2015-2025) - 正確な中央位置: 36.5% */}
-                <div style={{
-                  position: "absolute",
-                  top: "20px",
-                  left: "36.5%",
-                  transform: "translateX(-50%)",
-                  padding: "4px 14px",
-                  backgroundColor: "rgba(37, 99, 235, 0.8)",
-                  borderRadius: "999px",
-                  fontFamily: "'Roboto Condensed', sans-serif",
-                  fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000",
-                  letterSpacing: "0.5px",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                }}>
-                  Result
-                </div>
-                {/* Forecast (2025-2030) - 正確な中央位置: 82% */}
-                <div style={{
-                  position: "absolute",
-                  top: "20px",
-                  left: "82%",
-                  transform: "translateX(-50%)",
-                  padding: "4px 14px",
-                  backgroundColor: "rgba(100, 116, 139, 0.8)",
-                  borderRadius: "999px",
-                  fontFamily: "'Roboto Condensed', sans-serif",
-                  fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000",
-                  letterSpacing: "0.5px",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                }}>
-                  Forecast
-                </div>
+                {/* Actual / Forecast バッジ */}
+                <ForecastBadge type="actual" leftPosition="36.5%" />
+                <ForecastBadge type="forecast" leftPosition="82%" />
               </div>
               {/* マレーシア注釈 - チェックボックスの上 */}
               <p style={{ ...STYLES.fontSize.medium, ...STYLES.color.secondary, marginTop: "16px", marginBottom: "8px", lineHeight: "1.7", paddingLeft: "80px" }}>
@@ -946,14 +897,13 @@ function T1CountryProfile(): React.JSX.Element {
 const MarketSizeTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
 
-  const central = (payload.find(p => p.dataKey === "market_size_usd_million")?.value as number | undefined);
-  const low = (payload.find(p => p.dataKey === "market_size_low_usd_million")?.value as number | undefined);
-  const bandWidth = (payload.find(p => p.dataKey === "band_width")?.value as number | undefined);
+  const central = (payload.find(p => p.dataKey === "market_size_jpy")?.value as number | undefined);
+  const low = (payload.find(p => p.dataKey === "market_size_low_jpy")?.value as number | undefined);
+  const bandWidth = (payload.find(p => p.dataKey === "band_width_jpy")?.value as number | undefined);
   const high = low != null && bandWidth != null ? low + bandWidth : undefined;
 
-  // USD Million → 億円 変換
-  const USD_JPY = 140;
-  const toOkuYen = (usdMillion: number) => Math.round(usdMillion * USD_JPY / 100);
+  // 円 → 億円 変換
+  const toOkuYen = (yen: number) => Math.round(yen / 100000000);
 
   return (
     <div style={{ backgroundColor: "rgba(255,255,255,0.97)", border: "1px solid #ccc", padding: "10px 14px", borderRadius: "4px", lineHeight: "1.7", minWidth: "200px" }}>
@@ -962,7 +912,6 @@ const MarketSizeTooltip: React.FC<TooltipProps> = ({ active, payload, label }) =
         <p style={{ margin: "0 0 2px", fontSize: "0.9rem" }}>
           <span style={{ color: "#FF6600", fontWeight: 600 }}>●</span>
           {" "}中央推定値: 約{toOkuYen(central).toLocaleString()}億円
-          <span style={{ fontSize: "0.75rem", color: "#666" }}> (USD {central}M)</span>
         </p>
       )}
       {low != null && high != null && (
@@ -1046,6 +995,17 @@ function T2MarketAndDemand(): React.JSX.Element {
   // 展開行管理用State
   const [expandedSector, setExpandedSector] = useState<string | null>(null);
 
+  // 円換算済みの市場規模チャートデータ（1USD = 140JPY）
+  const CB_MARKET_CHART_DATA_JPY = useMemo(() => {
+    return CB_MARKET_CHART_DATA.map(d => ({
+      ...d,
+      market_size_jpy: d.market_size_usd_million * USD_JPY * 1000000, // 円
+      market_size_low_jpy: d.market_size_low_usd_million != null ? d.market_size_low_usd_million * USD_JPY * 1000000 : undefined,
+      market_size_high_jpy: d.market_size_high_usd_million != null ? d.market_size_high_usd_million * USD_JPY * 1000000 : undefined,
+      band_width_jpy: d.band_width != null ? d.band_width * USD_JPY * 1000000 : undefined,
+    }));
+  }, [CB_MARKET_CHART_DATA]);
+
   return (
     <>
       {/* ============================================================ */}
@@ -1113,35 +1073,32 @@ function T2MarketAndDemand(): React.JSX.Element {
           </p>
         </div>
 
-        {/* 市場規模折れ線グラフ（実績=実線、予測=破線） */}
+        {/* 市場規模折れ線グラフ（推移と不確実性レンジ） */}
         <article className="reference-block">
           <div style={{ position: "relative", height: "360px" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={CB_MARKET_CHART_DATA} margin={{ top: 10, right: 30, left: 20, bottom: 30 }}>
+              <ComposedChart data={CB_MARKET_CHART_DATA_JPY} margin={{ top: 10, right: 30, left: 20, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                 <XAxis dataKey="year" stroke="#666" tick={{ dy: 12 }} />
                 <YAxis
                   stroke="#666"
-                  domain={[0, 280]}
-                  tickFormatter={(v) => `${v}`}
-                  label={{ value: "USD Million", angle: -90, position: "insideLeft", offset: 10 }}
+                  domain={[0, 35000]}
+                  tickFormatter={(v) => `${(v / 10000).toFixed(1)}万億円`}
+                  label={{ value: "円（日本円）", angle: -90, position: "insideLeft", offset: 10 }}
                 />
-                {/* 予測期間背景（2026〜2031） */}
-                <ReferenceArea x1={2026} x2={2031} fill="rgba(200,200,200,0.25)" stroke="none" />
-                <ReferenceLine x={2025} stroke="#999" strokeDasharray="3 8" strokeWidth={1.5} />
                 {/* ツールチップ */}
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <Tooltip content={<MarketSizeTooltip active={false} payload={[]} label="" />  as any} />
                 {/* オレンジ帯: 不確実性レンジ */}
                 <Area
-                  dataKey="market_size_low_usd_million"
+                  dataKey="market_size_low_jpy"
                   stackId="band"
                   fill="transparent"
                   stroke="none"
                   isAnimationActive={false}
                 />
                 <Area
-                  dataKey="band_width"
+                  dataKey="band_width_jpy"
                   stackId="band"
                   fill="rgba(255,140,0,0.20)"
                   stroke="none"
@@ -1150,7 +1107,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                 {/* 中央推定値ライン */}
                 <Line
                   type="monotone"
-                  dataKey="market_size_usd_million"
+                  dataKey="market_size_jpy"
                   stroke="#FF6600"
                   strokeWidth={2.5}
                   dot={{ r: 4, fill: "#FF6600" }}
@@ -1159,18 +1116,11 @@ function T2MarketAndDemand(): React.JSX.Element {
                 />
               </ComposedChart>
             </ResponsiveContainer>
-            {/* Actual / Forecast バッジ */}
-            <div style={{ position: "absolute", top: "14px", left: "34%", transform: "translateX(-50%)", padding: "4px 12px", backgroundColor: "rgba(255,102,0,0.85)", borderRadius: "999px", fontSize: "0.82rem", fontWeight: 700, color: "#fff", letterSpacing: "0.5px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              Actual
-            </div>
-            <div style={{ position: "absolute", top: "14px", left: "74%", transform: "translateX(-50%)", padding: "4px 12px", backgroundColor: "rgba(100,116,139,0.85)", borderRadius: "999px", fontSize: "0.82rem", fontWeight: 700, color: "#fff", letterSpacing: "0.5px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              Forecast
-            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "12px", flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div style={{ width: "24px", height: "3px", backgroundColor: "#FF6600" }} />
-              <span style={{ fontSize: "0.82rem", color: "#666" }}>中央推定値（実線=実績、破線=予測）</span>
+              <span style={{ fontSize: "0.82rem", color: "#666" }}>中央推定値</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div style={{ width: "24px", height: "12px", backgroundColor: "rgba(255,140,0,0.20)", border: "1px solid rgba(255,140,0,0.4)" }} />
@@ -1178,7 +1128,7 @@ function T2MarketAndDemand(): React.JSX.Element {
             </div>
           </div>
           <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "10px", lineHeight: "1.6" }}>
-            出典: {MARKET_DATA_SOURCES.market_size}
+            出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"
           </p>
         </article>
       </section>
