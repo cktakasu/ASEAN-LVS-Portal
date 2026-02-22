@@ -1082,9 +1082,8 @@ function T2MarketAndDemand(): React.JSX.Element {
                 <XAxis dataKey="year" stroke="#666" tick={{ dy: 12 }} />
                 <YAxis
                   stroke="#666"
-                  domain={[0, 35000]}
-                  tickFormatter={(v) => `${(v / 10000).toFixed(1)}万億円`}
-                  label={{ value: "円（日本円）", angle: -90, position: "insideLeft", offset: 10 }}
+                  tickFormatter={(v) => `${Math.round(v / 100000000)}億円`}
+                  label={{ value: "億円", angle: -90, position: "insideLeft", offset: 10 }}
                 />
                 {/* ツールチップ */}
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
