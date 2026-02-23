@@ -246,7 +246,7 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
   },
   {
     state_name: "Kuala Lumpur / Putrajaya",
-    state_name_ja: "クアラルンプール / プトラジャヤ",
+    state_name_ja: "KL / プトラジャヤ",
     gdp_usd_billion: 65.1,
     gdp_national_share_pct: 15.9,
     gdp_growth_pct: 6.2,  // ①修正: 5.5%→6.2%

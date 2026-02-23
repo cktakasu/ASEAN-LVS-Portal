@@ -1322,12 +1322,12 @@ function T2MarketAndDemand(): React.JSX.Element {
             <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
               <thead>
                 <tr>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600 }}>州</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>GDP (兆円 / USD Bn)</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>全国比</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>成長率</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600 }}>主要産業</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600 }}>成長産業</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>州</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>GDP (兆円 / USD Bn)</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>全国比</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>成長率</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>主要産業</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>成長産業</th>
                 </tr>
               </thead>
               <tbody>
