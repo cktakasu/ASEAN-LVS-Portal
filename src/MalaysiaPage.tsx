@@ -1017,7 +1017,7 @@ function T2MarketAndDemand(): React.JSX.Element {
         <p className="section-subline">Low Voltage Circuit Breaker Market — Malaysia（2020-2031）</p>
 
         {/* KPI カード */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px", maxWidth: "1024px", marginInline: "0 auto" }}>
+        <div style={{ width: "100%", maxWidth: "1024px", marginLeft: "auto", marginRight: "auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px" }}>
           {[
             {
               label: "ASEANランク",
