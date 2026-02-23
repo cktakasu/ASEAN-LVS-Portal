@@ -1145,11 +1145,11 @@ function T2MarketAndDemand(): React.JSX.Element {
           <div className="table-wrap">
             <table className="definition-table" style={{ width: "100%", fontSize: "0.85rem", tableLayout: "fixed" }}>
               <colgroup>
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "30%" }} />
-                <col style={{ width: "10%" }} />
-                <col style={{ width: "30%" }} />
-                <col style={{ width: "10%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "34%" }} />
+                <col style={{ width: "9%" }} />
+                <col style={{ width: "26%" }} />
+                <col style={{ width: "13%" }} />
               </colgroup>
               <thead>
                 <tr>
@@ -1339,7 +1339,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                       <span style={{ fontSize: "0.75rem", color: "#999" }}> (USD {state.gdp_usd_billion.toFixed(1)}B)</span>
                     </td>
                     <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>{state.gdp_national_share_pct.toFixed(1)}%</td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
                       {state.gdp_growth_pct.toFixed(1)}%
                     </td>
                     <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.major_industries}</td>
@@ -1350,8 +1350,8 @@ function T2MarketAndDemand(): React.JSX.Element {
             </table>
           </div>
           <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
-            上位5州（Selangor、KL/Putrajaya、Johor、Penang、Sarawak）でマレーシアGDPの約68%を占め、LV遮断器の需要もこの5州に集中すると見られる。<br />
-            出典: {MARKET_DATA_SOURCES.regional_profile}
+            上位5州（Selangor、KL/Putrajaya、Johor、Sarawak、Penang）でマレーシアGDPの約68%を占め、LV遮断器の需要もこの5州に集中すると見られる。<br />
+            ※ 全国平均成長率5.1%超の州を緑色で表示。出典: DOSM, GDP by State 2024（2025年7月1日発表）
           </p>
         </article>
       </section>

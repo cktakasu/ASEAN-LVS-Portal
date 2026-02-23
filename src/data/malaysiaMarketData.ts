@@ -240,20 +240,20 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
     gdp_national_share_pct: 25.9,
     gdp_growth_pct: 6.3,
     major_industries: "サービス, E&E製造, デジタル, 製薬",
-    growing_industries: "DC（Google USD 2B投資、Cyberjaya集積）, デジタルサービス",
+    growing_industries: "DC（Google USD 2B投資、Elmina Business Park集積）, デジタルサービス",  // ⑨修正: Cyberjaya→Elmina Business Park
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
     state_name: "Kuala Lumpur / Putrajaya",
     state_name_ja: "クアラルンプール / プトラジャヤ",
     gdp_usd_billion: 65.1,
     gdp_national_share_pct: 15.9,
-    gdp_growth_pct: 5.5,
+    gdp_growth_pct: 6.2,  // ①修正: 5.5%→6.2%
     major_industries: "金融, 商業, サービス",
     growing_industries: "MRT3建設（RM 45B）, 都市再開発",
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
     state_name: "Johor",
@@ -264,62 +264,62 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
     major_industries: "DC, 物流, 製造, 石油化学",
     growing_industries: "DC（42+案件、ASEAN最大集積）, JS-SEZ, RTS（2026年末開業）",
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
     state_name: "Sarawak",
     state_name_ja: "サラワク",
     gdp_usd_billion: 40.4,
-    gdp_national_share_pct: 9.6,
-    gdp_growth_pct: 4.8,
+    gdp_national_share_pct: 9.0,  // ⑤修正: 9.6%→9.0%（RM148.2B÷RM1,650B）
+    gdp_growth_pct: 3.9,          // ④修正: 4.8%→3.9%
     major_industries: "石油ガス, 水力発電, アルミ精錬",
     growing_industries: "グリーン水素, 再エネ重工業（Baleh Dam 1,285MW追加）",
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
     state_name: "Penang",
     state_name_ja: "ペナン",
     gdp_usd_billion: 29.9,
     gdp_national_share_pct: 7.1,
-    gdp_growth_pct: 5.2,
+    gdp_growth_pct: 4.8,  // ⑦修正: 5.2%→4.8%
     major_industries: "半導体, E&E, 精密機械",
-    growing_industries: "半導体増設（Intel RM 30B/10年、Infineon SiC工場）",
+    growing_industries: "半導体増設（Intel RM 30B/10年 ※一部凍結中）",  // ⑥修正: Infineon削除 / ⑩修正: Intel凍結注記
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
     state_name: "Sabah",
     state_name_ja: "サバ",
     gdp_usd_billion: 25.0,
-    gdp_national_share_pct: 5.9,
-    gdp_growth_pct: 3.8,
+    gdp_national_share_pct: 5.1,  // ③修正: 5.9%→5.1%（RM84.3B÷RM1,650B）
+    gdp_growth_pct: 1.1,          // ②修正: 3.8%→1.1%（全州中最低）
     major_industries: "石油ガス, パーム油, 観光",
     growing_industries: "観光（高付加価値化）, ブルーエコノミー",
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
     state_name: "Perak",
     state_name_ja: "ペラク",
     gdp_usd_billion: 21.9,
     gdp_national_share_pct: 5.2,
-    gdp_growth_pct: 4.5,
+    gdp_growth_pct: 4.4,  // ⑪修正: 4.5%→4.4%
     major_industries: "製造, 農業, 鉱業",
     growing_industries: "—",
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
     state_name: "Pahang",
     state_name_ja: "パハン",
     gdp_usd_billion: 18.1,
     gdp_national_share_pct: 4.3,
-    gdp_growth_pct: 5.3,
+    gdp_growth_pct: 5.7,  // ⑧修正: 5.3%→5.7%
     major_industries: "鉱業, 農業, 建設",
     growing_industries: "ECRL沿線開発",
     year: 2024,
-    source: "DOSM; ASEAN Briefing",
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
 ];
 
@@ -330,5 +330,5 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
 export const MARKET_DATA_SOURCES = {
   market_size: '6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"',
   sector_focus: "Mordor Intelligence; Arizton; DOSM; MDEC; 6Wresearch",
-  regional_profile: "DOSM; ASEAN Briefing; 各州政府資料",
+  regional_profile: "DOSM, GDP by State 2024（2025年7月1日発表）; 各州政府資料",
 };
