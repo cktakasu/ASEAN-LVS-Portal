@@ -1022,7 +1022,7 @@ function T2MarketAndDemand(): React.JSX.Element {
             {
               label: "ASEANランク",
               value: "#2",
-              sub: "市場規模（6ヵ国中）",
+              sub: "ASEAN低圧遮断器市場規模（6ヵ国中）",
               color: "#4A90D9",
             },
             {
