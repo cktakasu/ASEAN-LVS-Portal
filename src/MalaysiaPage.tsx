@@ -776,7 +776,7 @@ function T1CountryProfile(): React.JSX.Element {
         <article className="reference-block">
           <h3>認証要件一覧</h3>
           <div className="table-wrap">
-            <table className="requirements-table">
+            <table className="requirements-table" style={{ maxWidth: "1004px", margin: "0 auto" }}>
               <thead>
                 <tr>
                   <th>製品</th>
