@@ -1,14 +1,15 @@
 /* ------------------------------------------------------------------ */
 /*  T2 Market & Demand — Malaysia LV CB Market Data                   */
 /*  出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"    */
+/*  CAGR: 6.8% (2025-2031) — 6Wresearch公表値（全CB帯対象）          */
+/*  URL: https://www.6wresearch.com/industry-report/                  */
+/*       malaysia-circuit-breaker-market-outlook                      */
 /* ------------------------------------------------------------------ */
 
 import type {
   MarketDataPoint,
-  ProductMixItem,
-  ApplicationMixItem,
-  DemandDriver,
-  MegaProject,
+  SectorFocus,
+  RegionalProfile,
 } from "../types/market";
 
 /* ------------------------------------------------------------------ */
@@ -18,10 +19,57 @@ import type {
 /**
  * マレーシア LV CB 市場規模（年次）
  * スコープ: LV CB only, excl. fuses, excl. MV/HV
- * CAGR: 約 6.0%（2025-2031）
+ * CAGR: 6.8%（2025-2031）— 6Wresearch公表値（全CB帯対象）
  * 出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"
+ *       https://www.6wresearch.com/industry-report/malaysia-circuit-breaker-market-outlook
+ * 注意: 2020-2024年の中央値は6Wresearch歴史的推計値。Low/Highレンジは一次出典なし（非表示）。
  */
 export const CB_MARKET_DATA: MarketDataPoint[] = [
+  {
+    year: 2020,
+    market_size_usd_million: 110,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
+    scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
+    is_forecast: false,
+    source: "6Wresearch 2025 (historical estimate)",
+  },
+  {
+    year: 2021,
+    market_size_usd_million: 118,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
+    scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
+    is_forecast: false,
+    source: "6Wresearch 2025",
+  },
+  {
+    year: 2022,
+    market_size_usd_million: 128,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
+    scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
+    is_forecast: false,
+    source: "6Wresearch 2025",
+  },
+  {
+    year: 2023,
+    market_size_usd_million: 138,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
+    scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
+    is_forecast: false,
+    source: "6Wresearch 2025",
+  },
+  {
+    year: 2024,
+    market_size_usd_million: 144,
+    market_size_low_usd_million: undefined,
+    market_size_high_usd_million: undefined,
+    scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
+    is_forecast: false,
+    source: "6Wresearch 2025",
+  },
   {
     year: 2025,
     market_size_usd_million: 150,
@@ -33,54 +81,60 @@ export const CB_MARKET_DATA: MarketDataPoint[] = [
   },
   {
     year: 2026,
-    market_size_usd_million: 159,
-    market_size_low_usd_million: 138,
-    market_size_high_usd_million: 180,
+    // 150 × 1.068^1 = 160.2 → 160 (CAGR 6.8% per 6Wresearch)
+    market_size_usd_million: 160,
+    market_size_low_usd_million: 139,
+    market_size_high_usd_million: 181,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2027,
-    market_size_usd_million: 169,
-    market_size_low_usd_million: 146,
-    market_size_high_usd_million: 193,
+    // 150 × 1.068^2 = 171.1 → 171
+    market_size_usd_million: 171,
+    market_size_low_usd_million: 148,
+    market_size_high_usd_million: 195,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2028,
-    market_size_usd_million: 179,
-    market_size_low_usd_million: 155,
-    market_size_high_usd_million: 205,
+    // 150 × 1.068^3 = 182.7 → 183
+    market_size_usd_million: 183,
+    market_size_low_usd_million: 158,
+    market_size_high_usd_million: 210,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2029,
-    market_size_usd_million: 190,
-    market_size_low_usd_million: 165,
-    market_size_high_usd_million: 218,
+    // 150 × 1.068^4 = 195.2 → 195
+    market_size_usd_million: 195,
+    market_size_low_usd_million: 169,
+    market_size_high_usd_million: 224,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2030,
-    market_size_usd_million: 202,
-    market_size_low_usd_million: 175,
-    market_size_high_usd_million: 231,
+    // 150 × 1.068^5 = 208.4 → 208
+    market_size_usd_million: 208,
+    market_size_low_usd_million: 180,
+    market_size_high_usd_million: 238,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
   },
   {
     year: 2031,
-    market_size_usd_million: 213,
-    market_size_low_usd_million: 185,
-    market_size_high_usd_million: 244,
+    // 150 × 1.068^6 = 222.6 → 223 → CAGR実測: (223/150)^(1/6)-1 ≈ 6.83%
+    market_size_usd_million: 223,
+    market_size_low_usd_million: 194,
+    market_size_high_usd_million: 255,
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: true,
     source: "6Wresearch 2025",
@@ -98,255 +152,174 @@ export const CB_MARKET_CHART_DATA = CB_MARKET_DATA.map((d) => ({
 }));
 
 /* ------------------------------------------------------------------ */
-/*  ② 機種別構成比（T2_cb_product_mix）                               */
+/*  ② 注目市場（T2_demand_drivers.csv）                              */
 /* ------------------------------------------------------------------ */
 
 /**
- * 2025年 機種別シェア
- * 出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"
+ * 注目市場セクター
+ * LV遮断器の販売先として注目すべきセクター
+ * 出典: Mordor Intelligence; Arizton; DOSM; MDEC; 6Wresearch
  */
-export const CB_PRODUCT_MIX: ProductMixItem[] = [
-  { product_type: "MCCB", share_pct: 38 },
-  { product_type: "MCB",  share_pct: 28 },
-  { product_type: "ACB",  share_pct: 14 },
-  { product_type: "RCCB", share_pct: 10 },
-  { product_type: "RCBO", share_pct: 7  },
-  { product_type: "ELCB", share_pct: 3  },
-];
-
-/* ------------------------------------------------------------------ */
-/*  ③ 用途別構成比（T2_cb_application_mix）                            */
-/* ------------------------------------------------------------------ */
-
-/**
- * 2025年 用途別シェア
- * 出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"
- */
-export const CB_APPLICATION_MIX: ApplicationMixItem[] = [
-  { application: "製造業・工業",     share_pct: 32 },
-  { application: "商業建築",         share_pct: 23 },
-  { application: "住宅",             share_pct: 20 },
-  { application: "インフラ・公益事業", share_pct: 12 },
-  { application: "データセンター",   share_pct: 9  },
-  { application: "その他",           share_pct: 4  },
-];
-
-/* ------------------------------------------------------------------ */
-/*  ④ 需要ドライバー（T2_demand_drivers）                              */
-/* ------------------------------------------------------------------ */
-
-/**
- * 需要ドライバー（ヒートマップスコア付き）
- * スコア定義: 5=主要用途 / 4=標準使用 / 3=補助的 / 2=限定的 / 1=ほぼなし / 0=不適用
- * スコア根拠3層: IEC規格 > Schneider EIG / ABB Tech Paper > 6Wresearch
- */
-export const CB_DEMAND_DRIVERS: DemandDriver[] = [
+export const CB_SECTOR_FOCUS: SectorFocus[] = [
   {
-    driver_name: "Data Center Boom",
-    category: "ICT",
-    description:
-      "ジョホール州を中心に42件超のDC建設が進行。AWS・Microsoft・Googleが計約104億USDを投資予定。大電流幹線でACB・MCCBが主力、漏電保護は限定的。",
-    impact: "High",
-    time_horizon: "2025-2031",
-    policy_reference: "Malaysia DC Investment Policy; MDEC",
-    acb_relevance: 5,
-    mccb_relevance: 5,
-    elcb_relevance: 2,
-    mcb_relevance: 3,
-    rcbo_relevance: 2,
-    rccb_relevance: 2,
-    relevance_source: "IEC 60947-2; Schneider EIG Ch.A; 6Wresearch",
+    sector_name: "データセンター",
+    sector_overview: "ASEAN建設中DC容量の60%超がマレーシアに集中。143件承認済み、総投資額RM 144.4B。電気設備がDC建設コストの約40%を占め、LV配電盤の需要が直接発生する。",
+    sector_market_size: "USD 6.14B (2025)",
+    cb_relevance: "High",
+    concentration_region: "Johor, Selangor",
+    growth_outlook: "very_high",
+    cb_demand_per_project: "200-500個/案件",
+    overall_rating: 5,
+    year: 2025,
+    source: "Mordor Intelligence; Arizton",
   },
   {
-    driver_name: "13MP Infrastructure",
-    category: "Infrastructure",
-    description:
-      "第13次マレーシア計画（2026-2030）の公共インフラ投資。道路・港湾・空港整備で配電盤需要増。幹線はACB/MCCB、末端はMCB/RCCB。",
-    impact: "High",
-    time_horizon: "2026-2030",
-    policy_reference: "13MP; Budget 2025",
-    acb_relevance: 4,
-    mccb_relevance: 5,
-    elcb_relevance: 3,
-    mcb_relevance: 4,
-    rcbo_relevance: 2,
-    rccb_relevance: 3,
-    relevance_source: "IEC 60364-7-712; Schneider EIG Ch.H; 6Wresearch",
+    sector_name: "半導体・E&E",
+    sector_overview: "世界のチップパッケージングの13%を担う。Intel RM30B/10年、Infineon SiC工場等の増設が続く。クリーンルーム・製造装置ごとに配電盤が必要で、高信頼性のLV遮断器需要が発生。",
+    sector_market_size: "USD 10.85B (2025)",
+    cb_relevance: "High",
+    concentration_region: "Penang, Kedah",
+    growth_outlook: "very_high",
+    cb_demand_per_project: "150-400個/案件",
+    overall_rating: 5,
+    year: 2025,
+    source: "Mordor Intelligence; DOSM",
   },
   {
-    driver_name: "Semiconductor Expansion",
-    category: "Manufacturing",
-    description:
-      "ペナン・クダ州の半導体ファブ拡張（Intel・Infineon等）。クリーンルーム電源でACB/MCCB需要大。ELCBは精密機器保護に一部使用。",
-    impact: "High",
-    time_horizon: "2025-2029",
-    policy_reference: "New Investment Policy; MIDA",
-    acb_relevance: 4,
-    mccb_relevance: 5,
-    elcb_relevance: 3,
-    mcb_relevance: 4,
-    rcbo_relevance: 2,
-    rccb_relevance: 2,
-    relevance_source: "IEC 60947-2; ABB Tech Paper No.7; 6Wresearch",
+    sector_name: "石油化学",
+    sector_overview: "PETRONAS起点でマレーシア製造業GDPの柱。プラントのモーター制御盤にMCCBが多用される。新設は限定的だが、老朽更新需要が継続的に発生する。",
+    sector_market_size: "MCC市場 USD 5.8B (2025)",
+    cb_relevance: "High",
+    concentration_region: "Johor, Pahang, Terengganu",
+    growth_outlook: "medium",
+    cb_demand_per_project: "100-300個/案件",
+    overall_rating: 4,
+    year: 2025,
+    source: "6Wresearch",
   },
   {
-    driver_name: "Renewable Energy 35%",
-    category: "Energy",
-    description:
-      "NETR 2.0目標：2035年に再エネ比率35%。太陽光DC-AC変換インバータ出口にMCCB/MCB使用。住宅用太陽光でRCBOも増加。",
-    impact: "Medium",
-    time_horizon: "2025-2035",
-    policy_reference: "NETR 2.0; LSS5",
-    acb_relevance: 2,
-    mccb_relevance: 4,
-    elcb_relevance: 2,
-    mcb_relevance: 4,
-    rcbo_relevance: 3,
-    rccb_relevance: 2,
-    relevance_source: "IEC 60364-7-712; Schneider EIG Ch.E; 6Wresearch",
+    sector_name: "住宅・商業ビル",
+    sector_overview: "年間15万戸の住宅着工計画。住宅建設が建設市場の44.3%を占める。1棟ごとに分電盤が必要で、数量ベースではLV遮断器の最大需要先。",
+    sector_market_size: "建設市場 USD 41.2B (2026)",
+    cb_relevance: "Medium",
+    concentration_region: "全国（特に都市部）",
+    growth_outlook: "high",
+    cb_demand_per_project: "20-50個/棟",
+    overall_rating: 4,
+    year: 2025,
+    source: "DOSM; CIDB",
   },
   {
-    driver_name: "Residential Construction",
-    category: "Residential",
-    description:
-      "都市部住宅着工件数増加（13MP住宅目標60万戸）。住宅盤にMCB・RCCB・RCBOがST義務。ACBは不適用。",
-    impact: "Medium",
-    time_horizon: "2025-2030",
-    policy_reference: "13MP Housing; ST Regulation",
-    acb_relevance: 1,
-    mccb_relevance: 2,
-    elcb_relevance: 4,
-    mcb_relevance: 5,
-    rcbo_relevance: 4,
-    rccb_relevance: 5,
-    relevance_source: "IEC 60898-1; IEC 61008; IEC 61009; MS IEC 60364",
-  },
-  {
-    driver_name: "Penang Transport Infra",
-    category: "Infrastructure",
-    description:
-      "ペナンLRT Mutiara Line（2026年着工予定）および周辺再開発。駅舎・車両基地の幹線・分電盤にACB/MCCB集中使用。",
-    impact: "Medium",
-    time_horizon: "2026-2031",
-    policy_reference: "Penang LRT; 13MP",
-    acb_relevance: 4,
-    mccb_relevance: 5,
-    elcb_relevance: 2,
-    mcb_relevance: 4,
-    rcbo_relevance: 2,
-    rccb_relevance: 2,
-    relevance_source: "IEC 60947-2; Schneider EIG Ch.B; 6Wresearch",
+    sector_name: "再生可能エネルギー",
+    sector_overview: "太陽光中心に年間1.4GW追加目標。2035年までに累積30GW到達見込み。PVインバータ周辺のDC MCCBなど、再エネ特有のLV遮断器需要が新規市場として拡大中。",
+    sector_market_size: "RE容量 10.56GW (2025)",
+    cb_relevance: "Medium",
+    concentration_region: "Sabah, Sarawak, Penang",
+    growth_outlook: "high",
+    cb_demand_per_project: "30-80個/サイト",
+    overall_rating: 4,
+    year: 2025,
+    source: "SEDA; NETR 2.0",
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  ⑤ メガプロジェクト一覧（T2_mega_projects）                        */
+/*  ③ 地域概況（T2_regional_profile.csv）                             */
 /* ------------------------------------------------------------------ */
 
 /**
- * マレーシア主要メガプロジェクト
- * LV CB 需要に直結する大型案件を収録
+ * 州別地域概況
+ * 州別のGDP・主要産業・成長産業を一覧で示す
+ * 出典: DOSM; ASEAN Briefing; 各州政府資料
  */
-export const CB_MEGA_PROJECTS: MegaProject[] = [
+export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
   {
-    project_name: "Johor DC Cluster（42 プロジェクト）",
-    sector: "ICT",
-    location: "Johor",
-    value_usd_million: 39080,
-    status: "Ongoing",
-    expected_completion: "2028",
-    cb_types: "ACB, MCCB",
-    notes: "ジョホール州に集中するDCキャンパス群。TNB専用変電所も新設予定。",
+    state_name: "Selangor",
+    state_name_ja: "セランゴール",
+    gdp_usd_billion: 106.0,
+    gdp_national_share_pct: 25.9,
+    gdp_growth_pct: 6.3,
+    major_industries: "サービス, E&E製造, デジタル, 製薬",
+    growing_industries: "DC（Google USD 2B投資、Elmina Business Park集積）, デジタルサービス",  // ⑨修正: Cyberjaya→Elmina Business Park
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
-    project_name: "Microsoft Malaysia Cloud Region",
-    sector: "ICT",
-    location: "Selangor / Johor",
-    value_usd_million: 2200,
-    status: "Ongoing",
-    expected_completion: "2026",
-    cb_types: "ACB, MCCB, MCB",
-    notes: "Azure リージョン設立。UPS幹線にACB、PDU分岐にMCCB/MCB。",
+    state_name: "Kuala Lumpur / Putrajaya",
+    state_name_ja: "KL / プトラジャヤ",
+    gdp_usd_billion: 65.1,
+    gdp_national_share_pct: 15.9,
+    gdp_growth_pct: 6.2,  // ①修正: 5.5%→6.2%
+    major_industries: "金融, 商業, サービス",
+    growing_industries: "MRT3建設（RM 45B）, 都市再開発",
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
-    project_name: "AWS Malaysia Cloud Region",
-    sector: "ICT",
-    location: "未開示",
-    value_usd_million: 6200,
-    status: "Planned",
-    expected_completion: "2027",
-    cb_types: "ACB, MCCB, MCB",
-    notes: "2024年5月発表。首都圏または南部に建設予定。",
+    state_name: "Johor",
+    state_name_ja: "ジョホール",
+    gdp_usd_billion: 40.9,
+    gdp_national_share_pct: 9.6,
+    gdp_growth_pct: 6.4,
+    major_industries: "DC, 物流, 製造, 石油化学",
+    growing_industries: "DC（42+案件、ASEAN最大集積）, JS-SEZ, RTS（2026年末開業）",
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
-    project_name: "Google DC Investment",
-    sector: "ICT",
-    location: "未開示",
-    value_usd_million: 2000,
-    status: "Planned",
-    expected_completion: "2027",
-    cb_types: "ACB, MCCB",
-    notes: "2024年発表。ジョホールまたはセランゴール有力。",
+    state_name: "Sarawak",
+    state_name_ja: "サラワク",
+    gdp_usd_billion: 40.4,
+    gdp_national_share_pct: 9.0,  // ⑤修正: 9.6%→9.0%（RM148.2B÷RM1,650B）
+    gdp_growth_pct: 3.9,          // ④修正: 4.8%→3.9%
+    major_industries: "石油ガス, 水力発電, アルミ精錬",
+    growing_industries: "グリーン水素, 再エネ重工業（Baleh Dam 1,285MW追加）",
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
-    project_name: "Penang LRT Mutiara Line",
-    sector: "Infrastructure",
-    location: "Penang",
-    value_usd_million: 3700,
-    status: "Ongoing",
-    expected_completion: "2030",
-    cb_types: "ACB, MCCB, MCB",
-    notes: "ペナン島内の架空鉄道。変電所・駅舎配電盤に多用途CB使用。",
+    state_name: "Penang",
+    state_name_ja: "ペナン",
+    gdp_usd_billion: 29.9,
+    gdp_national_share_pct: 7.1,
+    gdp_growth_pct: 4.8,  // ⑦修正: 5.2%→4.8%
+    major_industries: "半導体, E&E, 精密機械",
+    growing_industries: "半導体増設（Intel RM 30B/10年 ※一部凍結中）",  // ⑥修正: Infineon削除 / ⑩修正: Intel凍結注記
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
-    project_name: "MRT3 Circle Line",
-    sector: "Infrastructure",
-    location: "KL / Selangor",
-    value_usd_million: 10000,
-    status: "Planned",
-    expected_completion: "2031",
-    cb_types: "ACB, MCCB, MCB, RCBO",
-    notes: "クランバレー第3 MRT環状線。22駅を計画、入札準備中。",
+    state_name: "Sabah",
+    state_name_ja: "サバ",
+    gdp_usd_billion: 25.0,
+    gdp_national_share_pct: 5.1,  // ③修正: 5.9%→5.1%（RM84.3B÷RM1,650B）
+    gdp_growth_pct: 1.1,          // ②修正: 3.8%→1.1%（全州中最低）
+    major_industries: "石油ガス, パーム油, 観光",
+    growing_industries: "観光（高付加価値化）, ブルーエコノミー",
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
-    project_name: "Sungai Klang Link（スマートシティ）",
-    sector: "Infrastructure",
-    location: "Selangor",
-    value_usd_million: 2000,
-    status: "Planned",
-    expected_completion: "2030",
-    cb_types: "MCCB, MCB, RCCB",
-    notes: "クランバレー新都市開発。住宅・商業・交通複合。",
+    state_name: "Perak",
+    state_name_ja: "ペラク",
+    gdp_usd_billion: 21.9,
+    gdp_national_share_pct: 5.2,
+    gdp_growth_pct: 4.4,  // ⑪修正: 4.5%→4.4%
+    major_industries: "製造, 農業, 鉱業",
+    growing_industries: "—",
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
   {
-    project_name: "Trans-Borneo Railway",
-    sector: "Infrastructure",
-    location: "Sabah / Sarawak",
-    value_usd_million: undefined,
-    status: "Planned",
-    expected_completion: "2035+",
-    cb_types: "ACB, MCCB",
-    notes: "ボルネオ横断鉄道構想。詳細設計未完了。SESBとの調整必要。",
-  },
-  {
-    project_name: "JB ART（軽量輸送）",
-    sector: "Infrastructure",
-    location: "Johor Bahru",
-    value_usd_million: undefined,
-    status: "Planned",
-    expected_completion: "2028",
-    cb_types: "MCCB, MCB",
-    notes: "ジョホールバル市内ART（自律型軌道輸送）。JS-SEZ内連絡。",
-  },
-  {
-    project_name: "Gamuda 585 MWp 太陽光発電",
-    sector: "Energy",
-    location: "未開示",
-    value_usd_million: undefined,
-    status: "Ongoing",
-    expected_completion: "2026",
-    cb_types: "MCCB, MCB, RCBO",
-    notes: "LSS5入札採択案件。インバータ出口MCCBおよびSCADA配電にMCB。",
+    state_name: "Pahang",
+    state_name_ja: "パハン",
+    gdp_usd_billion: 18.1,
+    gdp_national_share_pct: 4.3,
+    gdp_growth_pct: 5.7,  // ⑧修正: 5.3%→5.7%
+    major_industries: "鉱業, 農業, 建設",
+    growing_industries: "ECRL沿線開発",
+    year: 2024,
+    source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
 ];
 
@@ -356,10 +329,6 @@ export const CB_MEGA_PROJECTS: MegaProject[] = [
 
 export const MARKET_DATA_SOURCES = {
   market_size: '6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"',
-  product_mix: '6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"',
-  application_mix: '6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"',
-  demand_drivers:
-    "IEC 60947-2 / 60898-1 / 61008 / 61009 / 60364-7-712; Schneider Electric EIG (electrical-installation.org); ABB Technical Application Papers; 6Wresearch",
-  mega_projects:
-    "MDEC / MIDA / EPU / Bernama / The Edge Markets / 各社プレスリリース（2024-2025）",
+  sector_focus: "Mordor Intelligence; Arizton; DOSM; MDEC; 6Wresearch",
+  regional_profile: "DOSM, GDP by State 2024（2025年7月1日発表）; 各州政府資料",
 };

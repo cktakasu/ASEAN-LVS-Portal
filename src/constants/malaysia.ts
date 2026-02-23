@@ -46,6 +46,65 @@ export const COLOR = {
   lightGray: "#f5f5f5",
 } as const;
 
+/* ------------------------------------------------------------------ */
+/*  Chart Forecast Visualization Colors                                */
+/* ------------------------------------------------------------------ */
+
+export const CHART_FORECAST_COLORS = {
+  // Actual badge - uses primary color
+  actualBadge: "rgba(37, 99, 235, 0.8)",      // Blue (same as COLOR.primary with opacity)
+
+  // Forecast badge - neutral gray
+  forecastBadge: "rgba(100, 116, 139, 0.8)",   // Slate gray
+
+  // Forecast period background
+  forecastBackground: "rgba(200, 200, 200, 0.4)", // Balanced opacity
+
+  // Boundary reference line
+  boundaryLine: "#999",
+
+  // Uncertainty band (Market Size only)
+  uncertaintyBand: "rgba(255, 140, 0, 0.20)",
+  uncertaintyBandBorder: "rgba(255, 140, 0, 0.4)",
+} as const;
+
+/* ------------------------------------------------------------------ */
+/*  Chart Badge Styles                                                */
+/* ------------------------------------------------------------------ */
+
+export const CHART_BADGE_STYLE = {
+  container: {
+    position: "absolute" as const,
+    top: "20px",
+    padding: "4px 14px",
+    borderRadius: "999px",
+    fontFamily: "'Roboto Condensed', sans-serif",
+    fontSize: "0.85rem",
+    fontWeight: 700,
+    color: "#fff",
+    textShadow: "0 1px 3px rgba(0,0,0,0.3)", // Simplified from 8-direction
+    letterSpacing: "0.5px",
+    textTransform: "uppercase" as const,
+    whiteSpace: "nowrap" as const,
+  },
+} as const;
+
+/* ------------------------------------------------------------------ */
+/*  Chart Reference Elements Configuration                            */
+/* ------------------------------------------------------------------ */
+
+export const CHART_REFERENCE_CONFIG = {
+  boundaryLine: {
+    stroke: "#999",
+    strokeDasharray: "3 8",
+    strokeWidth: 1.5,
+  },
+  forecastArea: {
+    fill: "rgba(200, 200, 200, 0.4)",
+    stroke: "none",
+  },
+} as const;
+
 // Spacing
 export const SPACING = {
   xs: "4px",

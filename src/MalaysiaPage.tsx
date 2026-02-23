@@ -19,6 +19,7 @@ import type {
 /* ------------------------------------------------------------------ */
 
 import { useChartTransition } from "./hooks";
+import { ForecastBadge, ForecastReferenceArea } from "./components/charts";
 
 /* ------------------------------------------------------------------ */
 /*  Legend Component                                                   */
@@ -190,24 +191,14 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceArea,
-  ReferenceLine,
   ComposedChart,
   Area,
 } from "recharts";
 import {
   CB_MARKET_CHART_DATA,
-  CB_PRODUCT_MIX,
-  CB_APPLICATION_MIX,
-  CB_DEMAND_DRIVERS,
-  CB_MEGA_PROJECTS,
-  MARKET_DATA_SOURCES,
+  CB_SECTOR_FOCUS,
+  CB_REGIONAL_PROFILE,
 } from "./data/malaysiaMarketData";
-import {
-  PRODUCT_TYPE_COLORS,
-  HEATMAP_COLORS,
-  PROJECT_STATUS_COLORS,
-} from "./constants/malaysia";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -382,21 +373,20 @@ const TABS: TabDef[] = [
 /* ------------------------------------------------------------------ */
 
 const CERT_ROWS: CertRow[] = [
-  { product: "ACB",  requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "法的義務なし。規制品目リスト（GP/ST/No.37/2024）に対象外。プロジェクト入札でSIRIM認証要求が多い" },
-  { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "法的義務なし。規制品目リストに対象外。配電盤用途でプロジェクト入札時にSIRIM認証要求が多い" },
-  { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "Electricity Regulations 1994 Reg.97およびGP/ST/No.37/2024 カテゴリ10でCoA義務。違反は最大RM100万罰金または10年禁固" },
-  { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "Electricity Regulations 1994 Reg.97およびGP/ST/No.37/2024 カテゴリ10でCoA義務。違反は最大RM100万罰金または10年禁固" },
-  { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "Electricity Regulations 1994 Reg.97およびGP/ST/No.37/2024 カテゴリ10でCoA義務。違反は最大RM100万罰金または10年禁固" },
+  { product: "ACB",  requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様で要求多し" },
+  { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様でSIRIM CoA要求" },
+  { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
 ];
 
 const POWER_INFO: InfoItem[] = [
-  { label: "系統電圧（低圧）", value: "230 V（単相）/ 400 V（三相）※ MS IEC 60038準拠、2008年1月以降の公称値。実運用上は240V/415V付近で供給されるケースも多い。" },
-  { label: "周波数",           value: "50 Hz（±1%）" },
-  { label: "主要電力会社（半島）",     value: "Tenaga Nasional Berhad（TNB）― 半島マレーシアの発電・送電・配電を一貫して担うマレーシア最大の電力会社。" },
-  { label: "主要電力会社（サバ州）",   value: "Sabah Electricity Sdn. Bhd.（SESB）― サバ州・ラブアン連邦直轄領。TNBの子会社（TNB 80%・サバ州政府 20%出資）。主要電源は天然ガス・ディーゼル。半島・サラワクとグリッド非接続（独立系統）。" },
-  { label: "主要電力会社（サラワク州）", value: "Sarawak Energy Berhad（SEB）― サラワク州。サラワク州政府が100%出資する独立電力会社。水力発電中心（バクン 2,400MW 等）、発電設備を100%自社保有。2025年12月にサバとの275kV送電線（ラワス〜メンガロン）が初連系。" },
-  { label: "プラグ形状",       value: "Type G（BS 1363 / MS 589-1）" },
-  { label: "配電方式",         value: "TT（標準）。大規模需要家（1MVA超・自家変電所保有）にはTN-S推奨。TN-C-Sは非推奨。" },
+  { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
+  { label: "周波数",           value: "50 Hz" },
+  { label: "主要電力会社",     value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
+  { label: "サバ・サラワク",   value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
+  { label: "プラグ形状",       value: "Type G（英国型 BS 1363）" },
+  { label: "配電方式",         value: "TN-S / TN-C-S（半島）、地域によりTT" },
 ];
 
 const SIRIM_PROCESS: string[] = [
@@ -556,7 +546,7 @@ function T1CountryProfile(): React.JSX.Element {
         }, [triggerTransition]);
 
         return (
-          <section className="content-block content-block--wide">
+          <section className="content-block">
             <p className="section-kicker">GDP TREND</p>
             <h2 style={{ fontSize: "28px" }}>GDP 推移（実績 + 予測）</h2>
             <p className="section-subline">2015-2030年度 / 単位：兆円（名目GDP・140円/USD）</p>
@@ -578,19 +568,7 @@ function T1CountryProfile(): React.JSX.Element {
                       label={{ value: "GDP（兆円）", angle: -90, position: "insideLeft" }}
                     />
                     {/* 予測期間の背景色（2025-2030） */}
-                    <ReferenceArea
-                      x1={2025}
-                      x2={2030}
-                      fill="rgba(200, 200, 200, 0.6)"
-                      stroke="none"
-                    />
-                    {/* Result / Forecast の境界線（2025年） */}
-                    <ReferenceLine
-                      x={2025}
-                      stroke="#999"
-                      strokeDasharray="3 8"
-                      strokeWidth={1.5}
-                    />
+                    <ForecastReferenceArea boundaryYear={2025} forecastEndYear={2030} />
                     <GDPChartTooltip usdJpy={USD_JPY} />
                     {/* マレーシア: 統合ライン（実績+予測）2015-2030 */}
                     <Line
@@ -627,47 +605,9 @@ function T1CountryProfile(): React.JSX.Element {
                     })}
                   </LineChart>
                 </ResponsiveContainer>
-                {/* Result / Forecast バッジ */}
-                {/* Result (2015-2025) - 正確な中央位置: 36.5% */}
-                <div style={{
-                  position: "absolute",
-                  top: "20px",
-                  left: "36.5%",
-                  transform: "translateX(-50%)",
-                  padding: "4px 14px",
-                  backgroundColor: "rgba(37, 99, 235, 0.8)",
-                  borderRadius: "999px",
-                  fontFamily: "'Roboto Condensed', sans-serif",
-                  fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000",
-                  letterSpacing: "0.5px",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                }}>
-                  Result
-                </div>
-                {/* Forecast (2025-2030) - 正確な中央位置: 82% */}
-                <div style={{
-                  position: "absolute",
-                  top: "20px",
-                  left: "82%",
-                  transform: "translateX(-50%)",
-                  padding: "4px 14px",
-                  backgroundColor: "rgba(100, 116, 139, 0.8)",
-                  borderRadius: "999px",
-                  fontFamily: "'Roboto Condensed', sans-serif",
-                  fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000",
-                  letterSpacing: "0.5px",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                }}>
-                  Forecast
-                </div>
+                {/* Actual / Forecast バッジ */}
+                <ForecastBadge type="actual" leftPosition="36.5%" />
+                <ForecastBadge type="forecast" leftPosition="82%" />
               </div>
               {/* マレーシア注釈 - チェックボックスの上 */}
               <p style={{ ...STYLES.fontSize.medium, ...STYLES.color.secondary, marginTop: "16px", marginBottom: "8px", lineHeight: "1.7", paddingLeft: "80px" }}>
@@ -740,7 +680,7 @@ function T1CountryProfile(): React.JSX.Element {
       })()}
 
       {/* 産業別GDP構成比 */}
-      <section className="content-block content-block--wide">
+      <section className="content-block">
         <p className="section-kicker">INDUSTRY COMPOSITION</p>
         <h2 style={{ fontSize: "28px" }}>産業別 GDP 構成比（2025年度）</h2>
         <p className="section-subline">セクター別のシェアと成長率</p>
@@ -826,65 +766,6 @@ function T1CountryProfile(): React.JSX.Element {
         </article>
       </section>
 
-      <section className="content-block content-block--wide fade-in">
-        <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
-        <h2 style={{ fontSize: "28px" }}>機種別規格認証</h2>
-        <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
-        <article className="reference-block">
-          <h3>認証要件一覧</h3>
-          <div className="table-wrap">
-            <table className="requirements-table" style={{ tableLayout: "fixed", width: "100%" }}>
-              <colgroup>
-                <col style={{ width: "8%" }} />
-                <col style={{ width: "10%" }} />
-                <col style={{ width: "18%" }} />
-                <col style={{ width: "15%" }} />
-                <col style={{ width: "49%" }} />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>製品</th>
-                  <th>認証</th>
-                  <th>適用規格</th>
-                  <th>認証機関</th>
-                  <th>備考</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CERT_ROWS.map((row) => (
-                  <tr key={row.product}>
-                    <td style={{ textAlign: "center" }}><strong>{row.product}</strong></td>
-                    <td
-                      style={{
-                        color: row.requirement === "必須" ? "#c00" : row.requirement === "条件付き" ? "#885500" : "inherit",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {row.requirement}
-                    </td>
-                    <td>{row.standard}</td>
-                    <td>{row.authority}</td>
-                    <td>{row.note}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="country-procedure">
-            <strong>必要手続き：</strong>
-            SIRIM製品認証 → ST（Energy Commission）ラベル取得 → CoA発行
-          </p>
-        </article>
-        <article className="reference-block">
-          <h3>SIRIM認証プロセス</h3>
-          <ol className="notes-list">
-            {SIRIM_PROCESS.map((step, index) => (
-              <li key={`sirim-${index}`}>{step}</li>
-            ))}
-          </ol>
-        </article>
-      </section>
-
       {/* 既存：電力インフラ基本情報 */}
       <section className="content-block content-block--major">
         <p className="section-kicker">POWER INFRASTRUCTURE</p>
@@ -953,52 +834,69 @@ function T1CountryProfile(): React.JSX.Element {
   );
 }
 
+
 /* ------------------------------------------------------------------ */
-/*  T2: ドーナツチャート用カスタムラベル                              */
+/*  T3: Regulatory Gateway                                             */
 /* ------------------------------------------------------------------ */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const T2DonutLabel: React.FC<any> = ({
-  cx, cy, midAngle, outerRadius, payload,
-}) => {
-  if (cx === undefined || cy === undefined || midAngle === undefined ||
-      outerRadius === undefined || !payload) return null;
-
-  const RADIAN = Math.PI / 180;
-  const leaderLineLength = 20;
-  const horizontalLineLength = 28;
-  const labelOffset = 5;
-
-  const angleRad = -midAngle * RADIAN;
-  const isRight = Math.cos(angleRad) >= 0;
-
-  const lineStartX = cx + outerRadius * Math.cos(angleRad);
-  const lineStartY = cy + outerRadius * Math.sin(angleRad);
-  const elbowX = cx + (outerRadius + leaderLineLength) * Math.cos(angleRad);
-  const elbowY = cy + (outerRadius + leaderLineLength) * Math.sin(angleRad);
-  const lineEndX = isRight ? elbowX + horizontalLineLength : elbowX - horizontalLineLength;
-  const lineEndY = elbowY;
-
-  const textAnchor = isRight ? "start" : "end";
-  const textX = isRight ? lineEndX + labelOffset : lineEndX - labelOffset;
-  const name: string = payload.product_type ?? payload.application ?? "";
-  const share: number = payload.share_pct ?? 0;
-  const color: string = payload.color ?? "#999";
-
+function T3RegulatoryGateway(): React.JSX.Element {
   return (
-    <g>
-      <line x1={lineStartX} y1={lineStartY} x2={elbowX} y2={elbowY} stroke={color} strokeWidth={1.5} opacity={0.8} />
-      <line x1={elbowX} y1={elbowY} x2={lineEndX} y2={lineEndY} stroke={color} strokeWidth={1.5} opacity={0.8} />
-      <circle cx={lineEndX} cy={lineEndY} r={3} fill={color} />
-      <text x={textX} y={elbowY - 9} textAnchor={textAnchor} dominantBaseline="middle" fontSize="13px" fill={color} fontWeight={600}>
-        {name}
-      </text>
-      <text x={textX} y={elbowY + 9} textAnchor={textAnchor} dominantBaseline="middle" fontSize="12px" fill={color} opacity={0.85}>
-        {share.toFixed(1)}%
-      </text>
-    </g>
+    <>
+      <section className="content-block fade-in">
+        <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
+        <h2 style={{ fontSize: "28px" }}>機種別規格認証</h2>
+        <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
+        <article className="reference-block">
+          <h3>認証要件一覧</h3>
+          <div className="table-wrap">
+            <table className="requirements-table" style={{ maxWidth: "1004px", margin: "0 auto" }}>
+              <thead>
+                <tr>
+                  <th>製品</th>
+                  <th>認証</th>
+                  <th>適用規格</th>
+                  <th>認証機関</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CERT_ROWS.map((row) => (
+                  <tr key={row.product}>
+                    <td><strong>{row.product}</strong></td>
+                    <td
+                      style={{
+                        color: row.requirement === "必須" ? "#c00" : row.requirement === "条件付き" ? "#885500" : "inherit",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {row.requirement}
+                    </td>
+                    <td>{row.standard}</td>
+                    <td>{row.authority}</td>
+                    <td>{row.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="country-procedure">
+            <strong>必要手続き：</strong>
+            SIRIM製品認証 → ST（Energy Commission）ラベル取得 → CoA発行
+          </p>
+        </article>
+        <article className="reference-block">
+          <h3>SIRIM認証プロセス</h3>
+          <ol className="notes-list">
+            {SIRIM_PROCESS.map((step, index) => (
+              <li key={`sirim-${index}`}>{step}</li>
+            ))}
+          </ol>
+        </article>
+      </section>
+    </>
   );
-};
+}
+
 
 /* ------------------------------------------------------------------ */
 /*  T2: 市場規模チャート用ツールチップ                                */
@@ -1007,23 +905,26 @@ const T2DonutLabel: React.FC<any> = ({
 const MarketSizeTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
 
-  const central = (payload.find(p => p.dataKey === "market_size_usd_million")?.value as number | undefined);
-  const low = (payload.find(p => p.dataKey === "market_size_low_usd_million")?.value as number | undefined);
-  const bandWidth = (payload.find(p => p.dataKey === "band_width")?.value as number | undefined);
+  const central = (payload.find(p => p.dataKey === "market_size_jpy")?.value as number | undefined);
+  const low = (payload.find(p => p.dataKey === "market_size_low_jpy")?.value as number | undefined);
+  const bandWidth = (payload.find(p => p.dataKey === "band_width_jpy")?.value as number | undefined);
   const high = low != null && bandWidth != null ? low + bandWidth : undefined;
 
+  // 円 → 億円 変換
+  const toOkuYen = (yen: number) => Math.round(yen / 100000000);
+
   return (
-    <div style={{ backgroundColor: "rgba(255,255,255,0.97)", border: "1px solid #ccc", padding: "10px 14px", borderRadius: "4px", lineHeight: "1.7", minWidth: "180px" }}>
+    <div style={{ backgroundColor: "rgba(255,255,255,0.97)", border: "1px solid #ccc", padding: "10px 14px", borderRadius: "4px", lineHeight: "1.7", minWidth: "200px" }}>
       <p style={{ margin: "0 0 8px", fontWeight: 600, color: "#333" }}>{label}年</p>
       {central != null && (
         <p style={{ margin: "0 0 2px", fontSize: "0.9rem" }}>
           <span style={{ color: "#FF6600", fontWeight: 600 }}>●</span>
-          {" "}中央推定値: USD {central}M
+          {" "}中央推定値: 約{toOkuYen(central).toLocaleString()}億円
         </p>
       )}
       {low != null && high != null && (
         <p style={{ margin: "0", fontSize: "0.82rem", color: "#888" }}>
-          レンジ: USD {low}M 〜 {high}M
+          レンジ: {toOkuYen(low).toLocaleString()} 〜 {toOkuYen(high).toLocaleString()}億円
         </p>
       )}
     </div>
@@ -1035,73 +936,113 @@ const MarketSizeTooltip: React.FC<TooltipProps> = ({ active, payload, label }) =
 /* ------------------------------------------------------------------ */
 
 function T2MarketAndDemand(): React.JSX.Element {
-  const [sectorFilter, setSectorFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  // 円換算レート（1 USD = 140 JPY）
+  const USD_JPY = 140;
 
-  // KPI 計算
-  const basePoint = CB_MARKET_CHART_DATA[0];
-  const lastPoint = CB_MARKET_CHART_DATA[CB_MARKET_CHART_DATA.length - 1];
-  const nYears = lastPoint.year - basePoint.year;
-  const cagr = (Math.pow(lastPoint.market_size_usd_million / basePoint.market_size_usd_million, 1 / nYears) - 1) * 100;
+  // USD Million → 億円
+  const usdMillionToOkuYen = (usdMillion: number): number => {
+    return Math.round(usdMillion * USD_JPY / 100);
+  };
 
-  // 機種別ドーナツデータ（color付与）
-  const productMixWithColor = CB_PRODUCT_MIX.map(d => ({
-    ...d,
-    color: PRODUCT_TYPE_COLORS[d.product_type] ?? "#ccc",
-  }));
+  // USD Billion → 兆円
+  const usdBillionToTrillionYen = (usdBillion: number): string => {
+    const yenValue = usdBillion * USD_JPY / 1000;
+    return yenValue >= 1
+      ? `${(Math.round(yenValue * 10) / 10).toFixed(1)}兆円`
+      : `${Math.round(yenValue * 1000).toLocaleString()}億円`;
+  };
 
-  // 用途別ドーナツデータ（color付与）
-  const appColors = ["#FF6600", "#FF8C00", "#FFA500", "#FFB84D", "#FFD699", "#FFECCC"];
-  const applicationMixWithColor = CB_APPLICATION_MIX.map((d, i) => ({
-    ...d,
-    color: appColors[i % appColors.length],
-  }));
+  // セクター市場規模文字列を解析して円換算
+  const parseAndConvertSectorMarketSize = (marketSizeStr: string): string => {
+    const usdMatch = marketSizeStr.match(/USD\s+([\d.]+)([BM])/i);
+    if (!usdMatch) return marketSizeStr; // USD値がない場合は元の文字列を返す
 
-  // ヒートマップ列定義
-  const heatmapColumns: { key: keyof typeof CB_DEMAND_DRIVERS[0]; label: string }[] = [
-    { key: "acb_relevance",  label: "ACB"  },
-    { key: "mccb_relevance", label: "MCCB" },
-    { key: "elcb_relevance", label: "ELCB" },
-    { key: "mcb_relevance",  label: "MCB"  },
-    { key: "rcbo_relevance", label: "RCBO" },
-    { key: "rccb_relevance", label: "RCCB" },
-  ];
+    const value = parseFloat(usdMatch[1]);
+    const unit = usdMatch[2].toUpperCase();
 
-  // メガプロジェクトフィルタ
-  const sectors = ["all", ...Array.from(new Set(CB_MEGA_PROJECTS.map(p => p.sector)))];
-  const statuses: string[] = ["all", "Planned", "Ongoing", "Completed", "Cancelled"];
-  const filteredProjects = CB_MEGA_PROJECTS.filter(p => {
-    if (sectorFilter !== "all" && p.sector !== sectorFilter) return false;
-    if (statusFilter !== "all" && p.status !== statusFilter) return false;
-    return true;
-  });
+    let jpyStr: string;
+    if (unit === 'B') {
+      jpyStr = usdBillionToTrillionYen(value);
+    } else {
+      jpyStr = `${usdMillionToOkuYen(value).toLocaleString()}億円`;
+    }
 
-  const impactBadgeColor = (impact: string) =>
-    impact === "High" ? "#dc3545" : impact === "Medium" ? "#d97706" : "#6c757d";
+    // USD部分を円換算値に置換し、元のUSD値を括弧で保持
+    return marketSizeStr.replace(
+      /USD\s+[\d.]+[BM]\s*/i,
+      `約${jpyStr} (USD ${value}${unit}, `
+    );
+  };
+
+  // KPI 計算（2025→2031 のCAGR）
+  const kpiBase = CB_MARKET_CHART_DATA.find(d => d.year === 2025) ?? CB_MARKET_CHART_DATA[0];
+  const kpiLast = CB_MARKET_CHART_DATA.find(d => d.year === 2031) ?? CB_MARKET_CHART_DATA[CB_MARKET_CHART_DATA.length - 1];
+  const nYears = kpiLast.year - kpiBase.year;
+  const cagr = (Math.pow(kpiLast.market_size_usd_million / kpiBase.market_size_usd_million, 1 / nYears) - 1) * 100;
+
+  // 成長見通しアイコン表示
+  const growthOutlookIcon = (outlook: string) => {
+    const icons = {
+      very_high: { symbol: "◎", color: "#28a745", label: "Very High" },
+      high: { symbol: "○", color: "#4A90D9", label: "High" },
+      medium: { symbol: "○", color: "#d97706", label: "Medium" },
+      low: { symbol: "△", color: "#dc3545", label: "Low" },
+    };
+    return icons[outlook as keyof typeof icons] || icons.medium;
+  };
+
+  // 星評価表示
+  const starRating = (rating: number) => {
+    return "★".repeat(rating) + "☆".repeat(5 - rating);
+  };
+
+  // 展開行管理用State
+  const [expandedSector, setExpandedSector] = useState<string | null>(null);
+
+  // 円換算済みの市場規模チャートデータ（1USD = 140JPY）
+  const CB_MARKET_CHART_DATA_JPY = useMemo(() => {
+    return CB_MARKET_CHART_DATA.map(d => ({
+      ...d,
+      market_size_jpy: d.market_size_usd_million * USD_JPY * 1000000, // 円
+      market_size_low_jpy: d.market_size_low_usd_million != null ? d.market_size_low_usd_million * USD_JPY * 1000000 : undefined,
+      market_size_high_jpy: d.market_size_high_usd_million != null ? d.market_size_high_usd_million * USD_JPY * 1000000 : undefined,
+      band_width_jpy: d.band_width != null ? d.band_width * USD_JPY * 1000000 : undefined,
+    }));
+  }, [CB_MARKET_CHART_DATA]);
 
   return (
     <>
       {/* ============================================================ */}
-      {/* Section ① 市場規模概観                                       */}
+      {/* Section 2-1: 市場概況                                         */}
       {/* ============================================================ */}
       <section className="content-block content-block--major">
         <p className="section-kicker">MARKET SIZE OVERVIEW</p>
         <h2 style={{ fontSize: "28px" }}>マレーシア LV CB 市場規模概観</h2>
-        <p className="section-subline">Low Voltage Circuit Breaker Market — Malaysia（2025-2031）</p>
+        <p className="section-subline">Low Voltage Circuit Breaker Market — Malaysia（2020-2031）</p>
 
         {/* KPI カード */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px" }}>
+        <div style={{ width: "100%", maxWidth: "1024px", marginLeft: "auto", marginRight: "auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px" }}>
           {[
             {
+              label: "ASEANランク",
+              value: "#2",
+              sub: "ASEAN低圧遮断器市場規模（6ヵ国中）",
+              color: "#4A90D9",
+            },
+            {
               label: "市場規模（2025）",
-              value: `USD ${basePoint.market_size_usd_million}M`,
-              sub: `レンジ: ${basePoint.market_size_low_usd_million}M 〜 ${basePoint.market_size_high_usd_million}M`,
+              value: `約${usdMillionToOkuYen(kpiBase.market_size_usd_million).toLocaleString()}億円`,
+              sub: kpiBase.market_size_low_usd_million && kpiBase.market_size_high_usd_million
+                ? `レンジ: ${usdMillionToOkuYen(kpiBase.market_size_low_usd_million).toLocaleString()} 〜 ${usdMillionToOkuYen(kpiBase.market_size_high_usd_million).toLocaleString()}億円`
+                : `USD ${kpiBase.market_size_usd_million}M`,
               color: "#FF6600",
             },
             {
               label: "市場規模（2031）",
-              value: `USD ${lastPoint.market_size_usd_million}M`,
-              sub: `レンジ: ${lastPoint.market_size_low_usd_million}M 〜 ${lastPoint.market_size_high_usd_million}M`,
+              value: `約${usdMillionToOkuYen(kpiLast.market_size_usd_million).toLocaleString()}億円`,
+              sub: kpiLast.market_size_low_usd_million && kpiLast.market_size_high_usd_million
+                ? `レンジ: ${usdMillionToOkuYen(kpiLast.market_size_low_usd_million).toLocaleString()} 〜 ${usdMillionToOkuYen(kpiLast.market_size_high_usd_million).toLocaleString()}億円`
+                : `USD ${kpiLast.market_size_usd_million}M`,
               color: "#FF6600",
             },
             {
@@ -1109,12 +1050,6 @@ function T2MarketAndDemand(): React.JSX.Element {
               value: `${cagr.toFixed(1)}%`,
               sub: "複合年間成長率",
               color: "#FF8C00",
-            },
-            {
-              label: "市場定義スコープ",
-              value: "LV CB only",
-              sub: "excl. fuses / MV / HV",
-              color: "#6c757d",
             },
           ].map(card => (
             <div key={card.label} style={{
@@ -1135,44 +1070,47 @@ function T2MarketAndDemand(): React.JSX.Element {
           ))}
         </div>
 
-        {/* 市場規模折れ線グラフ（オレンジ帯） */}
+        {/* 市場定義スコープ */}
+        <div style={{ marginBottom: "24px", padding: "12px 16px", backgroundColor: "#f8f9fa", borderRadius: "6px", border: "1px solid #e9ecef" }}>
+          <p style={{ margin: 0, fontSize: "0.88rem", color: "#495057" }}>
+            <strong>市場定義スコープ:</strong> LV CB only, excl. fuses / MV / HV
+          </p>
+        </div>
+
+        {/* 市場規模折れ線グラフ（推移と不確実性レンジ） */}
         <article className="reference-block">
           <div style={{ position: "relative", height: "360px" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={CB_MARKET_CHART_DATA} margin={{ top: 10, right: 30, left: 20, bottom: 30 }}>
+              <ComposedChart data={CB_MARKET_CHART_DATA_JPY} margin={{ top: 10, right: 30, left: 20, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                 <XAxis dataKey="year" stroke="#666" tick={{ dy: 12 }} />
                 <YAxis
                   stroke="#666"
-                  domain={[0, 280]}
-                  tickFormatter={(v) => `${v}`}
-                  label={{ value: "USD Million", angle: -90, position: "insideLeft", offset: 10 }}
+                  tickFormatter={(v) => `${Math.round(v / 100000000)}億円`}
+                  label={{ value: "億円", angle: -90, position: "insideLeft", offset: 10 }}
                 />
-                {/* 予測期間背景 */}
-                <ReferenceArea x1={2026} x2={2031} fill="rgba(200,200,200,0.35)" stroke="none" />
-                <ReferenceLine x={2026} stroke="#999" strokeDasharray="3 8" strokeWidth={1.5} />
                 {/* ツールチップ */}
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <Tooltip content={<MarketSizeTooltip active={false} payload={[]} label="" />  as any} />
-                {/* オレンジ帯: 低レンジ（透明ベース）→ バンド幅（オレンジ半透明） */}
+                {/* オレンジ帯: 不確実性レンジ */}
                 <Area
-                  dataKey="market_size_low_usd_million"
+                  dataKey="market_size_low_jpy"
                   stackId="band"
                   fill="transparent"
                   stroke="none"
                   isAnimationActive={false}
                 />
                 <Area
-                  dataKey="band_width"
+                  dataKey="band_width_jpy"
                   stackId="band"
-                  fill="rgba(255,140,0,0.22)"
+                  fill="rgba(255,140,0,0.20)"
                   stroke="none"
                   isAnimationActive={false}
                 />
                 {/* 中央推定値ライン */}
                 <Line
                   type="monotone"
-                  dataKey="market_size_usd_million"
+                  dataKey="market_size_jpy"
                   stroke="#FF6600"
                   strokeWidth={2.5}
                   dot={{ r: 4, fill: "#FF6600" }}
@@ -1181,13 +1119,6 @@ function T2MarketAndDemand(): React.JSX.Element {
                 />
               </ComposedChart>
             </ResponsiveContainer>
-            {/* Result / Forecast バッジ */}
-            <div style={{ position: "absolute", top: "14px", left: "28%", transform: "translateX(-50%)", padding: "3px 12px", backgroundColor: "rgba(255,102,0,0.8)", borderRadius: "999px", fontSize: "0.82rem", fontWeight: 700, color: "#fff", letterSpacing: "0.5px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              Actual
-            </div>
-            <div style={{ position: "absolute", top: "14px", left: "74%", transform: "translateX(-50%)", padding: "3px 12px", backgroundColor: "rgba(100,116,139,0.8)", borderRadius: "999px", fontSize: "0.82rem", fontWeight: 700, color: "#fff", letterSpacing: "0.5px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              Forecast
-            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "12px", flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -1195,406 +1126,239 @@ function T2MarketAndDemand(): React.JSX.Element {
               <span style={{ fontSize: "0.82rem", color: "#666" }}>中央推定値</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div style={{ width: "24px", height: "12px", backgroundColor: "rgba(255,140,0,0.22)", border: "1px solid rgba(255,140,0,0.4)" }} />
+              <div style={{ width: "24px", height: "12px", backgroundColor: "rgba(255,140,0,0.20)", border: "1px solid rgba(255,140,0,0.4)" }} />
               <span style={{ fontSize: "0.82rem", color: "#666" }}>不確実性レンジ（Low〜High）</span>
             </div>
           </div>
           <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "10px", lineHeight: "1.6" }}>
-            出典: {MARKET_DATA_SOURCES.market_size}
+            出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"
           </p>
         </article>
       </section>
 
       {/* ============================================================ */}
-      {/* Section ② 機種別構成比                                       */}
+      {/* Section 2-2: 注目市場                                         */}
       {/* ============================================================ */}
-      <section className="content-block content-block--wide">
-        <p className="section-kicker">PRODUCT MIX</p>
-        <h2 style={{ fontSize: "28px" }}>機種別構成比（2025年）</h2>
-        <p className="section-subline">LV Circuit Breaker — Malaysia市場シェア by product type</p>
-        <article className="reference-block">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", alignItems: "center" }}>
-            {/* ドーナツ */}
-            <div style={{ height: "360px" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 0, right: 60, bottom: 20, left: 60 }}>
-                  <Pie
-                    data={productMixWithColor}
-                    cx="50%"
-                    cy="45%"
-                    innerRadius={50}
-                    outerRadius={95}
-                    paddingAngle={3}
-                    dataKey="share_pct"
-                    label={<T2DonutLabel />}
-                    labelLine={false}
-                    isAnimationActive={false}
-                    style={{ cursor: "default", pointerEvents: "none" }}
-                  >
-                    {productMixWithColor.map((entry, index) => (
-                      <Cell key={`cell-pm-${index}`} fill={entry.color} stroke="#fff" strokeWidth={2} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            {/* 凡例テーブル */}
-            <div>
-              <div className="table-wrap">
-                <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
-                  <thead>
-                    <tr>
-                      <th>機種</th>
-                      <th>シェア</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {productMixWithColor.map(item => (
-                      <tr key={item.product_type}>
-                        <td>
-                          <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", backgroundColor: item.color, marginRight: "8px", verticalAlign: "middle" }} />
-                          <strong>{item.product_type}</strong>
-                        </td>
-                        <td>{item.share_pct.toFixed(1)}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
-                出典: {MARKET_DATA_SOURCES.product_mix}
-              </p>
-            </div>
-          </div>
-        </article>
-      </section>
+      <section className="content-block content-block--major">
+        <p className="section-kicker">SECTOR FOCUS</p>
+        <h2 style={{ fontSize: "28px" }}>注目市場</h2>
+        <p className="section-subline">LV遮断器の販売先として注目すべきセクター</p>
 
-      {/* ============================================================ */}
-      {/* Section ③ 用途別構成比                                       */}
-      {/* ============================================================ */}
-      <section className="content-block content-block--wide">
-        <p className="section-kicker">APPLICATION MIX</p>
-        <h2 style={{ fontSize: "28px" }}>用途別構成比（2025年）</h2>
-        <p className="section-subline">LV Circuit Breaker — Malaysia市場シェア by end-use segment</p>
-        <article className="reference-block">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", alignItems: "center" }}>
-            {/* ドーナツ */}
-            <div style={{ height: "360px" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 0, right: 60, bottom: 20, left: 60 }}>
-                  <Pie
-                    data={applicationMixWithColor}
-                    cx="50%"
-                    cy="45%"
-                    innerRadius={50}
-                    outerRadius={95}
-                    paddingAngle={3}
-                    dataKey="share_pct"
-                    label={<T2DonutLabel />}
-                    labelLine={false}
-                    isAnimationActive={false}
-                    style={{ cursor: "default", pointerEvents: "none" }}
-                  >
-                    {applicationMixWithColor.map((entry, index) => (
-                      <Cell key={`cell-am-${index}`} fill={entry.color} stroke="#fff" strokeWidth={2} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            {/* 凡例テーブル */}
-            <div>
-              <div className="table-wrap">
-                <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
-                  <thead>
-                    <tr>
-                      <th>用途セグメント</th>
-                      <th>シェア</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {applicationMixWithColor.map(item => (
-                      <tr key={item.application}>
-                        <td>
-                          <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", backgroundColor: item.color, marginRight: "8px", verticalAlign: "middle" }} />
-                          <strong>{item.application}</strong>
-                        </td>
-                        <td>{item.share_pct.toFixed(1)}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
-                出典: {MARKET_DATA_SOURCES.application_mix}
-              </p>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      {/* ============================================================ */}
-      {/* Section ④ 需要ドライバー＋ヒートマップ                       */}
-      {/* ============================================================ */}
-      <section className="content-block content-block--wide">
-        <p className="section-kicker">DEMAND DRIVERS &amp; PRODUCT HEATMAP</p>
-        <h2 style={{ fontSize: "28px" }}>需要ドライバー ＋ セクター×機種ヒートマップ</h2>
-        <p className="section-subline">スコア: 5=主要用途 / 4=標準使用 / 3=補助的 / 2=限定的 / 1=ほぼなし / 0=不適用</p>
-
-        {/* ドライバーテーブル */}
-        <article className="reference-block">
-          <h3 style={{ marginBottom: "12px" }}>需要ドライバー一覧</h3>
-          <div className="table-wrap">
-            <table className="definition-table" style={{ width: "100%", fontSize: "0.85rem" }}>
-              <colgroup>
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "12%" }} />
-                <col style={{ width: "9%" }} />
-                <col style={{ width: "12%" }} />
-                <col style={{ width: "18%" }} />
-                <col style={{ width: "29%" }} />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>需要ドライバー</th>
-                  <th>カテゴリ</th>
-                  <th>影響度</th>
-                  <th>需要期間</th>
-                  <th>関連政策</th>
-                  <th>概要</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CB_DEMAND_DRIVERS.map(d => (
-                  <tr key={d.driver_name}>
-                    <td><strong>{d.driver_name}</strong></td>
-                    <td>{d.category}</td>
-                    <td>
-                      <span style={{ padding: "2px 7px", borderRadius: "4px", fontSize: "0.78rem", fontWeight: 600, backgroundColor: impactBadgeColor(d.impact), color: "#fff" }}>
-                        {d.impact}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: "0.82rem", color: "#666" }}>{d.time_horizon ?? "—"}</td>
-                    <td style={{ fontSize: "0.82rem", color: "#555" }}>{d.policy_reference ?? "—"}</td>
-                    <td style={{ fontSize: "0.82rem", color: "#555", lineHeight: "1.5" }}>{d.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        {/* ヒートマップ */}
+        {/* セクター比較テーブル */}
         <article className="reference-block" style={{ marginTop: "24px" }}>
-          <h3 style={{ marginBottom: "16px" }}>セクター × 機種 需要強度ヒートマップ</h3>
           <div className="table-wrap">
-            <table style={{
-              borderCollapse: "collapse",
-              width: "100%",
-              fontSize: "0.88rem",
-              tableLayout: "fixed",
-            }}>
+            <table className="definition-table" style={{ width: "100%", fontSize: "0.85rem", tableLayout: "fixed" }}>
               <colgroup>
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "34%" }} />
+                <col style={{ width: "9%" }} />
                 <col style={{ width: "26%" }} />
-                {heatmapColumns.map(col => <col key={col.key} style={{ width: `${74 / heatmapColumns.length}%` }} />)}
+                <col style={{ width: "13%" }} />
               </colgroup>
               <thead>
                 <tr>
-                  <th style={{ padding: "10px 12px", backgroundColor: "#f5f5f5", border: "1px solid #ddd", textAlign: "left", fontWeight: 600 }}>
-                    需要ドライバー
-                  </th>
-                  {heatmapColumns.map(col => (
-                    <th key={col.key} style={{
-                      padding: "10px 8px",
-                      backgroundColor: PRODUCT_TYPE_COLORS[col.label] ?? "#eee",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                      fontWeight: 700,
-                      color: "#fff",
-                      fontSize: "0.82rem",
-                    }}>
-                      {col.label}
-                    </th>
-                  ))}
+                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, fontSize: "0.82rem" }}>セクター</th>
+                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, fontSize: "0.82rem" }}>市場規模</th>
+                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "center", fontWeight: 600, fontSize: "0.82rem" }}>成長見通し</th>
+                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, fontSize: "0.82rem" }}>案件あたり需要</th>
+                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "center", fontWeight: 600, fontSize: "0.82rem" }}>総合評価</th>
                 </tr>
               </thead>
               <tbody>
-                {CB_DEMAND_DRIVERS.map(d => (
-                  <tr key={d.driver_name}>
-                    <td style={{ padding: "10px 12px", border: "1px solid #ddd", fontWeight: 600, backgroundColor: "#fafafa", fontSize: "0.85rem" }}>
-                      {d.driver_name}
-                    </td>
-                    {heatmapColumns.map(col => {
-                      const score = d[col.key] as number;
-                      const bg = HEATMAP_COLORS[Math.max(0, Math.min(5, score))];
-                      const textColor = score >= 3 ? "#fff" : "#333";
-                      return (
-                        <td key={col.key} style={{
-                          padding: "10px 8px",
-                          border: "1px solid #ddd",
-                          textAlign: "center",
-                          backgroundColor: bg,
-                          color: textColor,
-                          fontWeight: 700,
-                          fontSize: "0.95rem",
-                          transition: "background-color 0.2s",
-                        }}>
-                          {score}
+                {CB_SECTOR_FOCUS.map((sector) => {
+                  const growthIcon = growthOutlookIcon(sector.growth_outlook);
+                  const isExpanded = expandedSector === sector.sector_name;
+
+                  return (
+                    <React.Fragment key={sector.sector_name}>
+                      {/* メインテーブル行 */}
+                      <tr
+                        style={{
+                          cursor: "pointer",
+                          backgroundColor: isExpanded ? "#f8f9fa" : "transparent"
+                        }}
+                        onClick={() => setExpandedSector(isExpanded ? null : sector.sector_name)}
+                      >
+                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            {sector.sector_name}
+                            <span style={{
+                              fontSize: "0.65rem",
+                              color: isExpanded ? "#FF6600" : "#999",
+                              transition: "transform 0.2s"
+                            }}>
+                              {isExpanded ? "▼" : "▶"}
+                            </span>
+                          </div>
                         </td>
-                      );
-                    })}
+                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontSize: "0.82rem" }}>
+                          {parseAndConvertSectorMarketSize(sector.sector_market_size)}
+                        </td>
+                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", textAlign: "center" }}>
+                          <span
+                            style={{
+                              fontSize: "1rem",
+                              color: growthIcon.color,
+                              fontWeight: 600
+                            }}
+                            title={growthIcon.label}
+                          >
+                            {growthIcon.symbol}
+                          </span>
+                        </td>
+                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontSize: "0.82rem" }}>
+                          {sector.cb_demand_per_project}
+                        </td>
+                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", textAlign: "center" }}>
+                          <span style={{
+                            fontSize: "0.85rem",
+                            color: "#FF6600",
+                            letterSpacing: "1px"
+                          }}>
+                            {starRating(sector.overall_rating)}
+                          </span>
+                        </td>
+                      </tr>
+
+                      {/* 展開詳細行 */}
+                      {isExpanded && (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            style={{
+                              padding: "12px 16px",
+                              border: "1px solid #dee2e6",
+                              backgroundColor: "#fafbfc",
+                              borderBottom: "2px solid #dee2e6",
+                              whiteSpace: "normal",
+                              wordBreak: "normal",
+                            }}
+                          >
+                            <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
+                              {/* 左: 概要テキスト（幅を制限して読みやすく） */}
+                              <div style={{ flex: "0 0 62%" }}>
+                                <h4 style={{
+                                  margin: "0 0 6px",
+                                  fontSize: "0.82rem",
+                                  fontWeight: 600,
+                                  color: "#495057",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.4px"
+                                }}>
+                                  セクター概要
+                                </h4>
+                                <p style={{
+                                  margin: 0,
+                                  fontSize: "0.85rem",
+                                  lineHeight: "1.75",
+                                  color: "#6c757d"
+                                }}>
+                                  {sector.sector_overview}
+                                </p>
+                              </div>
+                              {/* 右: 出典・補足 */}
+                              <div style={{ flex: 1, borderLeft: "1px solid #e9ecef", paddingLeft: "20px" }}>
+                                <h4 style={{
+                                  margin: "0 0 6px",
+                                  fontSize: "0.82rem",
+                                  fontWeight: 600,
+                                  color: "#495057",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.4px"
+                                }}>
+                                  出典
+                                </h4>
+                                <p style={{
+                                  margin: 0,
+                                  fontSize: "0.82rem",
+                                  color: "#6c757d",
+                                  lineHeight: "1.6"
+                                }}>
+                                  {sector.source}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* テーブル凡例 */}
+          <div style={{
+            marginTop: "16px",
+            padding: "12px 16px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "6px",
+            fontSize: "0.82rem"
+          }}>
+            <p style={{ margin: "0 0 6px", fontWeight: 600, color: "#495057" }}>
+              成長見通し凡例:
+            </p>
+            <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+              <span style={{ color: "#28a745" }}><strong>◎</strong> Very High (成長率 8%+)</span>
+              <span style={{ color: "#4A90D9" }}><strong>○</strong> High (成長率 5-8%)</span>
+              <span style={{ color: "#d97706" }}><strong>○</strong> Medium (成長率 3-5%)</span>
+              <span style={{ color: "#dc3545" }}><strong>△</strong> Low (成長率 3%未満)</span>
+            </div>
+            <p style={{ margin: "8px 0 0 0", fontSize: "0.78rem", color: "#6c757d" }}>
+              ※ 各行をクリックすると詳細情報が表示されます
+            </p>
+          </div>
+        </article>
+      </section>
+
+      {/* ============================================================ */}
+      {/* Section 2-3: 地域概況                                         */}
+      {/* ============================================================ */}
+      <section className="content-block content-block--major">
+        <p className="section-kicker">REGIONAL PROFILE</p>
+        <h2 style={{ fontSize: "28px" }}>地域概況</h2>
+        <p className="section-subline">州別のGDP・主要産業・成長産業</p>
+
+        {/* 地域概況テーブル */}
+        <article className="reference-block">
+          <div className="table-wrap">
+            <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
+              <thead>
+                <tr>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>州</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>
+                    GDP (兆円 / USD Bn)
+                    <div style={{ fontWeight: 400, fontSize: "0.72rem", color: "var(--text-sub-dark)", marginTop: "2px", whiteSpace: "nowrap" }}>DOSM GDP by State 2024</div>
+                  </th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>全国比</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>成長率</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>主要産業</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>成長産業</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CB_REGIONAL_PROFILE.map((state) => (
+                  <tr key={state.state_name}>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontWeight: 600 }}>{state.state_name_ja}</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>
+                      約{(state.gdp_usd_billion * USD_JPY / 1000).toFixed(1)}兆円
+                      <span style={{ fontSize: "0.75rem", color: "#999" }}> (USD {state.gdp_usd_billion.toFixed(1)}B)</span>
+                    </td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>{state.gdp_national_share_pct.toFixed(1)}%</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
+                      {state.gdp_growth_pct.toFixed(1)}%
+                    </td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.major_industries}</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.growing_industries}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {/* スコア凡例 */}
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "14px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "0.78rem", color: "#666", marginRight: "4px" }}>スコア凡例:</span>
-            {HEATMAP_COLORS.map((color, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <div style={{ width: "22px", height: "22px", backgroundColor: color, border: "1px solid #ccc", borderRadius: "3px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.78rem", fontWeight: 700, color: i >= 3 ? "#fff" : "#333" }}>
-                  {i}
-                </div>
-              </div>
-            ))}
-            <span style={{ fontSize: "0.75rem", color: "#888", marginLeft: "8px" }}>0=不適用 → 5=主要用途</span>
-          </div>
-          <p style={{ fontSize: "0.75rem", color: "#999", marginTop: "10px", lineHeight: "1.6" }}>
-            スコア根拠: {MARKET_DATA_SOURCES.demand_drivers}
-          </p>
-        </article>
-      </section>
-
-      {/* ============================================================ */}
-      {/* Section ⑤ メガプロジェクト一覧                               */}
-      {/* ============================================================ */}
-      <section className="content-block content-block--wide">
-        <p className="section-kicker">MEGA PROJECTS</p>
-        <h2 style={{ fontSize: "28px" }}>メガプロジェクト一覧</h2>
-        <p className="section-subline">LV CB 需要に直結する大型投資案件（マレーシア）</p>
-        <article className="reference-block">
-          {/* フィルタ */}
-          <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-            {/* セクターフィルタ */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "0.82rem", color: "#666", minWidth: "52px", fontWeight: 600 }}>セクター:</span>
-              {sectors.map(s => (
-                <button
-                  key={s}
-                  onClick={() => setSectorFilter(s)}
-                  style={{
-                    padding: "4px 12px",
-                    borderRadius: "999px",
-                    border: `1px solid ${sectorFilter === s ? "#FF6600" : "#ddd"}`,
-                    backgroundColor: sectorFilter === s ? "#FF6600" : "#fff",
-                    color: sectorFilter === s ? "#fff" : "#555",
-                    fontSize: "0.82rem",
-                    cursor: "pointer",
-                    fontWeight: sectorFilter === s ? 600 : 400,
-                    transition: "all 0.15s",
-                  }}
-                >
-                  {s === "all" ? "すべて" : s}
-                </button>
-              ))}
-            </div>
-            {/* ステータスフィルタ */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "0.82rem", color: "#666", minWidth: "52px", fontWeight: 600 }}>ステータス:</span>
-              {statuses.map(s => {
-                const badgeColor = s === "all" ? "#555" : (PROJECT_STATUS_COLORS[s] ?? "#555");
-                const isActive = statusFilter === s;
-                return (
-                  <button
-                    key={s}
-                    onClick={() => setStatusFilter(s)}
-                    style={{
-                      padding: "4px 12px",
-                      borderRadius: "999px",
-                      border: `1px solid ${isActive ? badgeColor : "#ddd"}`,
-                      backgroundColor: isActive ? badgeColor : "#fff",
-                      color: isActive ? "#fff" : "#555",
-                      fontSize: "0.82rem",
-                      cursor: "pointer",
-                      fontWeight: isActive ? 600 : 400,
-                      transition: "all 0.15s",
-                    }}
-                  >
-                    {s === "all" ? "すべて" : s}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          {/* 件数 */}
-          <p style={{ fontSize: "0.82rem", color: "#888", marginBottom: "12px" }}>
-            {filteredProjects.length} 件 / 全{CB_MEGA_PROJECTS.length}件表示中
-          </p>
-          {/* テーブル */}
-          <div className="table-wrap">
-            <table className="definition-table" style={{ width: "100%", fontSize: "0.85rem", minWidth: "800px" }}>
-              <colgroup>
-                <col style={{ width: "24%" }} />
-                <col style={{ width: "10%" }} />
-                <col style={{ width: "14%" }} />
-                <col style={{ width: "9%" }} />
-                <col style={{ width: "9%" }} />
-                <col style={{ width: "12%" }} />
-                <col style={{ width: "22%" }} />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>プロジェクト名</th>
-                  <th>セクター</th>
-                  <th>地域</th>
-                  <th>ステータス</th>
-                  <th>規模（USD M）</th>
-                  <th>完了予定</th>
-                  <th>関連 CB 機種</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProjects.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} style={{ textAlign: "center", color: "#999", padding: "24px" }}>
-                      該当するプロジェクトがありません
-                    </td>
-                  </tr>
-                ) : (
-                  filteredProjects.map(p => (
-                    <tr key={p.project_name}>
-                      <td><strong>{p.project_name}</strong></td>
-                      <td>{p.sector}</td>
-                      <td>{p.location}</td>
-                      <td>
-                        <span style={{
-                          padding: "2px 8px",
-                          borderRadius: "4px",
-                          fontSize: "0.78rem",
-                          fontWeight: 600,
-                          backgroundColor: PROJECT_STATUS_COLORS[p.status] ?? "#6c757d",
-                          color: "#fff",
-                          whiteSpace: "nowrap",
-                        }}>
-                          {p.status}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: "right" }}>
-                        {p.value_usd_million != null
-                          ? p.value_usd_million.toLocaleString()
-                          : "—"}
-                      </td>
-                      <td>{p.expected_completion ?? "—"}</td>
-                      <td style={{ fontSize: "0.82rem", color: "#555" }}>{p.cb_types}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-          <p style={{ fontSize: "0.75rem", color: "#999", marginTop: "12px", lineHeight: "1.6" }}>
-            出典: {MARKET_DATA_SOURCES.mega_projects}
+          <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
+            上位5州（Selangor、KL/Putrajaya、Johor、Sarawak、Penang）でマレーシアGDPの約68%を占め、LV遮断器の需要もこの5州に集中すると見られる。<br />
+            ※ 全国平均成長率5.1%超の州を緑色で表示。出典: DOSM, GDP by State 2024（2025年7月1日発表）
           </p>
         </article>
       </section>
@@ -1668,6 +1432,7 @@ export default function MalaysiaPage(): React.JSX.Element {
   const renderTab = () => {
     if (activeTab === "t1") return <T1CountryProfile />;
     if (activeTab === "t2") return <T2MarketAndDemand />;
+    if (activeTab === "t3") return <T3RegulatoryGateway />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;

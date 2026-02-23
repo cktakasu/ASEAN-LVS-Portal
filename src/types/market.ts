@@ -17,56 +17,36 @@ export interface MarketDataPoint {
 }
 
 /**
- * T2_cb_product_mix.csv 相当
- * 機種別構成比（ドーナツチャート用）
- */
-export interface ProductMixItem {
-  product_type: string;   // ACB / MCCB / ELCB / MCB / RCBO / RCCB
-  share_pct: number;
-}
-
-/**
- * T2_cb_application_mix.csv 相当
- * 用途別構成比（ドーナツチャート用）
- */
-export interface ApplicationMixItem {
-  application: string;
-  share_pct: number;
-}
-
-/**
  * T2_demand_drivers.csv 相当
- * 需要ドライバー（テーブル + ヒートマップ用）
- * ※ primary_product_types は削除済み
+ * 注目市場セクター（セクション2-2用）
  */
-export interface DemandDriver {
-  driver_name: string;
-  category: string;
-  description: string;
-  impact: "High" | "Medium" | "Low";
-  time_horizon?: string;          // 例: "2025-2031"
-  policy_reference?: string;      // 例: "13MP; NETR 2.0"
-  acb_relevance: number;          // 0-5
-  mccb_relevance: number;         // 0-5
-  elcb_relevance: number;         // 0-5
-  mcb_relevance: number;          // 0-5
-  rcbo_relevance: number;         // 0-5
-  rccb_relevance: number;         // 0-5
-  relevance_source: string;       // スコア根拠（IEC規格 / Schneider EIG / 6Wresearch）
+export interface SectorFocus {
+  sector_name: string;            // セクター名（日本語）
+  sector_overview: string;        // セクター概要（2〜3文）
+  sector_market_size: string;     // セクター市場規模（単位含む）
+  cb_relevance: "High" | "Medium" | "Low";  // LV-CB需要との関連度
+  concentration_region?: string;  // 需要集中地域
+  growth_outlook: "very_high" | "high" | "medium" | "low";  // 成長見通し（4段階）
+  cb_demand_per_project: string;  // 案件あたりCB需要
+  overall_rating: number;         // 総合評価（1-5星評価）
+  year: number;
+  source: string;
   notes?: string;
 }
 
 /**
- * T2_mega_projects.csv 相当
- * メガプロジェクト一覧（フィルタ付きテーブル用）
+ * T2_regional_profile.csv 相当
+ * 州別地域概況（セクション2-3用）
  */
-export interface MegaProject {
-  project_name: string;
-  sector: string;
-  location: string;
-  value_usd_million?: number;
-  status: "Planned" | "Ongoing" | "Completed" | "Cancelled";
-  expected_completion?: string;
-  cb_types: string;
+export interface RegionalProfile {
+  state_name: string;              // 州名（英語）
+  state_name_ja: string;           // 州名（日本語）
+  gdp_usd_billion: number;         // GDP（十億ドル）
+  gdp_national_share_pct: number;  // 全国GDP比（%）
+  gdp_growth_pct: number;          // 成長率（%）
+  major_industries: string;        // 主要産業
+  growing_industries: string;      // 特に成長している産業
+  year: number;
+  source: string;
   notes?: string;
 }
