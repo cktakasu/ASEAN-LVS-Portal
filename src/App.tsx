@@ -1532,7 +1532,7 @@ export default function App(): JSX.Element {
       <footer className="footer fade-in">
         <div className="footer-inner">
           <p className="footer-note">注意: 法令・制度は更新されるため、最終判断前に必ず一次情報を確認してください。</p>
-          <p className="footer-note">最終更新：2026年2月11日</p>
+          <p className="footer-note">最終更新：2026年2月23日</p>
           <div className="footer-line" />
           <small>ASEAN Low Voltage Business Portal</small>
         </div>
