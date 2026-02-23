@@ -1337,7 +1337,7 @@ export default function App(): JSX.Element {
 
         <section id="table-section" className="content-block">
           <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
-          <h2>ASEAN低圧遮断器 製品別規格認証対応表</h2>
+          <h2>低圧遮断器 / 製品別対応表</h2>
           <p className="section-subline">Product-Category Certification Requirements for Low-Voltage Circuit Breakers in ASEAN</p>
 
           <article className="reference-block">
