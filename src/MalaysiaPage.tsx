@@ -1315,6 +1315,7 @@ function T2MarketAndDemand(): React.JSX.Element {
         <p className="section-kicker">REGIONAL PROFILE</p>
         <h2 style={{ fontSize: "28px" }}>地域概況</h2>
         <p className="section-subline">州別のGDP・主要産業・成長産業</p>
+        <p style={{ margin: "4px 0 0", textAlign: "center", fontSize: "0.75rem", color: "var(--text-sub-dark)" }}>出典: DOSM, GDP by State 2024（2025年7月1日発表）</p>
 
         {/* 地域概況テーブル */}
         <article className="reference-block">
