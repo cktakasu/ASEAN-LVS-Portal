@@ -1020,6 +1020,12 @@ function T2MarketAndDemand(): React.JSX.Element {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px" }}>
           {[
             {
+              label: "ASEANランク",
+              value: "#2",
+              sub: "市場規模（6ヵ国中）",
+              color: "#4A90D9",
+            },
+            {
               label: "市場規模（2025）",
               value: `約${usdMillionToOkuYen(kpiBase.market_size_usd_million).toLocaleString()}億円`,
               sub: kpiBase.market_size_low_usd_million && kpiBase.market_size_high_usd_million
@@ -1040,12 +1046,6 @@ function T2MarketAndDemand(): React.JSX.Element {
               value: `${cagr.toFixed(1)}%`,
               sub: "複合年間成長率",
               color: "#FF8C00",
-            },
-            {
-              label: "ASEANランク",
-              value: "#2",
-              sub: "市場規模（6ヵ国中）",
-              color: "#4A90D9",
             },
           ].map(card => (
             <div key={card.label} style={{
