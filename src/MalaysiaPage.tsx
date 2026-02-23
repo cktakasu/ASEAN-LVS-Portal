@@ -191,8 +191,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceArea,
-  ReferenceLine,
   ComposedChart,
   Area,
 } from "recharts";
@@ -200,7 +198,6 @@ import {
   CB_MARKET_CHART_DATA,
   CB_SECTOR_FOCUS,
   CB_REGIONAL_PROFILE,
-  MARKET_DATA_SOURCES,
 } from "./data/malaysiaMarketData";
 
 /* ------------------------------------------------------------------ */
@@ -769,58 +766,6 @@ function T1CountryProfile(): React.JSX.Element {
         </article>
       </section>
 
-      <section className="content-block fade-in">
-        <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
-        <h2 style={{ fontSize: "28px" }}>機種別規格認証</h2>
-        <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
-        <article className="reference-block">
-          <h3>認証要件一覧</h3>
-          <div className="table-wrap">
-            <table className="requirements-table" style={{ maxWidth: "1004px", margin: "0 auto" }}>
-              <thead>
-                <tr>
-                  <th>製品</th>
-                  <th>認証</th>
-                  <th>適用規格</th>
-                  <th>認証機関</th>
-                  <th>備考</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CERT_ROWS.map((row) => (
-                  <tr key={row.product}>
-                    <td><strong>{row.product}</strong></td>
-                    <td
-                      style={{
-                        color: row.requirement === "必須" ? "#c00" : row.requirement === "条件付き" ? "#885500" : "inherit",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {row.requirement}
-                    </td>
-                    <td>{row.standard}</td>
-                    <td>{row.authority}</td>
-                    <td>{row.note}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="country-procedure">
-            <strong>必要手続き：</strong>
-            SIRIM製品認証 → ST（Energy Commission）ラベル取得 → CoA発行
-          </p>
-        </article>
-        <article className="reference-block">
-          <h3>SIRIM認証プロセス</h3>
-          <ol className="notes-list">
-            {SIRIM_PROCESS.map((step, index) => (
-              <li key={`sirim-${index}`}>{step}</li>
-            ))}
-          </ol>
-        </article>
-      </section>
-
       {/* 既存：電力インフラ基本情報 */}
       <section className="content-block content-block--major">
         <p className="section-kicker">POWER INFRASTRUCTURE</p>
@@ -881,6 +826,69 @@ function T1CountryProfile(): React.JSX.Element {
           <ol className="notes-list">
             {MARKET_NOTES.map((note, index) => (
               <li key={`market-note-${index}`}>{note}</li>
+            ))}
+          </ol>
+        </article>
+      </section>
+    </>
+  );
+}
+
+
+/* ------------------------------------------------------------------ */
+/*  T3: Regulatory Gateway                                             */
+/* ------------------------------------------------------------------ */
+
+function T3RegulatoryGateway(): React.JSX.Element {
+  return (
+    <>
+      <section className="content-block fade-in">
+        <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
+        <h2 style={{ fontSize: "28px" }}>機種別規格認証</h2>
+        <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
+        <article className="reference-block">
+          <h3>認証要件一覧</h3>
+          <div className="table-wrap">
+            <table className="requirements-table" style={{ maxWidth: "1004px", margin: "0 auto" }}>
+              <thead>
+                <tr>
+                  <th>製品</th>
+                  <th>認証</th>
+                  <th>適用規格</th>
+                  <th>認証機関</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CERT_ROWS.map((row) => (
+                  <tr key={row.product}>
+                    <td><strong>{row.product}</strong></td>
+                    <td
+                      style={{
+                        color: row.requirement === "必須" ? "#c00" : row.requirement === "条件付き" ? "#885500" : "inherit",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {row.requirement}
+                    </td>
+                    <td>{row.standard}</td>
+                    <td>{row.authority}</td>
+                    <td>{row.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="country-procedure">
+            <strong>必要手続き：</strong>
+            SIRIM製品認証 → ST（Energy Commission）ラベル取得 → CoA発行
+          </p>
+        </article>
+        <article className="reference-block">
+          <h3>SIRIM認証プロセス</h3>
+          <ol className="notes-list">
+            {SIRIM_PROCESS.map((step, index) => (
+              <li key={`sirim-${index}`}>{step}</li>
             ))}
           </ol>
         </article>
@@ -972,10 +980,6 @@ function T2MarketAndDemand(): React.JSX.Element {
   const nYears = kpiLast.year - kpiBase.year;
   const cagr = (Math.pow(kpiLast.market_size_usd_million / kpiBase.market_size_usd_million, 1 / nYears) - 1) * 100;
 
-  // セクター関連度バッジ色
-  const relevanceBadgeColor = (relevance: string) =>
-    relevance === "High" ? "#dc3545" : relevance === "Medium" ? "#d97706" : "#6c757d";
-
   // 成長見通しアイコン表示
   const growthOutlookIcon = (outlook: string) => {
     const icons = {
@@ -1013,7 +1017,7 @@ function T2MarketAndDemand(): React.JSX.Element {
       {/* ============================================================ */}
       <section className="content-block content-block--major">
         <p className="section-kicker">MARKET SIZE OVERVIEW</p>
-        <h2 style={{ fontSize: "28px" }}>マレーシア LV CB 市場規模概観</h2>
+        <h2 style={{ fontSize: "28px" }}>マレーシア低圧遮断器市場規模外観</h2>
         <p className="section-subline">Low Voltage Circuit Breaker Market — Malaysia（2020-2031）</p>
 
         {/* KPI カード */}
@@ -1428,6 +1432,7 @@ export default function MalaysiaPage(): React.JSX.Element {
   const renderTab = () => {
     if (activeTab === "t1") return <T1CountryProfile />;
     if (activeTab === "t2") return <T2MarketAndDemand />;
+    if (activeTab === "t3") return <T3RegulatoryGateway />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;
