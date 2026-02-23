@@ -549,7 +549,7 @@ function T1CountryProfile(): React.JSX.Element {
         }, [triggerTransition]);
 
         return (
-          <section className="content-block content-block--wide">
+          <section className="content-block">
             <p className="section-kicker">GDP TREND</p>
             <h2 style={{ fontSize: "28px" }}>GDP 推移（実績 + 予測）</h2>
             <p className="section-subline">2015-2030年度 / 単位：兆円（名目GDP・140円/USD）</p>
@@ -683,7 +683,7 @@ function T1CountryProfile(): React.JSX.Element {
       })()}
 
       {/* 産業別GDP構成比 */}
-      <section className="content-block content-block--wide">
+      <section className="content-block">
         <p className="section-kicker">INDUSTRY COMPOSITION</p>
         <h2 style={{ fontSize: "28px" }}>産業別 GDP 構成比（2025年度）</h2>
         <p className="section-subline">セクター別のシェアと成長率</p>
@@ -769,7 +769,7 @@ function T1CountryProfile(): React.JSX.Element {
         </article>
       </section>
 
-      <section className="content-block content-block--wide fade-in">
+      <section className="content-block fade-in">
         <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
         <h2 style={{ fontSize: "28px" }}>機種別規格認証</h2>
         <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
