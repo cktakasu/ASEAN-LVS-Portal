@@ -1315,7 +1315,6 @@ function T2MarketAndDemand(): React.JSX.Element {
         <p className="section-kicker">REGIONAL PROFILE</p>
         <h2 style={{ fontSize: "28px" }}>地域概況</h2>
         <p className="section-subline">州別のGDP・主要産業・成長産業</p>
-        <p style={{ margin: "4px 0 0", textAlign: "center", fontSize: "0.75rem", color: "var(--text-sub-dark)" }}>出典: DOSM, GDP by State 2024（2025年7月1日発表）</p>
 
         {/* 地域概況テーブル */}
         <article className="reference-block">
@@ -1324,7 +1323,10 @@ function T2MarketAndDemand(): React.JSX.Element {
               <thead>
                 <tr>
                   <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>州</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>GDP (兆円 / USD Bn)</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>
+                    GDP (兆円 / USD Bn)
+                    <div style={{ fontWeight: 400, fontSize: "0.72rem", color: "var(--text-sub-dark)", marginTop: "2px", whiteSpace: "nowrap" }}>DOSM GDP by State 2024</div>
+                  </th>
                   <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>全国比</th>
                   <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>成長率</th>
                   <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>主要産業</th>
