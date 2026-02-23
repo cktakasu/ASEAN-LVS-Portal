@@ -1017,7 +1017,7 @@ function T2MarketAndDemand(): React.JSX.Element {
       {/* ============================================================ */}
       <section className="content-block content-block--major">
         <p className="section-kicker">MARKET SIZE OVERVIEW</p>
-        <h2 style={{ fontSize: "28px" }}>マレーシア LV CB 市場規模概観</h2>
+        <h2 style={{ fontSize: "28px" }}>マレーシア低圧遮断器市場規模外観</h2>
         <p className="section-subline">Low Voltage Circuit Breaker Market — Malaysia（2020-2031）</p>
 
         {/* KPI カード */}
