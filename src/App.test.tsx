@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import App from "./App";
 
 const countriesPayload = [
@@ -79,6 +80,8 @@ function createJsonResponse(payload: unknown): Response {
 }
 
 describe("ASEAN map zoom", () => {
+  const pendingFrameIds: number[] = [];
+
   beforeEach(() => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input: RequestInfo | URL) => {
       const raw = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
@@ -95,32 +98,38 @@ describe("ASEAN map zoom", () => {
     });
 
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-      return setTimeout(() => callback(performance.now()), 16) as unknown as number;
+      const id = setTimeout(() => callback(performance.now()), 16) as unknown as number;
+      pendingFrameIds.push(id);
+      return id;
     });
 
     vi.stubGlobal("cancelAnimationFrame", (id: number) => {
       clearTimeout(id);
+      const idx = pendingFrameIds.indexOf(id);
+      if (idx !== -1) pendingFrameIds.splice(idx, 1);
     });
   });
 
   afterEach(() => {
+    pendingFrameIds.forEach(clearTimeout);
+    pendingFrameIds.length = 0;
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
   it("zooms when a country is clicked and resets on second click", async () => {
-    render(<App />);
+    render(<MemoryRouter><App /></MemoryRouter>);
 
     const myanmarPath = await screen.findByLabelText("ミャンマー");
     const svg = document.getElementById("asean-map-svg");
 
     expect(svg).not.toBeNull();
-    expect(svg).toHaveAttribute("viewBox", "0 0 960 620");
+    expect(svg).toHaveAttribute("viewBox", "0 0 960 700");
 
     fireEvent.click(myanmarPath);
 
     await waitFor(() => {
-      expect(svg?.getAttribute("viewBox")).not.toBe("0 0 960 620");
+      expect(svg?.getAttribute("viewBox")).not.toBe("0 0 960 700");
     });
     await waitFor(() => {
       expect(screen.getByText("MYANMAR")).toBeInTheDocument();
@@ -131,7 +140,7 @@ describe("ASEAN map zoom", () => {
 
     await waitFor(
       () => {
-        expect(svg).toHaveAttribute("viewBox", "0 0 960 620");
+        expect(svg).toHaveAttribute("viewBox", "0 0 960 700");
       },
       { timeout: 2500 }
     );

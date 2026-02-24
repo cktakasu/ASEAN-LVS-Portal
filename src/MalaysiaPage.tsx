@@ -293,8 +293,8 @@ const CHART_CONFIG = {
 
 const cbRelevanceColor = (relevance: string): string =>
   relevance === "High" ? "#dc3545" :
-  relevance === "Medium" ? "#d97706" :
-  "#6c757d";
+    relevance === "Medium" ? "#d97706" :
+      "#6c757d";
 
 /* ------------------------------------------------------------------ */
 /*  ドーナツチャート用カスタムラベル（リード線付き）                  */
@@ -360,12 +360,12 @@ const DonutLabelWithLeaderLine: React.FC<any> = ({
 /* ------------------------------------------------------------------ */
 
 const TABS: TabDef[] = [
-  { id: "t1", label: "Country Profile",       sublabel: "Is this country worth targeting?" },
-  { id: "t2", label: "Market & Demand",        sublabel: "Where is the demand?" },
-  { id: "t3", label: "Regulatory Gateway",     sublabel: "What is required to sell here?" },
-  { id: "t4", label: "Competitive Landscape",  sublabel: "Who are we competing against?" },
-  { id: "t5", label: "Our Position",           sublabel: "Where do we stand?" },
-  { id: "t6", label: "Strategic Assessment",   sublabel: "What should we do?" },
+  { id: "t1", label: "Country Profile", sublabel: "Is this country worth targeting?" },
+  { id: "t2", label: "Market & Demand", sublabel: "Where is the demand?" },
+  { id: "t3", label: "Regulatory Gateway", sublabel: "What is required to sell here?" },
+  { id: "t4", label: "Competitive Landscape", sublabel: "Who are we competing against?" },
+  { id: "t5", label: "Our Position", sublabel: "Where do we stand?" },
+  { id: "t6", label: "Strategic Assessment", sublabel: "What should we do?" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -373,20 +373,20 @@ const TABS: TabDef[] = [
 /* ------------------------------------------------------------------ */
 
 const CERT_ROWS: CertRow[] = [
-  { product: "ACB",  requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様で要求多し" },
+  { product: "ACB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様で要求多し" },
   { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様でSIRIM CoA要求" },
-  { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
-  { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
-  { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "MCB", requirement: "必須", standard: "MS IEC 60898", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCCB", requirement: "必須", standard: "MS IEC 61008", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "RCBO", requirement: "必須", standard: "MS IEC 61009", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
 ];
 
 const POWER_INFO: InfoItem[] = [
   { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
-  { label: "周波数",           value: "50 Hz" },
-  { label: "主要電力会社",     value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
-  { label: "サバ・サラワク",   value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
-  { label: "プラグ形状",       value: "Type G（英国型 BS 1363）" },
-  { label: "配電方式",         value: "TN-S / TN-C-S（半島）、地域によりTT" },
+  { label: "周波数", value: "50 Hz" },
+  { label: "主要電力会社", value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
+  { label: "サバ・サラワク", value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
+  { label: "プラグ形状", value: "Type G（英国型 BS 1363）" },
+  { label: "配電方式", value: "TN-S / TN-C-S（半島）、地域によりTT" },
 ];
 
 const SIRIM_PROCESS: string[] = [
@@ -398,8 +398,8 @@ const SIRIM_PROCESS: string[] = [
 ];
 
 const REGIONAL_DIFF: InfoItem[] = [
-  { label: "半島マレーシア",         value: "TNB系統。MS規格・SIRIM CoA体制が最も整備されており、ST登録が実質必須。" },
-  { label: "サバ（ボルネオ北部）",   value: "SESBが管轄。系統容量は半島より小さく、プロジェクト仕様でIECまたはBS準拠を要求するケースが多い。" },
+  { label: "半島マレーシア", value: "TNB系統。MS規格・SIRIM CoA体制が最も整備されており、ST登録が実質必須。" },
+  { label: "サバ（ボルネオ北部）", value: "SESBが管轄。系統容量は半島より小さく、プロジェクト仕様でIECまたはBS準拠を要求するケースが多い。" },
   { label: "サラワク（ボルネオ北西）", value: "SEBが独立運営。半島とは別制度。認証要件をSEB仕様で個別確認要。" },
 ];
 
@@ -1087,11 +1087,10 @@ function T2MarketAndDemand(): React.JSX.Element {
                 <YAxis
                   stroke="#666"
                   tickFormatter={(v) => `${Math.round(v / 100000000)}億円`}
-                  label={{ value: "億円", angle: -90, position: "insideLeft", offset: 10 }}
                 />
                 {/* ツールチップ */}
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <Tooltip content={<MarketSizeTooltip active={false} payload={[]} label="" />  as any} />
+                <Tooltip content={<MarketSizeTooltip active={false} payload={[]} label="" /> as any} />
                 {/* オレンジ帯: 不確実性レンジ */}
                 <Area
                   dataKey="market_size_low_jpy"
