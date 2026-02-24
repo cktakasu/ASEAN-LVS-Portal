@@ -141,8 +141,8 @@ body {
 }
 
 #map-section.hero {
-  padding-top: 36px;
-  padding-bottom: 60px;
+  padding-top: 16px;
+  padding-bottom: 36px;
 }
 
 .hero--light {
@@ -222,7 +222,9 @@ body {
 }
 
 .map-stage {
-  width: min(1400px, calc(100vw - 12px));
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   margin-top: 12px;
   height: 720px;
   background: var(--bg-gray);
@@ -1026,20 +1028,24 @@ td:first-child {
 
 /* ヒーロー強化（トップページのみ） */
 #top.hero {
-  padding: 72px 16px 56px;
+  padding: 28px 16px 20px;
 }
 
 #top.hero .hero-kicker {
-  font-size: 14px;
-  letter-spacing: 0.18em;
-  margin-bottom: 12px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin-bottom: 4px;
+  margin-top: 0;
+  color: var(--text-sub);
 }
 
 #top.hero h1 {
-  font-size: 52px;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.04;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.12;
+  color: var(--text-dark);
+  margin: 0;
 }
 
 #top.hero .hero-sub {
@@ -1229,11 +1235,11 @@ td:first-child {
 
 @media (max-width: 734px) {
   #top.hero {
-    padding: 48px 24px 40px;
+    padding: 20px 16px 16px;
   }
 
   #top.hero h1 {
-    font-size: 36px;
+    font-size: 24px;
   }
 
   #top.hero .hero-sub {
@@ -1336,6 +1342,7 @@ td:first-child {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
 }
 
 .matrix-th {
@@ -1351,7 +1358,13 @@ td:first-child {
 
 .matrix-th--country {
   text-align: left;
-  min-width: 96px;
+  width: 140px;
+}
+
+/* 需要ドライバー比較テーブルのスコア列を均等幅に */
+.matrix-table .matrix-th:not(.matrix-th--country):not(.matrix-th--total),
+.matrix-table .matrix-td--score {
+  width: calc((100% - 140px) / 5);
 }
 
 .matrix-th--total {
