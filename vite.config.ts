@@ -5,6 +5,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig(({ command }) => ({
   base: command === 'build' ? '/Kaikiei-Group-Site-Codex/' : '/',
   plugins: [react()],
+  server: {
+    allowedHosts: true,
+  },
   test: {
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
