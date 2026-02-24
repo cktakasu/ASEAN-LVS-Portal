@@ -1,6 +1,9 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import MalaysiaPage from "./MalaysiaPage";
+import { ASEANKPICards } from "./components/ASEANKPICards";
+import { CountryNavCards } from "./components/CountryNavCards";
+import { ASEAN_KPI, ASEAN_COUNTRY_CARDS } from "./data/aseanOverviewData";
 
 type Coordinate = [number, number];
 type Ring = Coordinate[];
@@ -64,56 +67,6 @@ type EditorialLabelSpec = {
   nudgeY: number;
 };
 
-type ProductCategory = {
-  abbr: string;
-  productName: string;
-  scope: string;
-  ratingRange: string;
-  iecStandard: string;
-  usage: string;
-};
-
-type CountryRequirementRow = {
-  product: string;
-  requirement: string;
-  standard: string;
-  authority: string;
-  note: string;
-};
-
-type CountryRequirement = {
-  country: string;
-  footnoteLabel: string;
-  footnote: string;
-  rows: CountryRequirementRow[];
-};
-
-type LegendRow = {
-  category: string;
-  meaning: string;
-};
-
-type SummaryRow = {
-  country: string;
-  acb: string;
-  mccb: string;
-  mcb: string;
-  rccb: string;
-  rcbo: string;
-};
-
-type ResidentialQuickRow = {
-  country: string;
-  mcb: string;
-  rccb: string;
-  rcbo: string;
-};
-
-type IndustrialQuickRow = {
-  country: string;
-  reference: string;
-  mandatory: string;
-};
 
 const MAP_WIDTH = 960;
 const MAP_HEIGHT = 700;
@@ -142,283 +95,7 @@ const ISO3_TO_JA = new Map<string, string>([
   ["VNM", "ベトナム"],
 ]);
 
-const PRODUCT_CATEGORIES: ProductCategory[] = [
-  {
-    abbr: "ACB",
-    productName: "Air Circuit Breaker（気中遮断器）",
-    scope: "産業用途",
-    ratingRange: "630A〜6300A",
-    iecStandard: "IEC 60947-2",
-    usage: "産業用主幹・大型商業施設",
-  },
-  {
-    abbr: "MCCB",
-    productName: "Molded Case Circuit Breaker（配線用遮断器）",
-    scope: "産業用途",
-    ratingRange: "32A〜1600A",
-    iecStandard: "IEC 60947-2",
-    usage: "産業用・商業用配電盤",
-  },
-  {
-    abbr: "MCB",
-    productName: "Miniature Circuit Breaker（小型遮断器）",
-    scope: "家庭・類似用途 / 産業用途",
-    ratingRange: "〜125A",
-    iecStandard: "IEC 60898-1（家庭）/ IEC 60947-2（産業）",
-    usage: "住宅・軽商業用分電盤、産業・盤内用途",
-  },
-  {
-    abbr: "RCCB",
-    productName: "Residual Current Circuit Breaker（漏電遮断器）",
-    scope: "家庭・類似用途",
-    ratingRange: "〜125A（63Aは典型）",
-    iecStandard: "IEC 61008-1",
-    usage: "漏電保護（過電流保護なし）",
-  },
-  {
-    abbr: "RCBO",
-    productName: "Residual Current Breaker with Overcurrent",
-    scope: "家庭・類似用途",
-    ratingRange: "〜125A（63Aは典型）",
-    iecStandard: "IEC 61009-1",
-    usage: "漏電＋過電流保護",
-  },
-];
 
-const PRODUCT_CATEGORY_NOTES = [
-  "MCBは用途で適用規格が分かれます。家庭・類似用途はIEC 60898-1、産業用途はIEC 60947-2系の適用が一般的です。",
-  "RCCB/RCBOの定格電流は実務上63A帯が多い一方、規格上限は125Aまでを想定した整理です。",
-  "ELCB/ELBは現場呼称として広く使われます。本表ではIEC用語に合わせ、RCCB/RCBOで分類しています。",
-];
-
-const LEGEND_ROWS: LegendRow[] = [
-  { category: "必須", meaning: "強制認証：販売・輸入前に認証取得必須" },
-  { category: "条件付き", meaning: "入札・プロジェクト仕様で要求される場合あり" },
-  { category: "対象外", meaning: "現時点で強制認証リストに含まれず" },
-  { category: "登録制", meaning: "製品登録・届出が必要" },
-];
-
-const COUNTRY_REQUIREMENTS: CountryRequirement[] = [
-  {
-    country: "インドネシア",
-    footnoteLabel: "必要手続き",
-    footnote: "SPPT-SNI認証取得 → NPB（製品登録番号）取得 → SNIマーク貼付",
-    rows: [
-      {
-        product: "ACB",
-        requirement: "対象外",
-        standard: "IEC 60947-2参照",
-        authority: "-",
-        note: "SNI強制リスト対象外",
-      },
-      {
-        product: "MCCB",
-        requirement: "対象外",
-        standard: "IEC 60947-2参照",
-        authority: "-",
-        note: "SNI強制リスト対象外",
-      },
-      {
-        product: "MCB",
-        requirement: "必須",
-        standard: "SNI IEC 60898-1:2009",
-        authority: "LSPro（認定CB）",
-        note: "HS: 85362091, 85362099",
-      },
-      {
-        product: "RCCB",
-        requirement: "必須",
-        standard: "SNI IEC 61008-1:2017",
-        authority: "LSPro（認定CB）",
-        note: "HS: 85362091, 85362099",
-      },
-      {
-        product: "RCBO",
-        requirement: "必須",
-        standard: "SNI IEC 61009関連",
-        authority: "LSPro（認定CB）",
-        note: "HS: 85362091, 85362099",
-      },
-    ],
-  },
-  {
-    country: "マレーシア",
-    footnoteLabel: "必要手続き",
-    footnote: "SIRIM製品認証 → ST（Energy Commission）ラベル取得 → CoA発行",
-    rows: [
-      {
-        product: "ACB",
-        requirement: "条件付き",
-        standard: "MS IEC 60947-2",
-        authority: "SIRIM QAS",
-        note: "プロジェクト仕様で要求多し",
-      },
-      {
-        product: "MCCB",
-        requirement: "条件付き",
-        standard: "MS IEC 60947-2",
-        authority: "SIRIM QAS",
-        note: "プロジェクト仕様でSIRIM CoA要求",
-      },
-      {
-        product: "MCB",
-        requirement: "必須",
-        standard: "MS IEC 60898",
-        authority: "SIRIM QAS",
-        note: "ST-SIRIM CoA必須",
-      },
-      {
-        product: "RCCB",
-        requirement: "必須",
-        standard: "MS IEC 61008",
-        authority: "SIRIM QAS",
-        note: "ST-SIRIM CoA必須",
-      },
-      {
-        product: "RCBO",
-        requirement: "必須",
-        standard: "MS IEC 61009",
-        authority: "SIRIM QAS",
-        note: "ST-SIRIM CoA必須",
-      },
-    ],
-  },
-  {
-    country: "シンガポール",
-    footnoteLabel: "特記",
-    footnote: "2023年7月より全住宅にRCCB設置義務化。1985年以前建築は2025年7月1日までに設置要。",
-    rows: [
-      { product: "ACB", requirement: "対象外", standard: "IEC 60947-2参照", authority: "-", note: "Controlled Goods対象外" },
-      { product: "MCCB", requirement: "対象外", standard: "IEC 60947-2参照", authority: "-", note: "Controlled Goods対象外" },
-      { product: "MCB", requirement: "対象外", standard: "IEC 60898参照", authority: "-", note: "Controlled Goods対象外" },
-      { product: "RCCB", requirement: "必須", standard: "SS 97:2016", authority: "認定CAB", note: "全住宅義務化（2025年7月期限）" },
-      { product: "RCBO", requirement: "条件付き", standard: "IEC 61009参照", authority: "-", note: "RCCBに準じて要求される場合あり" },
-    ],
-  },
-  {
-    country: "タイ",
-    footnoteLabel: "必要手続き",
-    footnote: "TISI認証申請 → タイ国内または認定海外ラボで試験 → TISIマーク取得",
-    rows: [
-      { product: "ACB", requirement: "対象外", standard: "IEC 60947-2参照", authority: "-", note: "TISI強制リスト対象外" },
-      { product: "MCCB", requirement: "対象外", standard: "IEC 60947-2参照", authority: "-", note: "TISI強制リスト対象外" },
-      { product: "MCB", requirement: "対象外", standard: "IEC 60898参照", authority: "-", note: "TISI強制リスト対象外" },
-      { product: "RCCB", requirement: "必須", standard: "TIS 2425-2560 (2017)", authority: "TISI", note: "施行日：2021年1月10日" },
-      { product: "RCBO", requirement: "必須", standard: "TIS 909-2548 (2005)", authority: "TISI", note: "施行日：2007年11月19日" },
-    ],
-  },
-  {
-    country: "フィリピン",
-    footnoteLabel: "特記",
-    footnote: "周波数60Hz（ASEAN唯一）。50Hz製品は適合確認要。ICC（Import Commodity Clearance）必須。",
-    rows: [
-      { product: "ACB", requirement: "条件付き", standard: "PNS IEC 60947-2参照", authority: "BPS", note: "プロジェクト仕様で要求される場合あり" },
-      { product: "MCCB", requirement: "必須", standard: "PNS 1573-2:1997 (IEC 947-2:1995)", authority: "BPS", note: "ICC必須" },
-      { product: "MCB", requirement: "必須", standard: "PNS IEC 60898", authority: "BPS", note: "ICC必須" },
-      { product: "RCCB", requirement: "必須", standard: "PNS IEC 61008", authority: "BPS", note: "ICC必須" },
-      { product: "RCBO", requirement: "必須", standard: "PNS IEC 61009", authority: "BPS", note: "ICC必須" },
-    ],
-  },
-  {
-    country: "ベトナム",
-    footnoteLabel: "特記",
-    footnote: "QCVN 25:2025/BKHCN適用。2025年10月1日完全施行。短絡試験は除外可。",
-    rows: [
-      { product: "ACB", requirement: "対象外", standard: "IEC 60947-2参照", authority: "-", note: "QCVN 25対象外（産業用）" },
-      { product: "MCCB", requirement: "対象外", standard: "IEC 60947-2参照", authority: "-", note: "QCVN 25対象外（産業用）" },
-      { product: "MCB", requirement: "必須", standard: "TCVN 6434-1:2018 (IEC 60898-1:2015)", authority: "認定CB", note: "定格63A以下が対象" },
-      { product: "RCCB", requirement: "必須", standard: "TCVN 6950-1:2007 (IEC 61008-1:2006)", authority: "認定CB", note: "定格63A以下が対象" },
-      { product: "RCBO", requirement: "必須", standard: "TCVN 6951-1:2007 (IEC 61009-1:2003)", authority: "認定CB", note: "定格63A以下が対象" },
-    ],
-  },
-  {
-    country: "ブルネイ",
-    footnoteLabel: "特記",
-    footnote: "強制認証リストなし。IEC/BS規格準拠が基本。プラグはType G（英国型）。",
-    rows: [
-      { product: "ACB", requirement: "条件付き", standard: "IEC 60947-2 / BS規格", authority: "-", note: "プロジェクト仕様で要求" },
-      { product: "MCCB", requirement: "条件付き", standard: "IEC 60947-2 / BS規格", authority: "-", note: "プロジェクト仕様で要求" },
-      { product: "MCB", requirement: "条件付き", standard: "IEC 60898 / BS規格", authority: "-", note: "プロジェクト仕様で要求" },
-      { product: "RCCB", requirement: "条件付き", standard: "IEC 61008 / BS規格", authority: "-", note: "プロジェクト仕様で要求" },
-      { product: "RCBO", requirement: "条件付き", standard: "IEC 61009 / BS規格", authority: "-", note: "プロジェクト仕様で要求" },
-    ],
-  },
-  {
-    country: "カンボジア",
-    footnoteLabel: "特記",
-    footnote: "CS0010-2003〜CS0050-2003（強制規格）。地域・案件差が大きい。現地パートナー経由で確認要。",
-    rows: [
-      { product: "ACB", requirement: "登録制", standard: "IEC 60947-2参照", authority: "ISC/MISTI", note: "登録が必要な場合あり" },
-      { product: "MCCB", requirement: "登録制", standard: "IEC 60947-2参照", authority: "ISC/MISTI", note: "登録が必要な場合あり" },
-      { product: "MCB", requirement: "登録制", standard: "CS規格（IEC準拠）", authority: "ISC/MISTI", note: "ISC登録制" },
-      { product: "RCCB", requirement: "登録制", standard: "CS規格（IEC準拠）", authority: "ISC/MISTI", note: "ISC登録制" },
-      { product: "RCBO", requirement: "登録制", standard: "CS規格（IEC準拠）", authority: "ISC/MISTI", note: "ISC登録制" },
-    ],
-  },
-  {
-    country: "ラオス",
-    footnoteLabel: "特記",
-    footnote: "強制認証制度は未整備。DSM（Department of Standard and Metrology）管轄。IEC適合証明で通関可能。",
-    rows: [
-      { product: "ACB", requirement: "条件付き", standard: "IEC 60947-2参照", authority: "DSM/MoIC", note: "プロジェクト仕様で要求" },
-      { product: "MCCB", requirement: "条件付き", standard: "IEC 60947-2参照", authority: "DSM/MoIC", note: "プロジェクト仕様で要求" },
-      { product: "MCB", requirement: "条件付き", standard: "IEC 60898参照", authority: "DSM/MoIC", note: "輸入時認証要求の場合あり" },
-      { product: "RCCB", requirement: "条件付き", standard: "IEC 61008参照", authority: "DSM/MoIC", note: "輸入時認証要求の場合あり" },
-      { product: "RCBO", requirement: "条件付き", standard: "IEC 61009参照", authority: "DSM/MoIC", note: "輸入時認証要求の場合あり" },
-    ],
-  },
-  {
-    country: "ミャンマー",
-    footnoteLabel: "特記",
-    footnote: "EID（Electrical Inspection Department）への登録制。BS・JIS・IEC等を受容。MNBC 2020にIEC規格引用。制度変更頻発。",
-    rows: [
-      { product: "ACB", requirement: "登録制", standard: "IEC 60947-2 / BS / JIS", authority: "EID", note: "登録制・制度流動的" },
-      { product: "MCCB", requirement: "登録制", standard: "IEC 60947-2 / BS / JIS", authority: "EID", note: "登録制・制度流動的" },
-      { product: "MCB", requirement: "登録制", standard: "IEC 60898 / BS / JIS", authority: "EID", note: "EID登録必要" },
-      { product: "RCCB", requirement: "登録制", standard: "IEC 61008 / BS / JIS", authority: "EID", note: "EID登録必要" },
-      { product: "RCBO", requirement: "登録制", standard: "IEC 61009 / BS / JIS", authority: "EID", note: "EID登録必要" },
-    ],
-  },
-];
-
-const CERT_SUMMARY_ROWS: SummaryRow[] = [
-  { country: "インドネシア", acb: "対象外", mccb: "対象外", mcb: "必須", rccb: "必須", rcbo: "必須" },
-  { country: "マレーシア", acb: "条件付き", mccb: "条件付き", mcb: "必須", rccb: "必須", rcbo: "必須" },
-  { country: "シンガポール", acb: "対象外", mccb: "対象外", mcb: "対象外", rccb: "必須", rcbo: "条件付き" },
-  { country: "タイ", acb: "対象外", mccb: "対象外", mcb: "対象外", rccb: "必須", rcbo: "必須" },
-  { country: "フィリピン", acb: "条件付き", mccb: "必須", mcb: "必須", rccb: "必須", rcbo: "必須" },
-  { country: "ベトナム", acb: "対象外", mccb: "対象外", mcb: "必須", rccb: "必須", rcbo: "必須" },
-  { country: "ブルネイ", acb: "条件付き", mccb: "条件付き", mcb: "条件付き", rccb: "条件付き", rcbo: "条件付き" },
-  { country: "カンボジア", acb: "登録制", mccb: "登録制", mcb: "登録制", rccb: "登録制", rcbo: "登録制" },
-  { country: "ラオス", acb: "条件付き", mccb: "条件付き", mcb: "条件付き", rccb: "条件付き", rcbo: "条件付き" },
-  { country: "ミャンマー", acb: "登録制", mccb: "登録制", mcb: "登録制", rccb: "登録制", rcbo: "登録制" },
-];
-
-const RESIDENTIAL_QUICK_ROWS: ResidentialQuickRow[] = [
-  { country: "インドネシア", mcb: "SNI IEC 60898-1:2009", rccb: "SNI IEC 61008-1:2017", rcbo: "SNI IEC 61009" },
-  { country: "マレーシア", mcb: "MS IEC 60898", rccb: "MS IEC 61008", rcbo: "MS IEC 61009" },
-  { country: "シンガポール", mcb: "-", rccb: "SS 97:2016", rcbo: "-" },
-  { country: "タイ", mcb: "-", rccb: "TIS 2425-2560", rcbo: "TIS 909-2548" },
-  { country: "フィリピン", mcb: "PNS IEC 60898", rccb: "PNS IEC 61008", rcbo: "PNS IEC 61009" },
-  { country: "ベトナム", mcb: "TCVN 6434-1:2018", rccb: "TCVN 6950-1:2007", rcbo: "TCVN 6951-1:2007" },
-];
-
-const INDUSTRIAL_QUICK_ROWS: IndustrialQuickRow[] = [
-  { country: "インドネシア", reference: "IEC 60947-2", mandatory: "なし" },
-  { country: "マレーシア", reference: "MS IEC 60947-2", mandatory: "プロジェクト依存" },
-  { country: "シンガポール", reference: "IEC 60947-2", mandatory: "なし" },
-  { country: "タイ", reference: "IEC 60947-2", mandatory: "なし" },
-  { country: "フィリピン", reference: "PNS 1573-2:1997", mandatory: "MCCB：ICC必須" },
-  { country: "ベトナム", reference: "IEC 60947-2", mandatory: "なし" },
-];
-
-const IMPORTANT_NOTES = [
-  "産業用ACB/MCCBは多くの国で強制認証対象外だが、入札・プロジェクト仕様でIEC適合証明やCBスキーム証明書を要求されるケースが多い。",
-  "フィリピンの60Hz問題：ASEAN唯一の60Hz国。50Hz仕様製品のトリップ特性等を確認必要。",
-  "ベトナムの定格制限：QCVN 25は63A以下の住宅用製品が対象。それ以上は現時点で強制対象外。",
-  "CLMV諸国（カンボジア・ラオス・ミャンマー・ベトナム）は制度が流動的。最新情報を現地で確認要。",
-  "シンガポールRCCB義務化：2025年7月1日が設置期限。住宅向け需要増加見込み。",
-];
 
 const EDITORIAL_LABELS = new Map<string, EditorialLabelSpec>([
   [
@@ -952,13 +629,6 @@ export default function App(): JSX.Element {
     }
   }, [countryBounds, selectedCountry]);
 
-  const visibleCountryRequirements = useMemo(() => {
-    if (selectedCountry === "all") {
-      return COUNTRY_REQUIREMENTS;
-    }
-    return COUNTRY_REQUIREMENTS.filter((item) => item.country === selectedCountry);
-  }, [selectedCountry]);
-
   const animateViewBox = useCallback((target: ViewBox, durationMs = ZOOM_ANIMATION_MS): Promise<void> => {
     return new Promise((resolve) => {
       if (boxesAlmostEqual(viewBoxRef.current, target)) {
@@ -1281,7 +951,6 @@ export default function App(): JSX.Element {
           <div className="nav-links">
             <a href="#top">ホーム</a>
             <a href="#map-section">マップ</a>
-            <a href="#table-section">比較表</a>
           </div>
           <div className="nav-actions" aria-hidden="true">
             <span>EN</span>
@@ -1292,7 +961,8 @@ export default function App(): JSX.Element {
       {!isCountryPage && (
         <header id="top" className="hero hero--light">
           <p className="hero-kicker">ASEAN LOW VOLTAGE BUSINESS PORTAL</p>
-          <h1>ASEAN低圧配制事業ポータル</h1>
+          <h1>ASEAN低圧配電事業ポータル</h1>
+          <p className="hero-sub">ASEAN 10カ国の低圧遮断器市場 — マクロ経済から認証制度まで</p>
         </header>
       )}
 
@@ -1335,193 +1005,26 @@ export default function App(): JSX.Element {
           </div>
         </section>
 
-        <section id="table-section" className="content-block">
-          <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
-          <h2>低圧遮断器 / 製品別対応表</h2>
-          <p className="section-subline">Product-Category Certification Requirements for Low-Voltage Circuit Breakers in ASEAN</p>
+        <section className="content-block content-block--major">
+          <p className="section-kicker">ASEAN OVERVIEW</p>
+          <ASEANKPICards data={ASEAN_KPI} />
+        </section>
 
-          <article className="reference-block">
-            <h3>製品カテゴリ定義</h3>
-            <div className="table-wrap">
-              <table className="definition-table">
-                <thead>
-                  <tr>
-                    <th>略称</th>
-                    <th>製品名</th>
-                    <th>適用スコープ</th>
-                    <th>定格範囲</th>
-                    <th>主要IEC規格</th>
-                    <th>用途</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {PRODUCT_CATEGORIES.map((item) => (
-                    <tr key={item.abbr}>
-                      <td>
-                        <strong>{item.abbr}</strong>
-                      </td>
-                      <td>{item.productName}</td>
-                      <td>{item.scope}</td>
-                      <td>{item.ratingRange}</td>
-                      <td>
-                        {item.abbr === "MCB" ? (
-                          <>
-                            IEC 60898-1（家庭）
-                            <br />
-                            IEC 60947-2（産業）
-                          </>
-                        ) : (
-                          item.iecStandard
-                        )}
-                      </td>
-                      <td>{item.usage}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <ul className="notes-list product-category-notes">
-              {PRODUCT_CATEGORY_NOTES.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
-          </article>
+        <hr className="section-divider" />
 
-          <article className="reference-block">
-            <h3>凡例</h3>
-            <div className="legend-inline" role="list" aria-label="凡例">
-              {LEGEND_ROWS.map((item) => (
-                <p className="legend-inline-item" role="listitem" key={item.category}>
-                  <strong>{item.category}</strong>
-                  <span>{item.meaning}</span>
-                </p>
-              ))}
-            </div>
-          </article>
+        <section className="content-block content-block--major">
+          <p className="section-kicker">ASEAN COUNTRIES</p>
+          <h2>10カ国の市場概要</h2>
+          <CountryNavCards countries={ASEAN_COUNTRY_CARDS} />
+        </section>
 
-          {visibleCountryRequirements.map((country) => (
-            <article className="country-block" key={country.country}>
-              <h3>{country.country}</h3>
-              <div className="table-wrap">
-                <table className="requirements-table">
-                  <thead>
-                    <tr>
-                      <th>製品</th>
-                      <th>認証</th>
-                      <th>適用規格</th>
-                      <th>認証機関</th>
-                      <th>備考</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {country.rows.map((row) => (
-                      <tr key={`${country.country}-${row.product}`}>
-                        <td>
-                          <strong>{row.product}</strong>
-                        </td>
-                        <td>{row.requirement}</td>
-                        <td>{row.standard}</td>
-                        <td>{row.authority}</td>
-                        <td>{row.note}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="country-procedure">
-                <strong>{country.footnoteLabel}：</strong>
-                {country.footnote}
-              </p>
-            </article>
-          ))}
-
-          <article className="reference-block">
-            <h3>製品別・国別 認証要否サマリー</h3>
-            <div className="table-wrap">
-              <table className="summary-table">
-                <thead>
-                  <tr>
-                    <th>国</th>
-                    <th>ACB</th>
-                    <th>MCCB</th>
-                    <th>MCB</th>
-                    <th>RCCB</th>
-                    <th>RCBO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {CERT_SUMMARY_ROWS.map((row) => (
-                    <tr key={row.country}>
-                      <td>{row.country}</td>
-                      <td>{row.acb}</td>
-                      <td>{row.mccb}</td>
-                      <td>{row.mcb}</td>
-                      <td>{row.rccb}</td>
-                      <td>{row.rcbo}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </article>
-
-          <article className="reference-block">
-            <h3>規格番号クイックリファレンス</h3>
-            <h4>住宅用（MCB/RCCB/RCBO）</h4>
-            <div className="table-wrap">
-              <table className="quick-table">
-                <thead>
-                  <tr>
-                    <th>国</th>
-                    <th>MCB規格</th>
-                    <th>RCCB規格</th>
-                    <th>RCBO規格</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {RESIDENTIAL_QUICK_ROWS.map((row) => (
-                    <tr key={row.country}>
-                      <td>{row.country}</td>
-                      <td>{row.mcb}</td>
-                      <td>{row.rccb}</td>
-                      <td>{row.rcbo}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <h4>産業用（ACB/MCCB）</h4>
-            <div className="table-wrap">
-              <table className="quick-table">
-                <thead>
-                  <tr>
-                    <th>国</th>
-                    <th>参照規格</th>
-                    <th>強制認証</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {INDUSTRIAL_QUICK_ROWS.map((row) => (
-                    <tr key={row.country}>
-                      <td>{row.country}</td>
-                      <td>{row.reference}</td>
-                      <td>{row.mandatory}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </article>
-
-          <article className="reference-block">
-            <h3>重要注意事項</h3>
-            <ol className="notes-list">
-              {IMPORTANT_NOTES.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ol>
-          </article>
+        <section className="content-block">
+          <p className="section-kicker">NOTES</p>
+          <ul style={{ fontSize: "13px", color: "var(--text-sub)", lineHeight: 1.7, paddingLeft: 20, margin: "12px 0 0" }}>
+            <li>IECスキーム（CBスキーム証明書）は各国認証取得の際に有利に活用できます。</li>
+            <li>フィリピンはASEAN唯一の60Hz電源国のため、他国（50Hz）と異なる製品仕様が必要です。</li>
+            <li>各国の認証制度・規制は随時改定されます。最新情報は各国規制当局の公式情報をご確認ください。</li>
+          </ul>
         </section>
             </>
           } />
