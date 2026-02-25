@@ -7,6 +7,9 @@ export default defineConfig(({ command }) => ({
   plugins: [react()],
   server: {
     allowedHosts: true,
+    headers: {
+      "Cache-Control": "no-store",
+    },
   },
   test: {
     environment: "jsdom",
