@@ -1,3 +1,4 @@
+import React from "react";
 import type { DemandDriverRow } from "../data/aseanMatrixData";
 import { DEMAND_SECTORS } from "../data/aseanMatrixData";
 
@@ -13,7 +14,7 @@ interface Props {
   data: DemandDriverRow[];
 }
 
-export function ASEANDemandMatrix({ data }: Props) {
+export const ASEANDemandMatrix = React.memo(function ASEANDemandMatrix({ data }: Props) {
   return (
     <div className="matrix-wrapper">
       <div className="matrix-scroll">
@@ -47,4 +48,4 @@ export function ASEANDemandMatrix({ data }: Props) {
       <p className="matrix-note">強度: 5=主要需要 / 1=軽微。各社・各プロジェクトにより異なる場合があります。</p>
     </div>
   );
-}
+});

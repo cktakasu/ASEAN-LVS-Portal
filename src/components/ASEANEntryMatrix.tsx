@@ -1,3 +1,4 @@
+import React from "react";
 import type { EntryPriorityRow } from "../data/aseanMatrixData";
 import { ENTRY_PRIORITY_AXES } from "../data/aseanMatrixData";
 
@@ -14,7 +15,7 @@ interface Props {
   data: EntryPriorityRow[];
 }
 
-export function ASEANEntryMatrix({ data }: Props) {
+export const ASEANEntryMatrix = React.memo(function ASEANEntryMatrix({ data }: Props) {
   return (
     <div className="matrix-wrapper">
       <div className="matrix-scroll">
@@ -50,4 +51,4 @@ export function ASEANEntryMatrix({ data }: Props) {
       <p className="matrix-note">スコア: 5=最優先 / 1=最低優先。合計点の降順で表示。</p>
     </div>
   );
-}
+});

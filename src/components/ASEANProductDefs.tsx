@@ -1,10 +1,11 @@
+import React from "react";
 import type { ProductDefRow } from "../data/aseanMatrixData";
 
 interface Props {
   rows: ProductDefRow[];
 }
 
-export function ASEANProductDefs({ rows }: Props) {
+export const ASEANProductDefs = React.memo(function ASEANProductDefs({ rows }: Props) {
   return (
     <div className="matrix-wrapper">
       <div className="matrix-scroll">
@@ -39,4 +40,4 @@ export function ASEANProductDefs({ rows }: Props) {
       </div>
     </div>
   );
-}
+});

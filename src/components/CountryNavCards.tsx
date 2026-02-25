@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { ASEANCountryCard } from "../data/aseanOverviewData";
 
@@ -12,7 +13,7 @@ function formatGDP(billion: number): string {
   return Math.round(billion) + " 十億";
 }
 
-export function CountryNavCards({ countries }: Props) {
+export const CountryNavCards = React.memo(function CountryNavCards({ countries }: Props) {
   const navigate = useNavigate();
 
   return (
@@ -61,4 +62,4 @@ export function CountryNavCards({ countries }: Props) {
       ))}
     </div>
   );
-}
+});

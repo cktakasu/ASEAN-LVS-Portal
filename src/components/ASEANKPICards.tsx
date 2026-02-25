@@ -1,10 +1,11 @@
+import React from "react";
 import type { ASEANAggregateKPI } from "../data/aseanOverviewData";
 
 type Props = {
   data: ASEANAggregateKPI;
 };
 
-export function ASEANKPICards({ data }: Props) {
+export const ASEANKPICards = React.memo(function ASEANKPICards({ data }: Props) {
   const cards = [
     {
       label: "ASEAN合計 GDP",
@@ -39,4 +40,4 @@ export function ASEANKPICards({ data }: Props) {
       ))}
     </div>
   );
-}
+});

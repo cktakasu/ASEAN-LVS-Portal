@@ -1,6 +1,7 @@
-import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import MalaysiaPage from "./MalaysiaPage";
+
+const MalaysiaPage = lazy(() => import("./MalaysiaPage"));
 import { ASEANKPICards } from "./components/ASEANKPICards";
 import { CountryNavCards } from "./components/CountryNavCards";
 import { ASEANGdpChart } from "./components/ASEANGdpChart";
@@ -1078,7 +1079,7 @@ export default function App(): JSX.Element {
         </section>
             </>
           } />
-          <Route path="/malaysia" element={<MalaysiaPage />} />
+          <Route path="/malaysia" element={<Suspense fallback={null}><MalaysiaPage /></Suspense>} />
         </Routes>
       </main>
 
