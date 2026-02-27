@@ -13,7 +13,13 @@ npm install
 
 # Always build fresh to get new hashed bundle URLs (bypasses proxy cache)
 echo "Building fresh bundle..."
-npm run build:local > /tmp/vite-build.log 2>&1 && echo "Build complete"
+if npm run build:local > /tmp/vite-build.log 2>&1; then
+  echo "Build complete"
+else
+  echo "Build failed. Log:"
+  cat /tmp/vite-build.log
+  exit 1
+fi
 
 # Start preview server (serves built dist/ with hashed URLs)
 if ! curl -sf http://localhost:8080/ > /dev/null 2>&1; then

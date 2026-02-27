@@ -569,7 +569,7 @@ export default function App(): JSX.Element {
   const viewBoxAnimationResolveRef = useRef<(() => void) | null>(null);
   const activeLabelRef = useRef<ActiveLabel | null>(null);
   const labelExitTimerRef = useRef<number | null>(null);
-  const transitionRunRef = useRef(0);
+  const transitionRunRef = useRef<number>(0);
 
   useEffect(() => {
     viewBoxRef.current = viewBox;
