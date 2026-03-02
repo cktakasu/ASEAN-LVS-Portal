@@ -239,9 +239,9 @@ const TABS: TabDef[] = [
 /* ------------------------------------------------------------------ */
 
 const CERT_ROWS: CertRow[] = [
-  { product: "ACB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様で要求多し" },
-  { product: "MCCB", requirement: "条件付き", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "プロジェクト仕様でSIRIM CoA要求" },
-  { product: "MCB", requirement: "必須", standard: "MS IEC 60898", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
+  { product: "ACB", requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器のためST-COA対象外。ただし政府プロジェクトではJKR JMAL評価登録が必要" },
+  { product: "MCCB", requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器のためST-COA対象外。ただし政府プロジェクトではJKR JMAL評価登録が必要" },
+  { product: "MCB", requirement: "必須", standard: "MS IEC 60898", authority: "SIRIM QAS", note: "住宅・民生用のためST-SIRIM CoA必須" },
   { product: "RCCB", requirement: "必須", standard: "MS IEC 61008", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
   { product: "RCBO", requirement: "必須", standard: "MS IEC 61009", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
 ];
@@ -731,7 +731,7 @@ function T3RegulatoryGateway(): React.JSX.Element {
                     <td><strong>{row.product}</strong></td>
                     <td
                       style={{
-                        color: row.requirement === "必須" ? "#c00" : row.requirement === "条件付き" ? "#885500" : "inherit",
+                        color: row.requirement === "必須" ? "#c00" : row.requirement === "法的義務なし" ? "#885500" : "inherit",
                         fontWeight: 600,
                       }}
                     >
