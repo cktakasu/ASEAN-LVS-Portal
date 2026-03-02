@@ -999,7 +999,107 @@ function T2MarketAndDemand(): React.JSX.Element {
       </section>
 
       {/* ============================================================ */}
-      {/* Section 2-2: 注目市場                                         */}
+      {/* Section 2-2: 地域概況                                         */}
+      {/* ============================================================ */}
+      <section className="content-block content-block--major">
+        <p className="section-kicker">REGIONAL PROFILE</p>
+        <h2 style={{ fontSize: "28px" }}>地域概況</h2>
+        <p className="section-subline">州別のGDP・主要産業・成長産業</p>
+
+        {/* 地域概況テーブル */}
+        <article className="reference-block">
+          <div className="table-wrap">
+            <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
+              <thead>
+                <tr>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>州</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>
+                    GDP (兆円 / USD Bn)
+                    <div style={{ fontWeight: 400, fontSize: "0.72rem", color: "var(--text-sub-dark)", marginTop: "2px", whiteSpace: "nowrap" }}>DOSM GDP by State 2024</div>
+                  </th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>全国比</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>成長率</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>主要産業</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>成長産業</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CB_REGIONAL_PROFILE.map((state) => (
+                  <tr key={state.state_name}>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontWeight: 600 }}>{state.state_name_ja}</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", whiteSpace: "nowrap" }}>
+                      約{(state.gdp_usd_billion * USD_JPY / 1000).toFixed(1)}兆円 <span style={{ fontSize: "0.75rem", color: "#999" }}>(USD {state.gdp_usd_billion.toFixed(1)}B)</span>
+                    </td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>{state.gdp_national_share_pct.toFixed(1)}%</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
+                      {state.gdp_growth_pct.toFixed(1)}%
+                    </td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.major_industries}</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.growing_industries}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
+            上位5州（Selangor、KL/Putrajaya、Johor、Sarawak、Penang）でマレーシアGDPの約68%を占め、LV遮断器の需要もこの5州に集中すると見られる。<br />
+            ※ 全国平均成長率5.1%超の州を緑色で表示。出典: DOSM, GDP by State 2024（2025年7月1日発表）
+          </p>
+        </article>
+      </section>
+
+      {/* ============================================================ */}
+      {/* Section 2-3: 注目市場                                         */}
+      {/* ============================================================ */}
+      <section className="content-block content-block--major">
+        <p className="section-kicker">REGIONAL PROFILE</p>
+        <h2 style={{ fontSize: "28px" }}>地域概況</h2>
+        <p className="section-subline">州別のGDP・主要産業・成長産業</p>
+
+        {/* 地域概況テーブル */}
+        <article className="reference-block">
+          <div className="table-wrap">
+            <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
+              <thead>
+                <tr>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>州</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>
+                    GDP (兆円 / USD Bn)
+                    <div style={{ fontWeight: 400, fontSize: "0.72rem", color: "var(--text-sub-dark)", marginTop: "2px", whiteSpace: "nowrap" }}>DOSM GDP by State 2024</div>
+                  </th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>全国比</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>成長率</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>主要産業</th>
+                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>成長産業</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CB_REGIONAL_PROFILE.map((state) => (
+                  <tr key={state.state_name}>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontWeight: 600 }}>{state.state_name_ja}</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", whiteSpace: "nowrap" }}>
+                      約{(state.gdp_usd_billion * USD_JPY / 1000).toFixed(1)}兆円 <span style={{ fontSize: "0.75rem", color: "#999" }}>(USD {state.gdp_usd_billion.toFixed(1)}B)</span>
+                    </td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>{state.gdp_national_share_pct.toFixed(1)}%</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
+                      {state.gdp_growth_pct.toFixed(1)}%
+                    </td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.major_industries}</td>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.growing_industries}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
+            上位5州（Selangor、KL/Putrajaya、Johor、Sarawak、Penang）でマレーシアGDPの約68%を占め、LV遮断器の需要もこの5州に集中すると見られる。<br />
+            ※ 全国平均成長率5.1%超の州を緑色で表示。出典: DOSM, GDP by State 2024（2025年7月1日発表）
+          </p>
+        </article>
+      </section>
+
+      {/* ============================================================ */}
+      {/* Section 2-3: 注目市場                                         */}
       {/* ============================================================ */}
       <section className="content-block content-block--major">
         <p className="section-kicker">SECTOR FOCUS</p>
@@ -1090,56 +1190,6 @@ function T2MarketAndDemand(): React.JSX.Element {
               <span style={{ color: "#dc3545" }}><strong>△</strong> Low (成長率 3%未満)</span>
             </div>
           </div>
-        </article>
-      </section>
-
-      {/* ============================================================ */}
-      {/* Section 2-3: 地域概況                                         */}
-      {/* ============================================================ */}
-      <section className="content-block content-block--major">
-        <p className="section-kicker">REGIONAL PROFILE</p>
-        <h2 style={{ fontSize: "28px" }}>地域概況</h2>
-        <p className="section-subline">州別のGDP・主要産業・成長産業</p>
-
-        {/* 地域概況テーブル */}
-        <article className="reference-block">
-          <div className="table-wrap">
-            <table className="definition-table" style={{ width: "100%", fontSize: "0.88rem" }}>
-              <thead>
-                <tr>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>州</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600 }}>
-                    GDP (兆円 / USD Bn)
-                    <div style={{ fontWeight: 400, fontSize: "0.72rem", color: "var(--text-sub-dark)", marginTop: "2px", whiteSpace: "nowrap" }}>DOSM GDP by State 2024</div>
-                  </th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>全国比</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "right", fontWeight: 600, whiteSpace: "nowrap" }}>成長率</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>主要産業</th>
-                  <th style={{ padding: "12px 10px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>成長産業</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CB_REGIONAL_PROFILE.map((state) => (
-                  <tr key={state.state_name}>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontWeight: 600 }}>{state.state_name_ja}</td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", whiteSpace: "nowrap" }}>
-                      約{(state.gdp_usd_billion * USD_JPY / 1000).toFixed(1)}兆円 <span style={{ fontSize: "0.75rem", color: "#999" }}>(USD {state.gdp_usd_billion.toFixed(1)}B)</span>
-                    </td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>{state.gdp_national_share_pct.toFixed(1)}%</td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
-                      {state.gdp_growth_pct.toFixed(1)}%
-                    </td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.major_industries}</td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.growing_industries}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
-            上位5州（Selangor、KL/Putrajaya、Johor、Sarawak、Penang）でマレーシアGDPの約68%を占め、LV遮断器の需要もこの5州に集中すると見られる。<br />
-            ※ 全国平均成長率5.1%超の州を緑色で表示。出典: DOSM, GDP by State 2024（2025年7月1日発表）
-          </p>
         </article>
       </section>
     </>
