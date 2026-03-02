@@ -1057,7 +1057,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                           </div>
                         </td>
                         <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontSize: "0.82rem" }}>
-                          {parseAndConvertSectorMarketSize(sector.sector_market_size)}
+                          {sector.sector_market_size ? parseAndConvertSectorMarketSize(sector.sector_market_size) : "—"}
                         </td>
                         <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", textAlign: "center" }}>
                           <span
@@ -1072,7 +1072,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                           </span>
                         </td>
                         <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontSize: "0.82rem" }}>
-                          {sector.cb_demand_per_project}
+                          {sector.cb_demand_per_project || "—"}
                         </td>
                         <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", textAlign: "center" }}>
                           <span style={{
@@ -1139,7 +1139,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                                   color: "#6c757d",
                                   lineHeight: "1.6"
                                 }}>
-                                  {sector.source}
+                                  {sector.source || "—"}
                                 </p>
                               </div>
                             </div>
