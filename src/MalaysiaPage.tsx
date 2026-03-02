@@ -862,9 +862,6 @@ function T2MarketAndDemand(): React.JSX.Element {
     return "★".repeat(rating) + "☆".repeat(5 - rating);
   };
 
-  // 展開行管理用State
-  const [expandedSector, setExpandedSector] = useState<string | null>(null);
-
   // 円換算済みの市場規模チャートデータ（1USD = 140JPY）
   const CB_MARKET_CHART_DATA_JPY = useMemo(() => {
     return CB_MARKET_CHART_DATA.map(d => ({
@@ -1014,50 +1011,37 @@ function T2MarketAndDemand(): React.JSX.Element {
           <div className="table-wrap">
             <table className="definition-table" style={{ width: "100%", fontSize: "0.85rem", tableLayout: "fixed" }}>
               <colgroup>
-                <col style={{ width: "18%" }} />
-                <col style={{ width: "34%" }} />
-                <col style={{ width: "9%" }} />
-                <col style={{ width: "26%" }} />
-                <col style={{ width: "13%" }} />
+                <col style={{ width: "15%" }} />
+                <col style={{ width: "50%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "10%" }} />
               </colgroup>
               <thead>
                 <tr>
                   <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, fontSize: "0.82rem" }}>セクター</th>
-                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, fontSize: "0.82rem" }}>市場規模</th>
+                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, fontSize: "0.82rem" }}>セクター概要</th>
                   <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "center", fontWeight: 600, fontSize: "0.82rem" }}>成長見通し</th>
-                  <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "left", fontWeight: 600, fontSize: "0.82rem" }}>案件あたり需要</th>
                   <th style={{ padding: "10px 8px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", textAlign: "center", fontWeight: 600, fontSize: "0.82rem" }}>総合評価</th>
                 </tr>
               </thead>
               <tbody>
                 {CB_SECTOR_FOCUS.map((sector) => {
                   const growthIcon = growthOutlookIcon(sector.growth_outlook);
-                  const isExpanded = expandedSector === sector.sector_name;
 
                   return (
                     <React.Fragment key={sector.sector_name}>
                       {/* メインテーブル行 */}
-                      <tr
-                        style={{
-                          cursor: "pointer",
-                          backgroundColor: isExpanded ? "#f8f9fa" : "transparent"
-                        }}
-                        onClick={() => setExpandedSector(isExpanded ? null : sector.sector_name)}
-                      >
+                      <tr>
                         <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontWeight: 600 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                            {sector.sector_name}
-                            <span style={{
-                              fontSize: "0.65rem",
-                              color: isExpanded ? "#FF6600" : "#999",
-                              transition: "transform 0.2s"
-                            }}>
-                              {isExpanded ? "▼" : "▶"}
-                            </span>
-                          </div>
+                          {sector.sector_name}
                         </td>
-                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontSize: "0.82rem" }}>
-                          {sector.sector_market_size ? parseAndConvertSectorMarketSize(sector.sector_market_size) : "—"}
+                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontSize: "0.82rem", lineHeight: "1.6" }}>
+                          {sector.sector_overview}
+                          {sector.source && (
+                            <div style={{ fontSize: "0.7rem", color: "#999", marginTop: "4px" }}>
+                              出典: {sector.source}
+                            </div>
+                          )}
                         </td>
                         <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", textAlign: "center" }}>
                           <span
@@ -1071,9 +1055,6 @@ function T2MarketAndDemand(): React.JSX.Element {
                             {growthIcon.symbol}
                           </span>
                         </td>
-                        <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", fontSize: "0.82rem" }}>
-                          {sector.cb_demand_per_project || "—"}
-                        </td>
                         <td style={{ padding: "10px 8px", border: "1px solid #dee2e6", textAlign: "center" }}>
                           <span style={{
                             fontSize: "0.85rem",
@@ -1084,68 +1065,6 @@ function T2MarketAndDemand(): React.JSX.Element {
                           </span>
                         </td>
                       </tr>
-
-                      {/* 展開詳細行 */}
-                      {isExpanded && (
-                        <tr>
-                          <td
-                            colSpan={5}
-                            style={{
-                              padding: "12px 16px",
-                              border: "1px solid #dee2e6",
-                              backgroundColor: "#fafbfc",
-                              borderBottom: "2px solid #dee2e6",
-                              whiteSpace: "normal",
-                              wordBreak: "normal",
-                            }}
-                          >
-                            <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
-                              {/* 左: 概要テキスト（幅を制限して読みやすく） */}
-                              <div style={{ flex: "0 0 62%" }}>
-                                <h4 style={{
-                                  margin: "0 0 6px",
-                                  fontSize: "0.82rem",
-                                  fontWeight: 600,
-                                  color: "#495057",
-                                  textTransform: "uppercase",
-                                  letterSpacing: "0.4px"
-                                }}>
-                                  セクター概要
-                                </h4>
-                                <p style={{
-                                  margin: 0,
-                                  fontSize: "0.85rem",
-                                  lineHeight: "1.75",
-                                  color: "#6c757d"
-                                }}>
-                                  {sector.sector_overview}
-                                </p>
-                              </div>
-                              {/* 右: 出典・補足 */}
-                              <div style={{ flex: 1, borderLeft: "1px solid #e9ecef", paddingLeft: "20px" }}>
-                                <h4 style={{
-                                  margin: "0 0 6px",
-                                  fontSize: "0.82rem",
-                                  fontWeight: 600,
-                                  color: "#495057",
-                                  textTransform: "uppercase",
-                                  letterSpacing: "0.4px"
-                                }}>
-                                  出典
-                                </h4>
-                                <p style={{
-                                  margin: 0,
-                                  fontSize: "0.82rem",
-                                  color: "#6c757d",
-                                  lineHeight: "1.6"
-                                }}>
-                                  {sector.source || "—"}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
                     </React.Fragment>
                   );
                 })}
@@ -1170,9 +1089,6 @@ function T2MarketAndDemand(): React.JSX.Element {
               <span style={{ color: "#d97706" }}><strong>○</strong> Medium (成長率 3-5%)</span>
               <span style={{ color: "#dc3545" }}><strong>△</strong> Low (成長率 3%未満)</span>
             </div>
-            <p style={{ margin: "8px 0 0 0", fontSize: "0.78rem", color: "#6c757d" }}>
-              ※ 各行をクリックすると詳細情報が表示されます
-            </p>
           </div>
         </article>
       </section>

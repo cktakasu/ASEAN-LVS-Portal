@@ -179,7 +179,7 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 5,
     year: 2025,
-    source: undefined,
+    source: "Mordor Intelligence; Arizton",
   },
   {
     sector_name: "半導体・E&E",
@@ -191,7 +191,7 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 5,
     year: 2025,
-    source: undefined,
+    source: "Mordor Intelligence; DOSM",
   },
   {
     sector_name: "石油化学",
@@ -203,7 +203,7 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: undefined,
+    source: "6Wresearch",
   },
   {
     sector_name: "住宅・商業ビル",
@@ -215,7 +215,7 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: undefined,
+    source: "DOSM; CIDB",
   },
   {
     sector_name: "再生可能エネルギー",
@@ -227,7 +227,7 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: undefined,
+    source: "SEDA; NETR 2.0",
   },
 ];
 
