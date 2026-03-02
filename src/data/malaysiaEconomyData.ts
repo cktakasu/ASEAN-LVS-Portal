@@ -207,8 +207,8 @@ export const ECONOMIC_NEWS_2025: EconomicNews[] = [
 /* ------------------------------------------------------------------ */
 
 export const CERT_ROWS: CertRow[] = [
-  { product: "ACB",  requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器のためST-COA対象外。ただし政府プロジェクトではJKR JMAL評価登録が必要" },
-  { product: "MCCB", requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器のためST-COA対象外。ただし政府プロジェクトではJKR JMAL評価登録が必要" },
+  { product: "ACB",  requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器：ST-COA対象外（政府プロジェクトでJKR JMAL評価が必要な場合あり）" },
+  { product: "MCCB", requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器：ST-COA対象外（政府プロジェクトでJKR JMAL評価が必要な場合あり）" },
   { product: "MCB",  requirement: "必須",     standard: "MS IEC 60898",   authority: "SIRIM QAS", note: "住宅・民生用のためST-SIRIM CoA必須" },
   { product: "RCCB", requirement: "必須",     standard: "MS IEC 61008",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
   { product: "RCBO", requirement: "必須",     standard: "MS IEC 61009",   authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
