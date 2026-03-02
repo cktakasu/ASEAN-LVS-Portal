@@ -886,30 +886,6 @@ function T2MarketAndDemand(): React.JSX.Element {
         <h2 style={{ fontSize: "28px" }}>マレーシア低圧遮断器市場規模外観</h2>
         <p className="section-subline">Low Voltage Circuit Breaker Market — Malaysia（2020-2031）</p>
 
-        {/* 出典情報 */}
-        <div style={{
-          marginTop: "16px",
-          padding: "12px 16px",
-          backgroundColor: "#fff3cd",
-          borderLeft: "4px solid #FF6600",
-          borderRadius: "4px"
-        }}>
-          <p style={{ margin: "0", fontSize: "0.85rem", color: "#495057", lineHeight: "1.6" }}>
-            <strong>📊 データ出典:</strong> 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"<br />
-            <span style={{ fontSize: "0.78rem", color: "#6c757d" }}>
-              • CAGR: 6.8% (2025-2031) — 6Wresearch公表値（全CB帯対象）<br />
-              • URL: <a href="https://www.6wresearch.com/industry-report/malaysia-circuit-breaker-market-outlook" target="_blank" rel="noopener noreferrer" style={{ color: "#FF6600" }}>https://www.6wresearch.com/industry-report/malaysia-circuit-breaker-market-outlook</a><br />
-              • スコープ: LV CB only（低圧遮断器のみ）、excl. fuses（ヒューズ除外）、excl. MV/HV（中高圧除外）<br />
-              <br />
-              <strong style={{ color: "#d97706" }}>⚠️ データの性質:</strong><br />
-              • <strong>2020-2024年:</strong> 6Wresearchによる「歴史的推計値（historical estimate）」<br />
-              &nbsp;&nbsp;→ マレーシア政府公式統計ではなく、民間シンクタンクによる推定値<br />
-              &nbsp;&nbsp;→ Low/Highレンジは一次出典なしのため非表示<br />
-              • <strong>2025-2031年:</strong> 6Wresearch予測値（Low/Highレンジ含む）
-            </span>
-          </p>
-        </div>
-
         {/* KPI カード */}
         <div style={{ width: "100%", maxWidth: "1024px", marginLeft: "auto", marginRight: "auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px" }}>
           {[

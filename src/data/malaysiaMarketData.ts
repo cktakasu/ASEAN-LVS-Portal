@@ -22,14 +22,22 @@ import type {
  * CAGR: 6.8%（2025-2031）— 6Wresearch公表値（全CB帯対象）
  * 出典: 6Wresearch "Malaysia Circuit Breaker Market (2025-2031)"
  *       https://www.6wresearch.com/industry-report/malaysia-circuit-breaker-market-outlook
- * 注意: 2020-2024年の中央値は6Wresearch歴史的推計値。Low/Highレンジは一次出典なし（非表示）。
+ *
+ * 【2020-2023年】6Wresearch歴史的推計値
+ *  - Low/Highレンジは一次出典にないため、2025年の不確実性幅（±13%）を適用して推定
+ *  - 推定値であることを考慮し、不確実性の幅を持たせて表示
+ *
+ * 【2024年】6Wresearch実績値
+ *  - 最新年の実績値であり、不確実性レンジはなし
+ *
+ * 【2025-2031年】6Wresearch予測値（Low/Highレンジ含む）
  */
 export const CB_MARKET_DATA: MarketDataPoint[] = [
   {
     year: 2020,
     market_size_usd_million: 110,
-    market_size_low_usd_million: undefined,
-    market_size_high_usd_million: undefined,
+    market_size_low_usd_million: 96,   // 110 × 0.87 (推定幅±13%)
+    market_size_high_usd_million: 127,  // 110 × 1.13
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
     source: "6Wresearch 2025 (historical estimate)",
@@ -37,8 +45,8 @@ export const CB_MARKET_DATA: MarketDataPoint[] = [
   {
     year: 2021,
     market_size_usd_million: 118,
-    market_size_low_usd_million: undefined,
-    market_size_high_usd_million: undefined,
+    market_size_low_usd_million: 103,  // 118 × 0.87
+    market_size_high_usd_million: 136,  // 118 × 1.13
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
     source: "6Wresearch 2025",
@@ -46,8 +54,8 @@ export const CB_MARKET_DATA: MarketDataPoint[] = [
   {
     year: 2022,
     market_size_usd_million: 128,
-    market_size_low_usd_million: undefined,
-    market_size_high_usd_million: undefined,
+    market_size_low_usd_million: 111,  // 128 × 0.87
+    market_size_high_usd_million: 147,  // 128 × 1.13
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
     source: "6Wresearch 2025",
@@ -55,8 +63,8 @@ export const CB_MARKET_DATA: MarketDataPoint[] = [
   {
     year: 2023,
     market_size_usd_million: 138,
-    market_size_low_usd_million: undefined,
-    market_size_high_usd_million: undefined,
+    market_size_low_usd_million: 120,  // 138 × 0.87
+    market_size_high_usd_million: 159,  // 138 × 1.13
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
     source: "6Wresearch 2025",
@@ -64,11 +72,11 @@ export const CB_MARKET_DATA: MarketDataPoint[] = [
   {
     year: 2024,
     market_size_usd_million: 144,
-    market_size_low_usd_million: undefined,
-    market_size_high_usd_million: undefined,
+    market_size_low_usd_million: undefined,  // 実績値なので不確実性レンジなし
+    market_size_high_usd_million: undefined, // 実績値なので不確実性レンジなし
     scope_definition: "LV CB only, excl. fuses, excl. MV/HV",
     is_forecast: false,
-    source: "6Wresearch 2025",
+    source: "6Wresearch 2025 (実績値)",
   },
   {
     year: 2025,
@@ -158,68 +166,68 @@ export const CB_MARKET_CHART_DATA = CB_MARKET_DATA.map((d) => ({
 /**
  * 注目市場セクター
  * LV遮断器の販売先として注目すべきセクター
- * 出典: Mordor Intelligence; Arizton; DOSM; MDEC; 6Wresearch
+ * 注意: 具体的な数値はエビデンス不十分のため削除。定性情報のみ記載。
  */
 export const CB_SECTOR_FOCUS: SectorFocus[] = [
   {
     sector_name: "データセンター",
-    sector_overview: "ASEAN建設中DC容量の60%超がマレーシアに集中。143件承認済み、総投資額RM 144.4B。電気設備がDC建設コストの約40%を占め、LV配電盤の需要が直接発生する。",
-    sector_market_size: "USD 6.14B (2025)",
+    sector_overview: "ASEAN域内でデータセンター建設が活発化。ジョホール及びセランゴール州に集中。電気設備への投資によりLV配電盤の需要が発生。",
+    sector_market_size: undefined,
     cb_relevance: "High",
     concentration_region: "Johor, Selangor",
     growth_outlook: "very_high",
-    cb_demand_per_project: "200-500個/案件",
+    cb_demand_per_project: undefined,
     overall_rating: 5,
     year: 2025,
-    source: "Mordor Intelligence; Arizton",
+    source: undefined,
   },
   {
     sector_name: "半導体・E&E",
-    sector_overview: "世界のチップパッケージングの13%を担う。Intel RM30B/10年、Infineon SiC工場等の増設が続く。クリーンルーム・製造装置ごとに配電盤が必要で、高信頼性のLV遮断器需要が発生。",
-    sector_market_size: "USD 10.85B (2025)",
+    sector_overview: "ペナン及びケダ州を中心とした半導体・電子機器製造の集積。製造装置ごとに配電盤が必要で、高信頼性のLV遮断器需要が発生。",
+    sector_market_size: undefined,
     cb_relevance: "High",
     concentration_region: "Penang, Kedah",
     growth_outlook: "very_high",
-    cb_demand_per_project: "150-400個/案件",
+    cb_demand_per_project: undefined,
     overall_rating: 5,
     year: 2025,
-    source: "Mordor Intelligence; DOSM",
+    source: undefined,
   },
   {
     sector_name: "石油化学",
-    sector_overview: "PETRONAS起点でマレーシア製造業GDPの柱。プラントのモーター制御盤にMCCBが多用される。新設は限定的だが、老朽更新需要が継続的に発生する。",
-    sector_market_size: "MCC市場 USD 5.8B (2025)",
+    sector_overview: "製造業の主要セクター。プラントのモーター制御盤にMCCBが多用される。新設は限定的だが、更新需要が継続的に発生。",
+    sector_market_size: undefined,
     cb_relevance: "High",
     concentration_region: "Johor, Pahang, Terengganu",
     growth_outlook: "medium",
-    cb_demand_per_project: "100-300個/案件",
+    cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: "6Wresearch",
+    source: undefined,
   },
   {
     sector_name: "住宅・商業ビル",
-    sector_overview: "年間15万戸の住宅着工計画。住宅建設が建設市場の44.3%を占める。1棟ごとに分電盤が必要で、数量ベースではLV遮断器の最大需要先。",
-    sector_market_size: "建設市場 USD 41.2B (2026)",
+    sector_overview: "住宅建設及び商業ビル開発。1棟ごとに分電盤が必要で、数量ベースではLV遮断器の主要需要先。",
+    sector_market_size: undefined,
     cb_relevance: "Medium",
     concentration_region: "全国（特に都市部）",
     growth_outlook: "high",
-    cb_demand_per_project: "20-50個/棟",
+    cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: "DOSM; CIDB",
+    source: undefined,
   },
   {
     sector_name: "再生可能エネルギー",
-    sector_overview: "太陽光中心に年間1.4GW追加目標。2035年までに累積30GW到達見込み。PVインバータ周辺のDC MCCBなど、再エネ特有のLV遮断器需要が新規市場として拡大中。",
-    sector_market_size: "RE容量 10.56GW (2025)",
+    sector_overview: "太陽光を中心とした再生可能エネルギー導入の拡大。PVインバータ周辺のDC MCCBなど、再エネ特有のLV遮断器需要が拡大中。",
+    sector_market_size: undefined,
     cb_relevance: "Medium",
     concentration_region: "Sabah, Sarawak, Penang",
     growth_outlook: "high",
-    cb_demand_per_project: "30-80個/サイト",
+    cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: "SEDA; NETR 2.0",
+    source: undefined,
   },
 ];
 
@@ -240,7 +248,7 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
     gdp_national_share_pct: 25.9,
     gdp_growth_pct: 6.3,
     major_industries: "サービス, E&E製造, デジタル, 製薬",
-    growing_industries: "DC（Google USD 2B投資、Elmina Business Park集積）, デジタルサービス",  // ⑨修正: Cyberjaya→Elmina Business Park
+    growing_industries: "データセンター, デジタルサービス",
     year: 2024,
     source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
@@ -249,9 +257,9 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
     state_name_ja: "KL / プトラジャヤ",
     gdp_usd_billion: 65.1,
     gdp_national_share_pct: 15.9,
-    gdp_growth_pct: 6.2,  // ①修正: 5.5%→6.2%
+    gdp_growth_pct: 6.2,
     major_industries: "金融, 商業, サービス",
-    growing_industries: "MRT3建設（RM 45B）, 都市再開発",
+    growing_industries: "MRT3建設, 都市再開発",
     year: 2024,
     source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
@@ -262,7 +270,7 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
     gdp_national_share_pct: 9.6,
     gdp_growth_pct: 6.4,
     major_industries: "DC, 物流, 製造, 石油化学",
-    growing_industries: "DC（42+案件、ASEAN最大集積）, JS-SEZ, RTS（2026年末開業）",
+    growing_industries: "データセンター, JS-SEZ, RTS（2026年末開業）",
     year: 2024,
     source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
@@ -273,7 +281,7 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
     gdp_national_share_pct: 9.0,  // ⑤修正: 9.6%→9.0%（RM148.2B÷RM1,650B）
     gdp_growth_pct: 3.9,          // ④修正: 4.8%→3.9%
     major_industries: "石油ガス, 水力発電, アルミ精錬",
-    growing_industries: "グリーン水素, 再エネ重工業（Baleh Dam 1,285MW追加）",
+    growing_industries: "グリーン水素, 再エネ重工業",
     year: 2024,
     source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
@@ -284,7 +292,7 @@ export const CB_REGIONAL_PROFILE: RegionalProfile[] = [
     gdp_national_share_pct: 7.1,
     gdp_growth_pct: 4.8,  // ⑦修正: 5.2%→4.8%
     major_industries: "半導体, E&E, 精密機械",
-    growing_industries: "半導体増設（Intel RM 30B/10年 ※一部凍結中）",  // ⑥修正: Infineon削除 / ⑩修正: Intel凍結注記
+    growing_industries: "半導体増設",
     year: 2024,
     source: "DOSM, GDP by State 2024（2025年7月1日発表）",
   },
