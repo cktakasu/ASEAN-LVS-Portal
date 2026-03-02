@@ -171,7 +171,7 @@ export const CB_MARKET_CHART_DATA = CB_MARKET_DATA.map((d) => ({
 export const CB_SECTOR_FOCUS: SectorFocus[] = [
   {
     sector_name: "データセンター",
-    sector_overview: "ASEAN域内でデータセンター建設が活発化。ジョホール及びセランゴール州に集中。電気設備への投資によりLV配電盤の需要が発生。",
+    sector_overview: "ASEAN域内でAI・クラウド需要急増によりデータセンター建設が活発化。ジョホール州（シンガポール・オーバーフロー効果）とセランゴール州（Cyberjaya）に集中し、2025年市場規模は約61億米ドル、2031年までに114億〜160億米ドルへ拡大（CAGR 10.85〜19.55%）が見込まれます。高密度ラック（AIワークロード）対応で電力負荷が急増するため、UPS・PDU・配電盤への投資が活発化し、高信頼性LV遮断器の需要が大幅に発生しています。",
     sector_market_size: undefined,
     cb_relevance: "High",
     concentration_region: "Johor, Selangor",
@@ -179,11 +179,11 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 5,
     year: 2025,
-    source: "Mordor Intelligence; Arizton",
+    source: "Mordor Intelligence (Malaysia Data Center Market, Jan 2026); Arizton Advisory (Malaysia Data Center Market, Jan 2026)",
   },
   {
     sector_name: "半導体・E&E",
-    sector_overview: "ペナン及びケダ州を中心とした半導体・電子機器製造の集積。製造装置ごとに配電盤が必要で、高信頼性のLV遮断器需要が発生。",
+    sector_overview: "ペナン州およびケダ州を中心に世界トップクラスの半導体後工程（ATP）集積地を形成。Intel、Infineonなど大手が生産拠点を置き、2025年半導体市場規模108.5億米ドル、2030年までに165億米ドルへ成長（CAGR 8.76%）が見込まれます。各製造装置・クリーンルームごとに専用配電盤が必要で、安定電源供給と過電流保護に高信頼性LV遮断器（MCCB中心）の需要が継続的に発生しています。National Semiconductor Strategyによる投資拡大で今後も堅調です。",
     sector_market_size: undefined,
     cb_relevance: "High",
     concentration_region: "Penang, Kedah",
@@ -191,11 +191,11 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 5,
     year: 2025,
-    source: "Mordor Intelligence; DOSM",
+    source: "Mordor Intelligence (Malaysia Semiconductor Market, Oct 2025); MIDA「Malaysia's E&E Industry」報告書; DOSM製造業統計",
   },
   {
     sector_name: "石油化学",
-    sector_overview: "製造業の主要セクター。プラントのモーター制御盤にMCCBが多用される。新設は限定的だが、更新需要が継続的に発生。",
+    sector_overview: "製造業の基幹セクターで、Pengerang統合複合施設など大型プラントが主力。プラント内のモーター制御盤（MCC）でMCCBが多用され、新設投資は原油価格変動により限定的ながら、既存設備の老朽化更新・安全基準強化（爆発危険区域対応）・デジタル化改修で継続的な更新需要が発生しています。",
     sector_market_size: undefined,
     cb_relevance: "High",
     concentration_region: "Johor, Pahang, Terengganu",
@@ -203,11 +203,11 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: "6Wresearch",
+    source: "6Wresearch (Malaysia Circuit Breaker / Related Market Outlook); PETRONAS年次報告; DOSM製造業統計",
   },
   {
     sector_name: "住宅・商業ビル",
-    sector_overview: "住宅建設及び商業ビル開発。1棟ごとに分電盤が必要で、数量ベースではLV遮断器の主要需要先。",
+    sector_overview: "住宅建設および商業ビル開発が建設市場の約50%を占め、2025年建設業総額は前年比12.5%増の1,786億リンギットに達しました（DOSM）。1棟ごとに分電盤・幹線盤が必要なため、数量ベースではLV遮断器の最大需要先であり、新築・リノベーション双方で安定した需要が見込まれます。特にジョホール・ペナンでの高層住宅・商業複合開発が活発です。",
     sector_market_size: undefined,
     cb_relevance: "Medium",
     concentration_region: "全国（特に都市部）",
@@ -215,11 +215,11 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: "DOSM; CIDB",
+    source: "DOSM「Construction Statistics Q4 2025」; CIDB建設業見通し; MIDA投資承認統計",
   },
   {
     sector_name: "再生可能エネルギー",
-    sector_overview: "太陽光を中心とした再生可能エネルギー導入の拡大。PVインバータ周辺のDC MCCBなど、再エネ特有のLV遮断器需要が拡大中。",
+    sector_overview: "太陽光を中心とした再生可能エネルギー導入がNETR（National Energy Transition Roadmap）により加速。2035年までに太陽光が発電ミックスの44%を占める見通しで、PVインバーター周辺のDC MCCBや再エネ特有のLV遮断器需要が急拡大中です。屋上太陽光（Solar ATAP新制度2026年開始）や大規模太陽光発電所の増加により、DC/AC双方の保護機器市場が成長しています。",
     sector_market_size: undefined,
     cb_relevance: "Medium",
     concentration_region: "Sabah, Sarawak, Penang",
@@ -227,7 +227,7 @@ export const CB_SECTOR_FOCUS: SectorFocus[] = [
     cb_demand_per_project: undefined,
     overall_rating: 4,
     year: 2025,
-    source: "SEDA; NETR 2.0",
+    source: "SEDA Malaysia; 経済省「National Energy Transition Roadmap (NETR) 2023」; Ember Energy分析（2025）",
   },
 ];
 
