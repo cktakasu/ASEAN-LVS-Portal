@@ -9,8 +9,6 @@ import { calculateMaxY, generateYTicks, generateChartData } from "./utils";
 import type {
   TooltipPayloadItem,
   TooltipProps,
-  CertRow,
-  InfoItem,
   TabDef,
 } from "./types";
 
@@ -68,7 +66,7 @@ const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) 
     if (!active || !payload || payload.length === 0) return null;
 
     return (
-      <div style={{ backgroundColor: "rgba(255,255,255,0.97)", border: "1px solid #ccc", padding: "10px 14px", borderRadius: "4px", lineHeight: "1.7", minWidth: "150px" }}>
+      <div style={{ ...TOOLTIP_STYLE, minWidth: "150px" }}>
         <p style={{ margin: "0 0 8px", fontWeight: 600, color: "#333" }}>{label}</p>
         {payload.map((p: TooltipPayloadItem) => {
           if (p.value == null) return null;
@@ -132,6 +130,28 @@ import {
   CB_SECTOR_FOCUS,
   CB_REGIONAL_PROFILE,
 } from "./data/malaysiaMarketData";
+import {
+  MY_POWER_SPECS,
+  MY_CB_SCHEME,
+  MY_ASEAN_EE_MRA,
+  MY_CERT_BODIES,
+  REGULATORY_DATA_SOURCES,
+  MY_PRODUCT_CERT_REQUIREMENTS,
+  MY_CERT_TIMELINE_COMPARISON,
+} from "./data/malaysiaRegulatoryData";
+import {
+  MY_TARIFF_DATA,
+  MY_IMPORT_STEPS,
+  MY_IMPORT_COSTS,
+  MY_DISTRIBUTION_CHANNELS,
+  MY_MARKET_PLAYERS,
+  MY_PROCUREMENT_STAGES,
+  MY_PROCUREMENT_COMPARISON,
+  MY_AVL_INFO,
+  MY_MARKET_BARRIERS,
+  MY_MARKET_FACILITATORS,
+  MARKET_ACCESS_DATA_SOURCES,
+} from "./data/malaysiaMarketAccessData";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -206,6 +226,48 @@ const STYLES = {
   },
 };
 
+// Tooltip base style (shared across chart tooltips)
+const TOOLTIP_STYLE: React.CSSProperties = {
+  backgroundColor: "rgba(255,255,255,0.97)",
+  border: "1px solid #ccc",
+  padding: "10px 14px",
+  borderRadius: "4px",
+  lineHeight: "1.7",
+};
+
+// Badge/pill helper
+type BadgeVariant = "success" | "warning" | "danger" | "neutral";
+const badgeStyle = (variant: BadgeVariant): React.CSSProperties => {
+  const map: Record<BadgeVariant, { bg: string; fg: string }> = {
+    success: { bg: "#d4edda", fg: "#155724" },
+    warning: { bg: "#fff3cd", fg: "#856404" },
+    danger:  { bg: "#f8d7da", fg: "#721c24" },
+    neutral: { bg: "#f8f9fa", fg: "#6c757d" },
+  };
+  const { bg, fg } = map[variant];
+  return {
+    padding: "4px 12px",
+    borderRadius: "20px",
+    fontSize: FONT_SIZE.medium,
+    fontWeight: 600,
+    backgroundColor: bg,
+    color: fg,
+  };
+};
+
+// Info box helper (left-border accent boxes)
+const infoBoxStyle = (accentColor: string, bgColor: string): React.CSSProperties => ({
+  padding: "12px 16px",
+  backgroundColor: bgColor,
+  borderLeft: `4px solid ${accentColor}`,
+  borderRadius: "4px",
+  fontSize: FONT_SIZE.medium,
+});
+
+// Source citation style
+const SOURCE_STYLE: React.CSSProperties = { fontSize: FONT_SIZE.small, color: COLOR.tertiary, marginTop: "12px" };
+const DISCLAIMER_STYLE: React.CSSProperties = { fontSize: "0.75rem", color: "#bbb", marginTop: "4px" };
+
 // チャート設定定数
 const CHART_CONFIG = {
   height: 530,
@@ -229,52 +291,9 @@ const TABS: TabDef[] = [
   { id: "t1", label: "Country Profile", sublabel: "Is this country worth targeting?" },
   { id: "t2", label: "Market & Demand", sublabel: "Where is the demand?" },
   { id: "t3", label: "Regulatory Gateway", sublabel: "What is required to sell here?" },
-  { id: "t4", label: "Competitive Landscape", sublabel: "Who are we competing against?" },
-  { id: "t5", label: "Our Position", sublabel: "Where do we stand?" },
-  { id: "t6", label: "Strategic Assessment", sublabel: "What should we do?" },
-];
-
-/* ------------------------------------------------------------------ */
-/*  T1 data                                                            */
-/* ------------------------------------------------------------------ */
-
-const CERT_ROWS: CertRow[] = [
-  { product: "ACB", requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器：ST-COA対象外（政府プロジェクトでJKR JMAL評価が必要な場合あり）" },
-  { product: "MCCB", requirement: "法的義務なし", standard: "MS IEC 60947-2", authority: "SIRIM QAS", note: "産業用機器：ST-COA対象外（政府プロジェクトでJKR JMAL評価が必要な場合あり）" },
-  { product: "MCB", requirement: "必須", standard: "MS IEC 60898", authority: "SIRIM QAS", note: "住宅・民生用のためST-SIRIM CoA必須" },
-  { product: "RCCB", requirement: "必須", standard: "MS IEC 61008", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
-  { product: "RCBO", requirement: "必須", standard: "MS IEC 61009", authority: "SIRIM QAS", note: "ST-SIRIM CoA必須" },
-];
-
-const POWER_INFO: InfoItem[] = [
-  { label: "系統電圧（低圧）", value: "240 V（単相）/ 415 V（三相）" },
-  { label: "周波数", value: "50 Hz" },
-  { label: "主要電力会社", value: "Tenaga Nasional Berhad（TNB）— 半島マレーシア" },
-  { label: "サバ・サラワク", value: "Sabah Electricity（SESB）/ Sarawak Energy（SEB）" },
-  { label: "プラグ形状", value: "Type G（英国型 BS 1363）" },
-  { label: "配電方式", value: "TN-S / TN-C-S（半島）、地域によりTT" },
-];
-
-const SIRIM_PROCESS: string[] = [
-  "SIRIM QAS International へ申請書・製品仕様書・試験報告書（認定ラボ発行）を提出",
-  "MS規格（MS IEC 60898 / 61008 / 61009 等）に基づく製品評価",
-  "CoA（Certificate of Approval）発行",
-  "ST（Suruhanjaya Tenaga / Energy Commission）への届出・登録",
-  "ST-SIRIM CoAマーク付き製品として出荷可能",
-];
-
-const REGIONAL_DIFF: InfoItem[] = [
-  { label: "半島マレーシア", value: "TNB系統。MS規格・SIRIM CoA体制が最も整備されており、ST登録が実質必須。" },
-  { label: "サバ（ボルネオ北部）", value: "SESBが管轄。系統容量は半島より小さく、プロジェクト仕様でIECまたはBS準拠を要求するケースが多い。" },
-  { label: "サラワク（ボルネオ北西）", value: "SEBが独立運営。半島とは別制度。認証要件をSEB仕様で個別確認要。" },
-];
-
-const MARKET_NOTES: string[] = [
-  "住宅向けMCB・RCCB・RCBOはST-SIRIM CoAが強制要件。SIRIM QAS以外の認証機関では取得不可。",
-  "産業用ACB・MCCBは強制認証対象外だが、PLCやTNBの入札仕様で「SIRIM CoAまたはCBスキーム証明書提出」を要求するケースが多い。",
-  "CBスキーム（IEC CB Scheme）証明書があれば、SIRIM試験の一部省略が可能な場合がある。事前にSIRIM QASに確認要。",
-  "HS分類：8536.20（MCB）、8536.10（RCCB/RCBO含む遮断器類）。輸入時に認証番号を税関申告書に記載する実務が定着している。",
-  "IEC 60947-2準拠のMCCBでもプロジェクトによってはBS EN 60947-2相当の試験報告書を追加要求されることがある（英国系エンジニアリング会社案件）。",
+  { id: "t4", label: "Market Access", sublabel: "How do we enter this market?" },
+  { id: "t5", label: "Competitive Landscape", sublabel: "Who are we competing against?" },
+  { id: "t6", label: "Strategy", sublabel: "What should we do?" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -632,133 +651,317 @@ function T1CountryProfile(): React.JSX.Element {
         </article>
       </section>
 
-      {/* 既存：電力インフラ基本情報 */}
-      <section className="content-block content-block--major">
-        <p className="section-kicker">POWER INFRASTRUCTURE</p>
-        <h2 style={{ fontSize: "28px" }}>電力インフラ基本情報</h2>
-        <p className="section-subline">系統電圧・周波数・プラグ規格・主要電力会社</p>
-        <article className="reference-block">
-          <div className="table-wrap">
-            <table className="definition-table">
-              <thead>
-                <tr>
-                  <th>項目</th>
-                  <th>内容</th>
-                </tr>
-              </thead>
-              <tbody>
-                {POWER_INFO.map((item) => (
-                  <tr key={item.label}>
-                    <td><strong>{item.label}</strong></td>
-                    <td>{item.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-      </section>
-
-      <section className="content-block fade-in">
-        <p className="section-kicker">REGIONAL DIFFERENCES</p>
-        <h2 style={{ fontSize: "28px" }}>地域別 留意点</h2>
-        <p className="section-subline">半島マレーシア・サバ・サラワクの制度差</p>
-        <article className="reference-block">
-          <div className="table-wrap">
-            <table className="definition-table">
-              <thead>
-                <tr>
-                  <th>地域</th>
-                  <th>留意点</th>
-                </tr>
-              </thead>
-              <tbody>
-                {REGIONAL_DIFF.map((item) => (
-                  <tr key={item.label}>
-                    <td><strong>{item.label}</strong></td>
-                    <td>{item.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-      </section>
-
-      <section className="content-block fade-in">
-        <p className="section-kicker">MARKET &amp; PRACTICAL NOTES</p>
-        <h2 style={{ fontSize: "28px" }}>市場・実務ノート</h2>
-        <article className="reference-block">
-          <ol className="notes-list">
-            {MARKET_NOTES.map((note, index) => (
-              <li key={`market-note-${index}`}>{note}</li>
-            ))}
-          </ol>
-        </article>
-      </section>
+      <T1PowerSpecs />
     </>
   );
 }
 
 
 /* ------------------------------------------------------------------ */
-/*  T3: Regulatory Gateway                                             */
+/*  T1: Power Specifications (moved from T3)                           */
+/* ------------------------------------------------------------------ */
+
+function T1PowerSpecs(): React.JSX.Element {
+  return (
+    <section className="content-block fade-in">
+      <p className="section-kicker">POWER SPECIFICATIONS</p>
+      <h2 style={{ fontSize: "28px" }}>電力仕様・配電システム</h2>
+      <p className="section-subline">Voltage, Frequency, Distribution System — Malaysia</p>
+
+      <article className="reference-block">
+        <h3>低圧電力仕様</h3>
+        <div className="legend-inline">
+          <div className="legend-inline-item">
+            <strong>単相:</strong>
+            <span>{MY_POWER_SPECS.voltage_lv.single_phase}</span>
+          </div>
+          <div className="legend-inline-item">
+            <strong>三相:</strong>
+            <span>{MY_POWER_SPECS.voltage_lv.three_phase}</span>
+          </div>
+          <div className="legend-inline-item">
+            <strong>周波数:</strong>
+            <span>{MY_POWER_SPECS.frequency}</span>
+          </div>
+          <div className="legend-inline-item">
+            <strong>プラグ:</strong>
+            <span>{MY_POWER_SPECS.plug_type}</span>
+          </div>
+          <div className="legend-inline-item">
+            <strong>配電方式:</strong>
+            <span>{MY_POWER_SPECS.distribution_system}</span>
+          </div>
+        </div>
+      </article>
+
+      <article className="reference-block">
+        <h3>電力会社</h3>
+        <div className="table-wrap">
+          <table className="definition-table">
+            <thead>
+              <tr>
+                <th>地域</th>
+                <th>電力会社</th>
+                <th>略称</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_POWER_SPECS.utility_companies.map((utility) => (
+                <tr key={utility.abbreviation}>
+                  <td>{utility.region}</td>
+                  <td>
+                    <strong>{utility.name}</strong>
+                  </td>
+                  <td>{utility.abbreviation}</td>
+                  <td style={{ fontSize: "0.85rem" }}>{utility.notes}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={SOURCE_STYLE}>
+          出典: {REGULATORY_DATA_SOURCES.power_specs}
+        </p>
+      </article>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  T3: Regulatory Gateway — Section Components                        */
+/* ------------------------------------------------------------------ */
+
+// 3-1 Product Certification Requirements
+function T3ProductCertRequirements(): React.JSX.Element {
+  return (
+    <section className="content-block content-block--major fade-in">
+      <p className="section-kicker">PRODUCT CERTIFICATION REQUIREMENTS</p>
+      <h2 style={{ fontSize: "28px" }}>製品別認証要件</h2>
+      <p className="section-subline">Do I need certification? — Product × Requirement Matrix</p>
+
+      <article className="reference-block">
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>製品</th>
+                <th>適用規格</th>
+                <th>法的義務</th>
+                <th>認証マーク</th>
+                <th>実務上の必要性</th>
+                <th>要点</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_PRODUCT_CERT_REQUIREMENTS.map((req) => (
+                <tr key={req.product_type}>
+                  <td><strong>{req.product_type}</strong></td>
+                  <td>{req.applicable_standard}</td>
+                  <td style={{
+                    fontWeight: 600,
+                    color: req.requirement_level === "Mandatory" ? "#c00" : "#885500",
+                  }}>
+                    {req.requirement_level === "Mandatory" ? "必須" : "任意"}
+                  </td>
+                  <td>{req.certification_mark}</td>
+                  <td>
+                    <span style={badgeStyle(
+                      req.practical_necessity === "Required" ? "success"
+                      : req.practical_necessity === "Recommended" ? "warning"
+                      : "neutral"
+                    )}>
+                      {req.practical_necessity === "Required" ? "必須"
+                        : req.practical_necessity === "Recommended" ? "推奨"
+                        : "任意"}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: "0.85rem" }}>{req.key_notes}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div style={{ ...infoBoxStyle("#fd7e14", "#fff8e1"), marginTop: "16px" }}>
+          <strong>要約:</strong> MCB・RCCB・RCBOは
+          <span style={{ color: "#c00", fontWeight: 600 }}> ST-SIRIM CoA必須</span>（住宅用途）。
+          ACB・MCCBは法的義務なしだが、
+          <span style={{ color: "#885500", fontWeight: 600 }}> プロジェクト入札にはCoA事実上必要</span>。
+        </div>
+
+        <p style={SOURCE_STYLE}>
+          出典: {REGULATORY_DATA_SOURCES.standards}
+        </p>
+        <p style={DISCLAIMER_STYLE}>
+          ※ 本データは参考値です。最新情報はSIRIM QAS / Suruhanjaya Tenagaの公式情報をご確認ください。
+        </p>
+      </article>
+    </section>
+  );
+}
+
+// 3-2 CB Scheme Strategy
+function T3CBStrategy(): React.JSX.Element {
+  return (
+    <section className="content-block fade-in">
+      <p className="section-kicker">CB SCHEME STRATEGY</p>
+      <h2 style={{ fontSize: "28px" }}>CBスキーム活用戦略</h2>
+      <p className="section-subline">Leveraging IECEE CB Certificates for Malaysia Market Entry</p>
+
+      {/* CB acceptance table */}
+      <article className="reference-block">
+        <h3>製品カテゴリー別CBスキーム受入状況</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>製品カテゴリー</th>
+                <th>受入レベル</th>
+                <th>国内差分</th>
+                <th>時間短縮</th>
+                <th>追加要件</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_CB_SCHEME.map((item) => (
+                <tr key={item.product_category}>
+                  <td><strong>{item.product_category}</strong></td>
+                  <td>
+                    <span
+                      style={badgeStyle(
+                        item.cb_acceptance === "Full" ? "success"
+                        : item.cb_acceptance === "Partial" ? "warning"
+                        : "danger"
+                      )}
+                    >
+                      {item.cb_acceptance === "Full" ? "完全受入" : item.cb_acceptance === "Partial" ? "一部受入" : "未受入"}
+                    </span>
+                  </td>
+                  <td>{item.national_differences.length > 0 ? item.national_differences.join("、") : "—"}</td>
+                  <td>{item.time_savings_notes || "—"}</td>
+                  <td>{item.additional_requirements?.join("、") || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      {/* CB vs non-CB timeline comparison */}
+      <article className="reference-block">
+        <h3>CB証書活用 vs 新規申請 — 期間比較</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>製品</th>
+                <th>CB証書あり</th>
+                <th>CB証書なし</th>
+                <th>短縮率</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_CERT_TIMELINE_COMPARISON.map((item) => (
+                <tr key={item.product_type}>
+                  <td><strong>{item.product_type}</strong></td>
+                  <td style={{ color: "#28a745", fontWeight: 600 }}>
+                    {item.with_cb_weeks}週間
+                  </td>
+                  <td>{item.without_cb_weeks}週間</td>
+                  <td>
+                    <span style={badgeStyle("success")}>
+                      -{item.time_savings_pct}%
+                    </span>
+                  </td>
+                  <td style={{ fontSize: "0.85rem" }}>{item.notes}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      {/* ASEAN MRA note (compact) */}
+      <article className="reference-block">
+        <h3>ASEAN EE MRA 参考情報</h3>
+        <div style={infoBoxStyle("#17a2b8", "#f0f9ff")}>
+          <div style={{ marginBottom: "8px" }}>
+            <span style={badgeStyle(MY_ASEAN_EE_MRA.mra_status === "Active" ? "success" : "danger")}>
+              {MY_ASEAN_EE_MRA.mra_status === "Active" ? "署名国・有効" : "未署名"}
+            </span>
+            <span style={{ marginLeft: "12px" }}>
+              MRAタイプ: {MY_ASEAN_EE_MRA.ee_mra_type || "—"}
+            </span>
+          </div>
+          {MY_ASEAN_EE_MRA.notes && (
+            <p style={{ margin: 0 }}>※ {MY_ASEAN_EE_MRA.notes}</p>
+          )}
+        </div>
+      </article>
+
+      {/* Certification bodies (compact next-steps) */}
+      <article className="reference-block">
+        <h3>主要認証機関連絡先</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {MY_CERT_BODIES.map((body) => (
+            <div key={body.abbreviation} style={{
+              padding: "12px 16px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              borderLeft: "4px solid #2563eb",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
+                <div>
+                  <strong style={{ fontSize: "1rem" }}>{body.name}</strong>
+                  <span style={{
+                    marginLeft: "8px",
+                    padding: "2px 8px",
+                    borderRadius: "4px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    backgroundColor: "#e7f3ff",
+                    color: "#004085",
+                  }}>
+                    {body.abbreviation}
+                  </span>
+                </div>
+                {body.contact_info.website && (
+                  <a href={body.contact_info.website} target="_blank" rel="noopener noreferrer"
+                    style={{ color: "#4A90D9", fontSize: "0.85rem" }}>
+                    {body.contact_info.website}
+                  </a>
+                )}
+              </div>
+              <div style={{ marginTop: "8px", fontSize: "0.85rem", color: "#666" }}>
+                {body.contact_info.email && <span>{body.contact_info.email}</span>}
+                {body.contact_info.phone && <span> | {body.contact_info.phone}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
+        出典: {REGULATORY_DATA_SOURCES.cb_scheme || REGULATORY_DATA_SOURCES.certification}
+      </p>
+      <p style={{ fontSize: "0.75rem", color: "#bbb", marginTop: "4px" }}>
+        ※ 期間は概算であり、製品タイプ・申請状況により変動します。最新情報は各認証機関にお問い合わせください。
+      </p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  T3: Regulatory Gateway (Main)                                      */
 /* ------------------------------------------------------------------ */
 
 function T3RegulatoryGateway(): React.JSX.Element {
   return (
     <>
-      <section className="content-block fade-in">
-        <p className="section-kicker">PRODUCT-CATEGORY CERTIFICATION REQUIREMENTS</p>
-        <h2 style={{ fontSize: "28px" }}>機種別規格認証</h2>
-        <p className="section-subline">Low-Voltage Circuit Breakers — Malaysia</p>
-        <article className="reference-block">
-          <h3>認証要件一覧</h3>
-          <div className="table-wrap">
-            <table className="requirements-table" style={{ maxWidth: "1004px", margin: "0 auto" }}>
-              <thead>
-                <tr>
-                  <th>製品</th>
-                  <th>認証</th>
-                  <th>適用規格</th>
-                  <th>認証機関</th>
-                  <th>備考</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CERT_ROWS.map((row) => (
-                  <tr key={row.product}>
-                    <td><strong>{row.product}</strong></td>
-                    <td
-                      style={{
-                        color: row.requirement === "必須" ? "#c00" : row.requirement === "法的義務なし" ? "#885500" : "inherit",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {row.requirement}
-                    </td>
-                    <td>{row.standard}</td>
-                    <td>{row.authority}</td>
-                    <td>{row.note}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="country-procedure">
-            <strong>必要手続き：</strong>
-            SIRIM製品認証 → ST（Energy Commission）ラベル取得 → CoA発行
-          </p>
-        </article>
-        <article className="reference-block">
-          <h3>SIRIM認証プロセス</h3>
-          <ol className="notes-list">
-            {SIRIM_PROCESS.map((step, index) => (
-              <li key={`sirim-${index}`}>{step}</li>
-            ))}
-          </ol>
-        </article>
-      </section>
+      <T3ProductCertRequirements />
+      <T3CBStrategy />
     </>
   );
 }
@@ -780,7 +983,7 @@ const MarketSizeTooltip: React.FC<TooltipProps> = ({ active, payload, label }) =
   const toOkuYen = (yen: number) => Math.round(yen / 100000000);
 
   return (
-    <div style={{ backgroundColor: "rgba(255,255,255,0.97)", border: "1px solid #ccc", padding: "10px 14px", borderRadius: "4px", lineHeight: "1.7", minWidth: "200px" }}>
+    <div style={{ ...TOOLTIP_STYLE, minWidth: "200px" }}>
       <p style={{ margin: "0 0 8px", fontWeight: 600, color: "#333" }}>{label}年</p>
       {central != null && (
         <p style={{ margin: "0 0 2px", fontSize: "0.9rem" }}>
@@ -808,36 +1011,6 @@ function T2MarketAndDemand(): React.JSX.Element {
   // USD Million → 億円
   const usdMillionToOkuYen = (usdMillion: number): number => {
     return Math.round(usdMillion * USD_JPY / 100);
-  };
-
-  // USD Billion → 兆円
-  const usdBillionToTrillionYen = (usdBillion: number): string => {
-    const yenValue = usdBillion * USD_JPY / 1000;
-    return yenValue >= 1
-      ? `${(Math.round(yenValue * 10) / 10).toFixed(1)}兆円`
-      : `${Math.round(yenValue * 1000).toLocaleString()}億円`;
-  };
-
-  // セクター市場規模文字列を解析して円換算
-  const parseAndConvertSectorMarketSize = (marketSizeStr: string): string => {
-    const usdMatch = marketSizeStr.match(/USD\s+([\d.]+)([BM])/i);
-    if (!usdMatch) return marketSizeStr; // USD値がない場合は元の文字列を返す
-
-    const value = parseFloat(usdMatch[1]);
-    const unit = usdMatch[2].toUpperCase();
-
-    let jpyStr: string;
-    if (unit === 'B') {
-      jpyStr = usdBillionToTrillionYen(value);
-    } else {
-      jpyStr = `${usdMillionToOkuYen(value).toLocaleString()}億円`;
-    }
-
-    // USD部分を円換算値に置換し、元のUSD値を括弧で保持
-    return marketSizeStr.replace(
-      /USD\s+[\d.]+[BM]\s*/i,
-      `約${jpyStr} (USD ${value}${unit}, `
-    );
   };
 
   // KPI 計算（2025→2031 のCAGR）
@@ -1041,7 +1214,7 @@ function T2MarketAndDemand(): React.JSX.Element {
               </tbody>
             </table>
           </div>
-          <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
+          <p style={SOURCE_STYLE}>
             上位5州（Selangor、KL/Putrajaya、Johor、Sarawak、Penang）でマレーシアGDPの約68%を占め、LV遮断器の需要もこの5州に集中すると見られる。<br />
             ※ 全国平均成長率5.1%超の州を緑色で表示。出典: DOSM, GDP by State 2024（2025年7月1日発表）
           </p>
@@ -1146,6 +1319,537 @@ function T2MarketAndDemand(): React.JSX.Element {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  T4: Market Access — Section Components                             */
+/* ------------------------------------------------------------------ */
+
+// 4-1 Trade & Tariff Regime
+function T4TariffRegime(): React.JSX.Element {
+  return (
+    <section className="content-block content-block--major fade-in">
+      <p className="section-kicker">TRADE &amp; TARIFF REGIME</p>
+      <h2 style={{ fontSize: "28px" }}>貿易・関税制度</h2>
+      <p className="section-subline">
+        What does it cost to import LV switchgear into Malaysia?
+      </p>
+
+      {/* --- Tariff Table --- */}
+      <article className="reference-block">
+        <h3>HS Code別 関税率一覧</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>製品</th>
+                <th>HSコード</th>
+                <th>品目説明</th>
+                <th>MFN税率</th>
+                <th>ATIGA</th>
+                <th>JMEPA</th>
+                <th>RCEP</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_TARIFF_DATA.map((row) => (
+                <tr key={`${row.product_type}-${row.hs_code}`}>
+                  <td><strong>{row.product_type}</strong></td>
+                  <td style={{ fontFamily: "monospace" }}>{row.hs_code}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.hs_description}</td>
+                  <td style={{ fontWeight: 600, color: row.mfn_rate_pct > 0 ? "#c00" : COLOR.success }}>
+                    {row.mfn_rate_pct}%
+                  </td>
+                  <td>
+                    <span style={badgeStyle(row.atiga_rate_pct === 0 ? "success" : "warning")}>
+                      {row.atiga_rate_pct}%
+                    </span>
+                  </td>
+                  <td>{row.jmepa_rate_pct != null ? `${row.jmepa_rate_pct}%` : "—"}</td>
+                  <td>{row.rcep_rate_pct != null ? `${row.rcep_rate_pct}%` : "—"}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.notes || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div style={{ ...infoBoxStyle("#28a745", "#f0fff4"), marginTop: "16px" }}>
+          <strong>ポイント:</strong> ATIGA適用により
+          <span style={{ color: COLOR.success, fontWeight: 600 }}> ASEAN域内製造品は関税0%</span>。
+          日本からの直接輸出はMFN 15%だが、
+          <span style={{ color: "#004085", fontWeight: 600 }}> JMEPA活用で軽減可能</span>。
+        </div>
+
+        <p style={SOURCE_STYLE}>
+          出典: {MARKET_ACCESS_DATA_SOURCES.tariff}
+        </p>
+        <p style={DISCLAIMER_STYLE}>
+          ※ 関税率は暫定値です。最新のHS分類・税率はKDRM（マレーシア税関）の公式タリフ表をご確認ください。
+        </p>
+      </article>
+
+      {/* --- Import Cost Breakdown --- */}
+      <article className="reference-block">
+        <h3>輸入コスト構成</h3>
+        <div className="table-wrap">
+          <table className="definition-table">
+            <thead>
+              <tr>
+                <th>費目</th>
+                <th>税率/金額</th>
+                <th>課税ベース</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_IMPORT_COSTS.map((cost) => (
+                <tr key={cost.cost_item}>
+                  <td><strong>{cost.cost_item}</strong></td>
+                  <td style={{ fontWeight: 600 }}>{cost.rate_or_amount}</td>
+                  <td>{cost.basis}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{cost.notes || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      {/* --- Import Process Flow --- */}
+      <article className="reference-block">
+        <h3>輸入手続きフロー</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "14px" }}>
+          {MY_IMPORT_STEPS.map((step, idx) => (
+            <div key={step.step_number} style={{
+              padding: "12px 16px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              borderLeft: `4px solid ${idx === 0 ? COLOR.primary : "#999"}`,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+                <span style={{
+                  ...badgeStyle("neutral"),
+                  minWidth: "32px",
+                  textAlign: "center" as const,
+                }}>
+                  Step {step.step_number}
+                </span>
+                <strong style={{ fontSize: "1rem" }}>{step.step_title}</strong>
+                <span style={{ fontSize: "0.8rem", color: "#888" }}>({step.step_title_en})</span>
+              </div>
+              <div style={{ fontSize: FONT_SIZE.medium, color: "#555", marginBottom: "4px" }}>
+                <strong>担当:</strong> {step.responsible_party}
+                {step.typical_duration && (
+                  <span style={{ marginLeft: "16px" }}>
+                    <strong>所要期間:</strong> {step.typical_duration}
+                  </span>
+                )}
+              </div>
+              <ul style={{ margin: "4px 0 0", paddingLeft: "20px", fontSize: FONT_SIZE.medium }}>
+                {step.key_actions.map((action, i) => (
+                  <li key={`step${step.step_number}-action${i}`}>{action}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p style={SOURCE_STYLE}>
+          出典: {MARKET_ACCESS_DATA_SOURCES.import_process}
+        </p>
+        <p style={DISCLAIMER_STYLE}>
+          ※ 手続きフローは概要です。製品カテゴリー・輸入量により手続きが異なる場合があります。
+        </p>
+      </article>
+    </section>
+  );
+}
+
+// 4-2 Distribution Structure
+function T4DistributionStructure(): React.JSX.Element {
+  return (
+    <section className="content-block fade-in">
+      <p className="section-kicker">DISTRIBUTION STRUCTURE</p>
+      <h2 style={{ fontSize: "28px" }}>流通構造</h2>
+      <p className="section-subline">
+        How does LV switchgear reach the end user in Malaysia?
+      </p>
+
+      {/* --- Channel Comparison Table --- */}
+      <article className="reference-block">
+        <h3>チャネル別特性比較</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>チャネル</th>
+                <th>概要</th>
+                <th>主要顧客</th>
+                <th>推定シェア</th>
+                <th>マージン</th>
+                <th>強み</th>
+                <th>弱み</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_DISTRIBUTION_CHANNELS.map((ch) => (
+                <tr key={ch.channel_type}>
+                  <td><strong>{ch.channel_name_ja}</strong></td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{ch.description}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{ch.target_customers}</td>
+                  <td style={{ fontWeight: 600 }}>{ch.volume_share_pct || "—"}</td>
+                  <td>{ch.typical_margin_pct || "—"}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{ch.strengths.join("、")}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{ch.weaknesses.join("、")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      {/* --- Key Market Players --- */}
+      <article className="reference-block">
+        <h3>主要ディストリビューター / パネルビルダー</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {MY_MARKET_PLAYERS.map((player) => (
+            <div key={player.company_name} style={{
+              padding: "12px 16px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              borderLeft: `4px solid ${player.company_type === "Distributor" ? "#FF6600" : COLOR.primary}`,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <strong style={{ fontSize: "1rem" }}>{player.company_name}</strong>
+                <span style={{
+                  padding: "2px 8px",
+                  borderRadius: "4px",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  backgroundColor: player.company_type === "Distributor" ? "#fff3cd" : "#d4edda",
+                  color: player.company_type === "Distributor" ? "#856404" : "#155724",
+                }}>
+                  {player.company_type}
+                </span>
+                <span style={badgeStyle(
+                  player.estimated_scale === "Large" ? "success"
+                  : player.estimated_scale === "Medium" ? "warning"
+                  : "neutral"
+                )}>
+                  {player.estimated_scale}
+                </span>
+              </div>
+              <div style={{ marginTop: "8px", fontSize: FONT_SIZE.medium, color: COLOR.secondary }}>
+                <span>カバー地域: {player.coverage}</span>
+                {player.specialization && <span> | 専門: {player.specialization}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ ...infoBoxStyle("#fd7e14", "#fff8e1"), marginTop: "16px" }}>
+          <strong>注:</strong> 主要プレーヤーのリストは調査中です。
+          実際の企業名・取引情報は業界ヒアリングに基づき更新予定。
+        </div>
+      </article>
+
+      <p style={SOURCE_STYLE}>
+        出典: {MARKET_ACCESS_DATA_SOURCES.distribution}
+      </p>
+      <p style={DISCLAIMER_STYLE}>
+        ※ シェア・マージン数値は業界推定であり、公式統計ではありません。
+      </p>
+    </section>
+  );
+}
+
+// 4-3 Project Procurement Ecosystem
+function T4ProjectProcurementEcosystem(): React.JSX.Element {
+  return (
+    <section className="content-block fade-in">
+      <p className="section-kicker">PROJECT PROCUREMENT ECOSYSTEM</p>
+      <h2 style={{ fontSize: "28px" }}>プロジェクト調達エコシステム</h2>
+      <p className="section-subline">
+        How are LV switchgear specified and procured in Malaysian projects?
+      </p>
+
+      {/* --- Procurement Stage Flow --- */}
+      <article className="reference-block">
+        <h3>案件の仕様決定 → 発注プロセス</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0", marginTop: "14px" }}>
+          {MY_PROCUREMENT_STAGES.map((stage, idx) => (
+            <div key={stage.stage_number}>
+              <div style={{
+                padding: "16px",
+                backgroundColor: stage.decision_influence === "High" ? "#f0f7ff" : "#f8f9fa",
+                borderRadius: idx === 0 ? "8px 8px 0 0" : idx === MY_PROCUREMENT_STAGES.length - 1 ? "0 0 8px 8px" : "0",
+                borderLeft: `4px solid ${stage.decision_influence === "High" ? COLOR.primary : stage.decision_influence === "Medium" ? "#fd7e14" : "#999"}`,
+                borderBottom: idx < MY_PROCUREMENT_STAGES.length - 1 ? "1px dashed #ddd" : "none",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px", flexWrap: "wrap" }}>
+                  <span style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "28px",
+                    height: "28px",
+                    borderRadius: "50%",
+                    backgroundColor: COLOR.primary,
+                    color: "#fff",
+                    fontSize: FONT_SIZE.medium,
+                    fontWeight: 700,
+                  }}>
+                    {stage.stage_number}
+                  </span>
+                  <strong style={{ fontSize: "1rem" }}>{stage.stage_name}</strong>
+                  <span style={{ fontSize: "0.8rem", color: "#888" }}>({stage.stage_name_en})</span>
+                  <span style={badgeStyle(
+                    stage.decision_influence === "High" ? "danger"
+                    : stage.decision_influence === "Medium" ? "warning"
+                    : "neutral"
+                  )}>
+                    影響度: {stage.decision_influence}
+                  </span>
+                </div>
+                <p style={{ margin: "0 0 4px", fontSize: FONT_SIZE.medium, color: "#555" }}>
+                  <strong>キーアクター:</strong> {stage.key_actors.join("、")}
+                </p>
+                <p style={{ margin: "0 0 4px", fontSize: FONT_SIZE.medium }}>{stage.description}</p>
+                <div style={{ ...infoBoxStyle("#17a2b8", "#f0f9ff"), marginTop: "8px", padding: "8px 12px" }}>
+                  <strong>LVタッチポイント:</strong> {stage.lv_touchpoint}
+                </div>
+              </div>
+              {idx < MY_PROCUREMENT_STAGES.length - 1 && (
+                <div style={{ textAlign: "center" as const, color: "#999", fontSize: "1.2rem", lineHeight: "1" }}>
+                  ▼
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </article>
+
+      {/* --- Government vs Private Comparison --- */}
+      <article className="reference-block">
+        <h3>政府調達 vs 民間調達の比較</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>比較軸</th>
+                <th>政府調達</th>
+                <th>民間調達</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_PROCUREMENT_COMPARISON.map((row) => (
+                <tr key={row.dimension}>
+                  <td><strong>{row.dimension}</strong></td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.government}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.private_sector}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      {/* --- AVL Structure --- */}
+      <article className="reference-block">
+        <h3>AVL（Approved Vendor List）の仕組み</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>AVLオーナー</th>
+                <th>代表例</th>
+                <th>登録要件</th>
+                <th>登録ブランド数</th>
+                <th>影響度</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_AVL_INFO.map((avl) => (
+                <tr key={avl.avl_owner_type}>
+                  <td><strong>{avl.avl_owner_type}</strong></td>
+                  <td>{avl.avl_owner_example}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>
+                    <ul style={{ margin: 0, paddingLeft: "16px" }}>
+                      {avl.entry_requirements.map((req, i) => (
+                        <li key={`avl-${avl.avl_owner_type}-req${i}`}>{req}</li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td>{avl.typical_brands_count || "—"}</td>
+                  <td>
+                    <span style={badgeStyle(
+                      avl.influence_level === "High" ? "danger"
+                      : avl.influence_level === "Medium" ? "warning"
+                      : "neutral"
+                    )}>
+                      {avl.influence_level}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <p style={SOURCE_STYLE}>
+        出典: {MARKET_ACCESS_DATA_SOURCES.procurement}
+      </p>
+      <p style={DISCLAIMER_STYLE}>
+        ※ 調達プロセスは案件規模・セクターにより大きく異なります。本情報は一般的な構造を示すものです。
+      </p>
+    </section>
+  );
+}
+
+// 4-4 Barriers & Facilitators
+function T4BarriersAndFacilitators(): React.JSX.Element {
+  return (
+    <section className="content-block fade-in">
+      <p className="section-kicker">BARRIERS &amp; FACILITATORS</p>
+      <h2 style={{ fontSize: "28px" }}>市場アクセス障壁と促進要因</h2>
+      <p className="section-subline">
+        What makes market entry harder — and what makes it easier?
+      </p>
+
+      {/* --- Barriers Table --- */}
+      <article className="reference-block">
+        <h3>市場アクセス障壁</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>カテゴリー</th>
+                <th>障壁</th>
+                <th>深刻度</th>
+                <th>説明</th>
+                <th>対象製品</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_MARKET_BARRIERS.map((b) => (
+                <tr key={b.barrier_id}>
+                  <td style={{ fontFamily: "monospace", fontSize: FONT_SIZE.medium }}>{b.barrier_id}</td>
+                  <td>
+                    <span style={badgeStyle("neutral")}>{b.category}</span>
+                  </td>
+                  <td><strong>{b.barrier_name}</strong></td>
+                  <td>
+                    <span style={badgeStyle(
+                      b.severity === "High" ? "danger"
+                      : b.severity === "Medium" ? "warning"
+                      : "neutral"
+                    )}>
+                      {b.severity}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{b.description}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>
+                    {Array.isArray(b.affected_products) ? b.affected_products.join(", ") : b.affected_products}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      {/* --- Facilitators Table --- */}
+      <article className="reference-block">
+        <h3>市場アクセス促進要因</h3>
+        <div className="table-wrap">
+          <table className="requirements-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>カテゴリー</th>
+                <th>促進要因</th>
+                <th>インパクト</th>
+                <th>説明</th>
+                <th>対象製品</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_MARKET_FACILITATORS.map((f) => (
+                <tr key={f.facilitator_id}>
+                  <td style={{ fontFamily: "monospace", fontSize: FONT_SIZE.medium }}>{f.facilitator_id}</td>
+                  <td>
+                    <span style={badgeStyle("neutral")}>{f.category}</span>
+                  </td>
+                  <td><strong>{f.facilitator_name}</strong></td>
+                  <td>
+                    <span style={badgeStyle(
+                      f.impact === "High" ? "success"
+                      : f.impact === "Medium" ? "warning"
+                      : "neutral"
+                    )}>
+                      {f.impact}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>{f.description}</td>
+                  <td style={{ fontSize: FONT_SIZE.medium }}>
+                    {Array.isArray(f.relevant_products) ? f.relevant_products.join(", ") : f.relevant_products}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      {/* --- Barrier × Facilitator Summary --- */}
+      <article className="reference-block">
+        <h3>障壁 × 促進要因の対比サマリー</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "14px" }}>
+          <div style={infoBoxStyle("#dc3545", "#fdf2f2")}>
+            <strong style={{ color: "#721c24" }}>主要障壁</strong>
+            <ul style={{ margin: "8px 0 0", paddingLeft: "16px", fontSize: FONT_SIZE.medium }}>
+              {MY_MARKET_BARRIERS.filter(b => b.severity === "High").map(b => (
+                <li key={b.barrier_id}>{b.barrier_name}</li>
+              ))}
+            </ul>
+          </div>
+          <div style={infoBoxStyle("#28a745", "#f0fff4")}>
+            <strong style={{ color: "#155724" }}>主要促進要因</strong>
+            <ul style={{ margin: "8px 0 0", paddingLeft: "16px", fontSize: FONT_SIZE.medium }}>
+              {MY_MARKET_FACILITATORS.filter(f => f.impact === "High").map(f => (
+                <li key={f.facilitator_id}>{f.facilitator_name}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <p style={SOURCE_STYLE}>
+        出典: {MARKET_ACCESS_DATA_SOURCES.barriers}
+      </p>
+      <p style={DISCLAIMER_STYLE}>
+        ※ 障壁・促進要因の評価は定性的なものであり、市場環境の変化により変動します。
+      </p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  T4: Market Access (Main)                                           */
+/* ------------------------------------------------------------------ */
+
+function T4MarketAccess(): React.JSX.Element {
+  return (
+    <>
+      <T4TariffRegime />
+      <T4DistributionStructure />
+      <T4ProjectProcurementEcosystem />
+      <T4BarriersAndFacilitators />
+    </>
+  );
+}
+
 function TabPlaceholder({ tab }: { tab: TabDef }): React.JSX.Element {
   return (
     <section className="content-block content-block--major fade-in" style={{ textAlign: "center" }}>
@@ -1213,6 +1917,7 @@ export default function MalaysiaPage(): React.JSX.Element {
     if (activeTab === "t1") return <T1CountryProfile />;
     if (activeTab === "t2") return <T2MarketAndDemand />;
     if (activeTab === "t3") return <T3RegulatoryGateway />;
+    if (activeTab === "t4") return <T4MarketAccess />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;
