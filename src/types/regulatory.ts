@@ -2,6 +2,8 @@
 /*  Regulatory Gateway — Type Definitions                              */
 /* ------------------------------------------------------------------ */
 
+import type { LVProductType } from "./marketAccess";
+
 /**
  * Power Specifications
  */
@@ -77,7 +79,7 @@ export interface ContactInfo {
  * Product Certification Requirement — flattened per-product row
  */
 export interface ProductCertRequirement {
-  product_type: "ACB" | "MCCB" | "MCB" | "RCCB" | "RCBO";
+  product_type: LVProductType;
   applicable_standard: string;
   requirement_level: "Mandatory" | "Voluntary";
   certification_mark: string;
@@ -89,7 +91,7 @@ export interface ProductCertRequirement {
  * CB vs non-CB timeline comparison per product
  */
 export interface CertTimelineComparison {
-  product_type: "ACB" | "MCCB" | "MCB" | "RCCB" | "RCBO";
+  product_type: LVProductType;
   with_cb_weeks: number;
   without_cb_weeks: number;
   time_savings_pct: number;

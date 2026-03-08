@@ -132,12 +132,8 @@ import {
 } from "./data/malaysiaMarketData";
 import {
   MY_POWER_SPECS,
-  MY_CB_SCHEME,
-  MY_ASEAN_EE_MRA,
-  MY_CERT_BODIES,
   REGULATORY_DATA_SOURCES,
   MY_PRODUCT_CERT_REQUIREMENTS,
-  MY_CERT_TIMELINE_COMPARISON,
 } from "./data/malaysiaRegulatoryData";
 import {
   MY_TARIFF_DATA,
@@ -150,6 +146,8 @@ import {
   MY_AVL_INFO,
   MY_MARKET_BARRIERS,
   MY_MARKET_FACILITATORS,
+  MY_HIGH_SEVERITY_BARRIERS,
+  MY_HIGH_IMPACT_FACILITATORS,
   MARKET_ACCESS_DATA_SOURCES,
 } from "./data/malaysiaMarketAccessData";
 
@@ -254,6 +252,22 @@ const badgeStyle = (variant: BadgeVariant): React.CSSProperties => {
     color: fg,
   };
 };
+
+// Badge variant mappers — derive BadgeVariant from domain enum values
+const mapInfluenceToBadge = (level: "High" | "Medium" | "Low"): BadgeVariant =>
+  level === "High" ? "danger" : level === "Medium" ? "warning" : "neutral";
+
+const mapSeverityToBadge = (severity: "High" | "Medium" | "Low"): BadgeVariant =>
+  severity === "High" ? "danger" : severity === "Medium" ? "warning" : "neutral";
+
+const mapImpactToBadge = (impact: "High" | "Medium" | "Low"): BadgeVariant =>
+  impact === "High" ? "success" : impact === "Medium" ? "warning" : "neutral";
+
+const mapScaleToBadge = (scale: "Large" | "Medium" | "Small"): BadgeVariant =>
+  scale === "Large" ? "success" : scale === "Medium" ? "warning" : "neutral";
+
+const mapNecessityToBadge = (necessity: "Required" | "Recommended" | "Optional"): BadgeVariant =>
+  necessity === "Required" ? "success" : necessity === "Recommended" ? "warning" : "neutral";
 
 // Info box helper (left-border accent boxes)
 const infoBoxStyle = (accentColor: string, bgColor: string): React.CSSProperties => ({
@@ -749,7 +763,7 @@ function T3ProductCertRequirements(): React.JSX.Element {
                 <th>適用規格</th>
                 <th>法的義務</th>
                 <th>認証マーク</th>
-                <th>実務上の必要性</th>
+                <th>実務上の<br />必要性</th>
                 <th>要点</th>
               </tr>
             </thead>
@@ -766,11 +780,7 @@ function T3ProductCertRequirements(): React.JSX.Element {
                   </td>
                   <td>{req.certification_mark}</td>
                   <td>
-                    <span style={badgeStyle(
-                      req.practical_necessity === "Required" ? "success"
-                      : req.practical_necessity === "Recommended" ? "warning"
-                      : "neutral"
-                    )}>
+                    <span style={badgeStyle(mapNecessityToBadge(req.practical_necessity))}>
                       {req.practical_necessity === "Required" ? "必須"
                         : req.practical_necessity === "Recommended" ? "推奨"
                         : "任意"}
@@ -783,7 +793,7 @@ function T3ProductCertRequirements(): React.JSX.Element {
           </table>
         </div>
 
-        <div style={{ ...infoBoxStyle("#fd7e14", "#fff8e1"), marginTop: "16px" }}>
+        <div style={{ ...infoBoxStyle(COLOR.warning, "#fff8e1"), marginTop: "16px" }}>
           <strong>要約:</strong> MCB・RCCB・RCBOは
           <span style={{ color: "#c00", fontWeight: 600 }}> ST-SIRIM CoA必須</span>（住宅用途）。
           ACB・MCCBは法的義務なしだが、
@@ -807,11 +817,7 @@ function T3ProductCertRequirements(): React.JSX.Element {
 /* ------------------------------------------------------------------ */
 
 function T3RegulatoryGateway(): React.JSX.Element {
-  return (
-    <>
-      <T3ProductCertRequirements />
-    </>
-  );
+  return <T3ProductCertRequirements />;
 }
 
 
@@ -1221,7 +1227,7 @@ function T4TariffRegime(): React.JSX.Element {
           </table>
         </div>
 
-        <div style={{ ...infoBoxStyle("#28a745", "#f0fff4"), marginTop: "16px" }}>
+        <div style={{ ...infoBoxStyle(COLOR.success, "#f0fff4"), marginTop: "16px" }}>
           <strong>ポイント:</strong> ATIGA適用により
           <span style={{ color: COLOR.success, fontWeight: 600 }}> ASEAN域内製造品は関税0%</span>。
           日本（福山拠点）からの直接輸出はMFN 15%だが、
@@ -1372,21 +1378,10 @@ function T4DistributionStructure(): React.JSX.Element {
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <strong style={{ fontSize: "1rem" }}>{player.company_name}</strong>
-                <span style={{
-                  padding: "2px 8px",
-                  borderRadius: "4px",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  backgroundColor: player.company_type === "Distributor" ? "#fff3cd" : "#d4edda",
-                  color: player.company_type === "Distributor" ? "#856404" : "#155724",
-                }}>
+                <span style={badgeStyle(player.company_type === "Distributor" ? "warning" : "success")}>
                   {player.company_type}
                 </span>
-                <span style={badgeStyle(
-                  player.estimated_scale === "Large" ? "success"
-                  : player.estimated_scale === "Medium" ? "warning"
-                  : "neutral"
-                )}>
+                <span style={badgeStyle(mapScaleToBadge(player.estimated_scale))}>
                   {player.estimated_scale}
                 </span>
               </div>
@@ -1398,7 +1393,7 @@ function T4DistributionStructure(): React.JSX.Element {
           ))}
         </div>
 
-        <div style={{ ...infoBoxStyle("#fd7e14", "#fff8e1"), marginTop: "16px" }}>
+        <div style={{ ...infoBoxStyle(COLOR.warning, "#fff8e1"), marginTop: "16px" }}>
           <strong>注:</strong> 主要プレーヤーのリストは調査中です。
           実際の企業名・取引情報は業界ヒアリングに基づき更新予定。
         </div>
@@ -1434,7 +1429,7 @@ function T4ProjectProcurementEcosystem(): React.JSX.Element {
                 padding: "16px",
                 backgroundColor: stage.decision_influence === "High" ? "#f0f7ff" : "#f8f9fa",
                 borderRadius: idx === 0 ? "8px 8px 0 0" : idx === MY_PROCUREMENT_STAGES.length - 1 ? "0 0 8px 8px" : "0",
-                borderLeft: `4px solid ${stage.decision_influence === "High" ? COLOR.primary : stage.decision_influence === "Medium" ? "#fd7e14" : "#999"}`,
+                borderLeft: `4px solid ${stage.decision_influence === "High" ? COLOR.primary : stage.decision_influence === "Medium" ? COLOR.warning : COLOR.tertiary}`,
                 borderBottom: idx < MY_PROCUREMENT_STAGES.length - 1 ? "1px dashed #ddd" : "none",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px", flexWrap: "wrap" }}>
@@ -1453,12 +1448,8 @@ function T4ProjectProcurementEcosystem(): React.JSX.Element {
                     {stage.stage_number}
                   </span>
                   <strong style={{ fontSize: "1rem" }}>{stage.stage_name}</strong>
-                  <span style={{ fontSize: "0.8rem", color: "#888" }}>({stage.stage_name_en})</span>
-                  <span style={badgeStyle(
-                    stage.decision_influence === "High" ? "danger"
-                    : stage.decision_influence === "Medium" ? "warning"
-                    : "neutral"
-                  )}>
+                  <span style={{ fontSize: "0.8rem", color: COLOR.secondaryLight }}>({stage.stage_name_en})</span>
+                  <span style={badgeStyle(mapInfluenceToBadge(stage.decision_influence))}>
                     影響度: {stage.decision_influence}
                   </span>
                 </div>
@@ -1466,12 +1457,12 @@ function T4ProjectProcurementEcosystem(): React.JSX.Element {
                   <strong>キーアクター:</strong> {stage.key_actors.join("、")}
                 </p>
                 <p style={{ margin: "0 0 4px", fontSize: FONT_SIZE.medium }}>{stage.description}</p>
-                <div style={{ ...infoBoxStyle("#17a2b8", "#f0f9ff"), marginTop: "8px", padding: "8px 12px" }}>
+                <div style={{ ...infoBoxStyle(COLOR.info, "#f0f9ff"), marginTop: "8px", padding: "8px 12px" }}>
                   <strong>LVタッチポイント:</strong> {stage.lv_touchpoint}
                 </div>
               </div>
               {idx < MY_PROCUREMENT_STAGES.length - 1 && (
-                <div style={{ textAlign: "center" as const, color: "#999", fontSize: "1.2rem", lineHeight: "1" }}>
+                <div style={{ textAlign: "center" as const, color: COLOR.tertiary, fontSize: "1.2rem", lineHeight: "1" }}>
                   ▼
                 </div>
               )}
@@ -1533,11 +1524,7 @@ function T4ProjectProcurementEcosystem(): React.JSX.Element {
                   </td>
                   <td>{avl.typical_brands_count || "—"}</td>
                   <td>
-                    <span style={badgeStyle(
-                      avl.influence_level === "High" ? "danger"
-                      : avl.influence_level === "Medium" ? "warning"
-                      : "neutral"
-                    )}>
+                    <span style={badgeStyle(mapInfluenceToBadge(avl.influence_level))}>
                       {avl.influence_level}
                     </span>
                   </td>
@@ -1592,11 +1579,7 @@ function T4BarriersAndFacilitators(): React.JSX.Element {
                   </td>
                   <td><strong>{b.barrier_name}</strong></td>
                   <td>
-                    <span style={badgeStyle(
-                      b.severity === "High" ? "danger"
-                      : b.severity === "Medium" ? "warning"
-                      : "neutral"
-                    )}>
+                    <span style={badgeStyle(mapSeverityToBadge(b.severity))}>
                       {b.severity}
                     </span>
                   </td>
@@ -1635,11 +1618,7 @@ function T4BarriersAndFacilitators(): React.JSX.Element {
                   </td>
                   <td><strong>{f.facilitator_name}</strong></td>
                   <td>
-                    <span style={badgeStyle(
-                      f.impact === "High" ? "success"
-                      : f.impact === "Medium" ? "warning"
-                      : "neutral"
-                    )}>
+                    <span style={badgeStyle(mapImpactToBadge(f.impact))}>
                       {f.impact}
                     </span>
                   </td>
@@ -1658,18 +1637,18 @@ function T4BarriersAndFacilitators(): React.JSX.Element {
       <article className="reference-block">
         <h3>障壁 × 促進要因の対比サマリー</h3>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "14px" }}>
-          <div style={infoBoxStyle("#dc3545", "#fdf2f2")}>
+          <div style={infoBoxStyle(COLOR.error, "#fdf2f2")}>
             <strong style={{ color: "#721c24" }}>主要障壁</strong>
             <ul style={{ margin: "8px 0 0", paddingLeft: "16px", fontSize: FONT_SIZE.medium }}>
-              {MY_MARKET_BARRIERS.filter(b => b.severity === "High").map(b => (
+              {MY_HIGH_SEVERITY_BARRIERS.map(b => (
                 <li key={b.barrier_id}>{b.barrier_name}</li>
               ))}
             </ul>
           </div>
-          <div style={infoBoxStyle("#28a745", "#f0fff4")}>
+          <div style={infoBoxStyle(COLOR.success, "#f0fff4")}>
             <strong style={{ color: "#155724" }}>主要促進要因</strong>
             <ul style={{ margin: "8px 0 0", paddingLeft: "16px", fontSize: FONT_SIZE.medium }}>
-              {MY_MARKET_FACILITATORS.filter(f => f.impact === "High").map(f => (
+              {MY_HIGH_IMPACT_FACILITATORS.map(f => (
                 <li key={f.facilitator_id}>{f.facilitator_name}</li>
               ))}
             </ul>

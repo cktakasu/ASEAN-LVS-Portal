@@ -551,3 +551,17 @@ export const MARKET_ACCESS_DATA_SOURCES: MarketAccessDataSources = {
   procurement: "CIDB; JKR; 業界ヒアリング (TBC)",
   barriers: "SIRIM QAS; ST; 業界ヒアリング (TBC)",
 };
+
+/* ================================================================== */
+/*  Pre-computed Views                                                  */
+/* ================================================================== */
+
+/** High-severity barriers — pre-computed for summary panels */
+export const MY_HIGH_SEVERITY_BARRIERS = MY_MARKET_BARRIERS.filter(
+  (b) => b.severity === "High"
+);
+
+/** High-impact facilitators — pre-computed for summary panels */
+export const MY_HIGH_IMPACT_FACILITATORS = MY_MARKET_FACILITATORS.filter(
+  (f) => f.impact === "High"
+);

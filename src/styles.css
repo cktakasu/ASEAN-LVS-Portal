@@ -625,10 +625,20 @@ td:first-child {
   min-width: 5rem;
 }
 
+.requirements-table th:first-child,
+.requirements-table td:first-child {
+  min-width: 3rem;
+}
+
+/* 製品〜実務上の必要性（1〜5列目）は中央揃え */
+.requirements-table th:nth-child(-n+5),
+.requirements-table td:nth-child(-n+5) {
+  text-align: center;
+}
+
 .requirements-table th:nth-child(2),
 .requirements-table td:nth-child(2) {
   min-width: 7rem;
-  text-align: center;
 }
 
 .summary-table th:not(:first-child),
