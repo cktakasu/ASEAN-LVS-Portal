@@ -801,104 +801,6 @@ function T3ProductCertRequirements(): React.JSX.Element {
   );
 }
 
-// 3-2 CB Scheme Strategy
-function T3CBStrategy(): React.JSX.Element {
-  return (
-    <section className="content-block fade-in">
-      <p className="section-kicker">CB SCHEME STRATEGY</p>
-      <h2 style={{ fontSize: "28px" }}>CBスキーム活用戦略</h2>
-      <p className="section-subline">Leveraging IECEE CB Certificates for Malaysia Market Entry</p>
-
-      {/* CB acceptance table */}
-      <article className="reference-block">
-        <h3>製品カテゴリー別CBスキーム受入状況</h3>
-        <div className="table-wrap">
-          <table className="requirements-table">
-            <thead>
-              <tr>
-                <th>製品カテゴリー</th>
-                <th>受入レベル</th>
-                <th>国内差分</th>
-                <th>時間短縮</th>
-                <th>追加要件</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MY_CB_SCHEME.map((item) => (
-                <tr key={item.product_category}>
-                  <td><strong>{item.product_category}</strong></td>
-                  <td>
-                    <span
-                      style={badgeStyle(
-                        item.cb_acceptance === "Full" ? "success"
-                        : item.cb_acceptance === "Partial" ? "warning"
-                        : "danger"
-                      )}
-                    >
-                      {item.cb_acceptance === "Full" ? "完全受入" : item.cb_acceptance === "Partial" ? "一部受入" : "未受入"}
-                    </span>
-                  </td>
-                  <td>{item.national_differences.length > 0 ? item.national_differences.join("、") : "—"}</td>
-                  <td>{item.time_savings_notes || "—"}</td>
-                  <td>{item.additional_requirements?.join("、") || "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      {/* Certification bodies (compact next-steps) */}
-      <article className="reference-block">
-        <h3>主要認証機関連絡先</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {MY_CERT_BODIES.map((body) => (
-            <div key={body.abbreviation} style={{
-              padding: "12px 16px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "8px",
-              borderLeft: "4px solid #2563eb",
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-                <div>
-                  <strong style={{ fontSize: "1rem" }}>{body.name}</strong>
-                  <span style={{
-                    marginLeft: "8px",
-                    padding: "2px 8px",
-                    borderRadius: "4px",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    backgroundColor: "#e7f3ff",
-                    color: "#004085",
-                  }}>
-                    {body.abbreviation}
-                  </span>
-                </div>
-                {body.contact_info.website && (
-                  <a href={body.contact_info.website} target="_blank" rel="noopener noreferrer"
-                    style={{ color: "#4A90D9", fontSize: "0.85rem" }}>
-                    {body.contact_info.website}
-                  </a>
-                )}
-              </div>
-              <div style={{ marginTop: "8px", fontSize: "0.85rem", color: "#666" }}>
-                {body.contact_info.email && <span>{body.contact_info.email}</span>}
-                {body.contact_info.phone && <span> | {body.contact_info.phone}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </article>
-
-      <p style={{ fontSize: "0.78rem", color: "#999", marginTop: "12px" }}>
-        出典: {REGULATORY_DATA_SOURCES.cb_scheme || REGULATORY_DATA_SOURCES.certification}
-      </p>
-      <p style={{ fontSize: "0.75rem", color: "#bbb", marginTop: "4px" }}>
-        ※ 期間は概算であり、製品タイプ・申請状況により変動します。最新情報は各認証機関にお問い合わせください。
-      </p>
-    </section>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /*  T3: Regulatory Gateway (Main)                                      */
@@ -908,7 +810,6 @@ function T3RegulatoryGateway(): React.JSX.Element {
   return (
     <>
       <T3ProductCertRequirements />
-      <T3CBStrategy />
     </>
   );
 }
