@@ -1220,7 +1220,7 @@ function T4TariffRegime(): React.JSX.Element {
         <div style={{ ...infoBoxStyle(COLOR.success, "#f0fff4"), marginTop: "16px" }}>
           <strong>ポイント:</strong> ATIGA適用により
           <span style={{ color: COLOR.success, fontWeight: 600 }}> ASEAN域内製造品は関税0%</span>。
-          日本（福山拠点）からの直接輸出はMFN 15%だが、
+          日本からの直接輸出はMFN 15%だが、
           <span style={{ color: "#004085", fontWeight: 600 }}> JMEPA原産地証明で実質0%</span>に軽減可能。
           <br />
           <strong>注意:</strong> 630A超MCCBはACBと同じ
