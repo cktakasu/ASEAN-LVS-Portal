@@ -140,10 +140,6 @@ import {
   MY_IMPORT_STEPS,
   MY_IMPORT_COSTS,
   MY_DISTRIBUTION_CHANNELS,
-  MY_MARKET_PLAYERS,
-  MY_PROCUREMENT_STAGES,
-  MY_PROCUREMENT_COMPARISON,
-  MY_AVL_INFO,
   MY_MARKET_BARRIERS,
   MY_MARKET_FACILITATORS,
   MY_HIGH_SEVERITY_BARRIERS,
@@ -254,17 +250,11 @@ const badgeStyle = (variant: BadgeVariant): React.CSSProperties => {
 };
 
 // Badge variant mappers — derive BadgeVariant from domain enum values
-const mapInfluenceToBadge = (level: "High" | "Medium" | "Low"): BadgeVariant =>
-  level === "High" ? "danger" : level === "Medium" ? "warning" : "neutral";
-
 const mapSeverityToBadge = (severity: "High" | "Medium" | "Low"): BadgeVariant =>
   severity === "High" ? "danger" : severity === "Medium" ? "warning" : "neutral";
 
 const mapImpactToBadge = (impact: "High" | "Medium" | "Low"): BadgeVariant =>
   impact === "High" ? "success" : impact === "Medium" ? "warning" : "neutral";
-
-const mapScaleToBadge = (scale: "Large" | "Medium" | "Small"): BadgeVariant =>
-  scale === "Large" ? "success" : scale === "Medium" ? "warning" : "neutral";
 
 const mapNecessityToBadge = (necessity: "Required" | "Recommended" | "Optional"): BadgeVariant =>
   necessity === "Required" ? "success" : necessity === "Recommended" ? "warning" : "neutral";
@@ -1365,40 +1355,6 @@ function T4DistributionStructure(): React.JSX.Element {
         </div>
       </article>
 
-      {/* --- Key Market Players --- */}
-      <article className="reference-block">
-        <h3>主要ディストリビューター / パネルビルダー</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {MY_MARKET_PLAYERS.map((player) => (
-            <div key={player.company_name} style={{
-              padding: "12px 16px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "8px",
-              borderLeft: `4px solid ${player.company_type === "Distributor" ? "#FF6600" : COLOR.primary}`,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <strong style={{ fontSize: "1rem" }}>{player.company_name}</strong>
-                <span style={badgeStyle(player.company_type === "Distributor" ? "warning" : "success")}>
-                  {player.company_type}
-                </span>
-                <span style={badgeStyle(mapScaleToBadge(player.estimated_scale))}>
-                  {player.estimated_scale}
-                </span>
-              </div>
-              <div style={{ marginTop: "8px", fontSize: FONT_SIZE.medium, color: COLOR.secondary }}>
-                <span>カバー地域: {player.coverage}</span>
-                {player.specialization && <span> | 専門: {player.specialization}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ ...infoBoxStyle(COLOR.warning, "#fff8e1"), marginTop: "16px" }}>
-          <strong>注:</strong> 主要プレーヤーのリストは調査中です。
-          実際の企業名・取引情報は業界ヒアリングに基づき更新予定。
-        </div>
-      </article>
-
       <p style={SOURCE_STYLE}>
         出典: {MARKET_ACCESS_DATA_SOURCES.distribution}
       </p>
@@ -1409,143 +1365,7 @@ function T4DistributionStructure(): React.JSX.Element {
   );
 }
 
-// 4-3 Project Procurement Ecosystem
-function T4ProjectProcurementEcosystem(): React.JSX.Element {
-  return (
-    <section className="content-block fade-in">
-      <p className="section-kicker">PROJECT PROCUREMENT ECOSYSTEM</p>
-      <h2 style={{ fontSize: "28px" }}>プロジェクト調達エコシステム</h2>
-      <p className="section-subline">
-        How are LV switchgear specified and procured in Malaysian projects?
-      </p>
-
-      {/* --- Procurement Stage Flow --- */}
-      <article className="reference-block">
-        <h3>案件の仕様決定 → 発注プロセス</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0", marginTop: "14px" }}>
-          {MY_PROCUREMENT_STAGES.map((stage, idx) => (
-            <div key={stage.stage_number}>
-              <div style={{
-                padding: "16px",
-                backgroundColor: stage.decision_influence === "High" ? "#f0f7ff" : "#f8f9fa",
-                borderRadius: idx === 0 ? "8px 8px 0 0" : idx === MY_PROCUREMENT_STAGES.length - 1 ? "0 0 8px 8px" : "0",
-                borderLeft: `4px solid ${stage.decision_influence === "High" ? COLOR.primary : stage.decision_influence === "Medium" ? COLOR.warning : COLOR.tertiary}`,
-                borderBottom: idx < MY_PROCUREMENT_STAGES.length - 1 ? "1px dashed #ddd" : "none",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px", flexWrap: "wrap" }}>
-                  <span style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    backgroundColor: COLOR.primary,
-                    color: "#fff",
-                    fontSize: FONT_SIZE.medium,
-                    fontWeight: 700,
-                  }}>
-                    {stage.stage_number}
-                  </span>
-                  <strong style={{ fontSize: "1rem" }}>{stage.stage_name}</strong>
-                  <span style={{ fontSize: "0.8rem", color: COLOR.secondaryLight }}>({stage.stage_name_en})</span>
-                  <span style={badgeStyle(mapInfluenceToBadge(stage.decision_influence))}>
-                    影響度: {stage.decision_influence}
-                  </span>
-                </div>
-                <p style={{ margin: "0 0 4px", fontSize: FONT_SIZE.medium, color: "#555" }}>
-                  <strong>キーアクター:</strong> {stage.key_actors.join("、")}
-                </p>
-                <p style={{ margin: "0 0 4px", fontSize: FONT_SIZE.medium }}>{stage.description}</p>
-                <div style={{ ...infoBoxStyle(COLOR.info, "#f0f9ff"), marginTop: "8px", padding: "8px 12px" }}>
-                  <strong>LVタッチポイント:</strong> {stage.lv_touchpoint}
-                </div>
-              </div>
-              {idx < MY_PROCUREMENT_STAGES.length - 1 && (
-                <div style={{ textAlign: "center" as const, color: COLOR.tertiary, fontSize: "1.2rem", lineHeight: "1" }}>
-                  ▼
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </article>
-
-      {/* --- Government vs Private Comparison --- */}
-      <article className="reference-block">
-        <h3>政府調達 vs 民間調達の比較</h3>
-        <div className="table-wrap">
-          <table className="requirements-table">
-            <thead>
-              <tr>
-                <th>比較軸</th>
-                <th>政府調達</th>
-                <th>民間調達</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MY_PROCUREMENT_COMPARISON.map((row) => (
-                <tr key={row.dimension}>
-                  <td><strong>{row.dimension}</strong></td>
-                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.government}</td>
-                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.private_sector}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      {/* --- AVL Structure --- */}
-      <article className="reference-block">
-        <h3>AVL（Approved Vendor List）の仕組み</h3>
-        <div className="table-wrap">
-          <table className="requirements-table">
-            <thead>
-              <tr>
-                <th>AVLオーナー</th>
-                <th>代表例</th>
-                <th>登録要件</th>
-                <th>登録ブランド数</th>
-                <th>影響度</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MY_AVL_INFO.map((avl) => (
-                <tr key={avl.avl_owner_type}>
-                  <td><strong>{avl.avl_owner_type}</strong></td>
-                  <td>{avl.avl_owner_example}</td>
-                  <td style={{ fontSize: FONT_SIZE.medium }}>
-                    <ul style={{ margin: 0, paddingLeft: "16px" }}>
-                      {avl.entry_requirements.map((req, i) => (
-                        <li key={`avl-${avl.avl_owner_type}-req${i}`}>{req}</li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td>{avl.typical_brands_count || "—"}</td>
-                  <td>
-                    <span style={badgeStyle(mapInfluenceToBadge(avl.influence_level))}>
-                      {avl.influence_level}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      <p style={SOURCE_STYLE}>
-        出典: {MARKET_ACCESS_DATA_SOURCES.procurement}
-      </p>
-      <p style={DISCLAIMER_STYLE}>
-        ※ 調達プロセスは案件規模・セクターにより大きく異なります。本情報は一般的な構造を示すものです。
-      </p>
-    </section>
-  );
-}
-
-// 4-4 Barriers & Facilitators
+// 4-3 Barriers & Facilitators
 function T4BarriersAndFacilitators(): React.JSX.Element {
   return (
     <section className="content-block fade-in">
@@ -1675,7 +1495,6 @@ function T4MarketAccess(): React.JSX.Element {
     <>
       <T4TariffRegime />
       <T4DistributionStructure />
-      <T4ProjectProcurementEcosystem />
       <T4BarriersAndFacilitators />
     </>
   );
