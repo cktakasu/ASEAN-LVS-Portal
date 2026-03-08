@@ -848,59 +848,6 @@ function T3CBStrategy(): React.JSX.Element {
         </div>
       </article>
 
-      {/* CB vs non-CB timeline comparison */}
-      <article className="reference-block">
-        <h3>CB証書活用 vs 新規申請 — 期間比較</h3>
-        <div className="table-wrap">
-          <table className="requirements-table">
-            <thead>
-              <tr>
-                <th>製品</th>
-                <th>CB証書あり</th>
-                <th>CB証書なし</th>
-                <th>短縮率</th>
-                <th>備考</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MY_CERT_TIMELINE_COMPARISON.map((item) => (
-                <tr key={item.product_type}>
-                  <td><strong>{item.product_type}</strong></td>
-                  <td style={{ color: "#28a745", fontWeight: 600 }}>
-                    {item.with_cb_weeks}週間
-                  </td>
-                  <td>{item.without_cb_weeks}週間</td>
-                  <td>
-                    <span style={badgeStyle("success")}>
-                      -{item.time_savings_pct}%
-                    </span>
-                  </td>
-                  <td style={{ fontSize: "0.85rem" }}>{item.notes}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      {/* ASEAN MRA note (compact) */}
-      <article className="reference-block">
-        <h3>ASEAN EE MRA 参考情報</h3>
-        <div style={infoBoxStyle("#17a2b8", "#f0f9ff")}>
-          <div style={{ marginBottom: "8px" }}>
-            <span style={badgeStyle(MY_ASEAN_EE_MRA.mra_status === "Active" ? "success" : "danger")}>
-              {MY_ASEAN_EE_MRA.mra_status === "Active" ? "署名国・有効" : "未署名"}
-            </span>
-            <span style={{ marginLeft: "12px" }}>
-              MRAタイプ: {MY_ASEAN_EE_MRA.ee_mra_type || "—"}
-            </span>
-          </div>
-          {MY_ASEAN_EE_MRA.notes && (
-            <p style={{ margin: 0 }}>※ {MY_ASEAN_EE_MRA.notes}</p>
-          )}
-        </div>
-      </article>
-
       {/* Certification bodies (compact next-steps) */}
       <article className="reference-block">
         <h3>主要認証機関連絡先</h3>
