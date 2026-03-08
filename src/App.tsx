@@ -4,12 +4,10 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 const MalaysiaPage = lazy(() => import("./MalaysiaPage"));
 import { ASEANKPICards } from "./components/ASEANKPICards";
 import { CountryNavCards } from "./components/CountryNavCards";
-import { ASEANGdpChart } from "./components/ASEANGdpChart";
 import { ASEANEntryMatrix } from "./components/ASEANEntryMatrix";
 import { ASEANDemandMatrix } from "./components/ASEANDemandMatrix";
 import { ASEANProductDefs } from "./components/ASEANProductDefs";
 import { ASEAN_KPI, ASEAN_COUNTRY_CARDS } from "./data/aseanOverviewData";
-import { GDP_TREND_DATA, GDP_COUNTRY_META } from "./data/aseanGdpTrendData";
 import {
   ENTRY_PRIORITY_DATA,
   DEMAND_DRIVER_DATA,
@@ -1019,16 +1017,6 @@ export default function App(): JSX.Element {
         <section className="content-block content-block--major">
           <p className="section-kicker">ASEAN OVERVIEW</p>
           <ASEANKPICards data={ASEAN_KPI} />
-        </section>
-
-        <hr className="section-divider" />
-
-        {/* Section 4: GDP比較チャート */}
-        <section className="content-block content-block--major">
-          <p className="section-kicker">ASEAN GDP TRENDS</p>
-          <h2>ASEAN主要6カ国 GDP推移（2015–2030）</h2>
-          <p className="section-sub">実績（〜2023）＋ IMF WEO 予測（2024〜）</p>
-          <ASEANGdpChart data={GDP_TREND_DATA} meta={GDP_COUNTRY_META} />
         </section>
 
         <hr className="section-divider" />
