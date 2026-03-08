@@ -868,7 +868,7 @@ function T2MarketAndDemand(): React.JSX.Element {
     const icons = {
       very_high: { symbol: "◎", color: "#28a745", label: "Very High" },
       high: { symbol: "○", color: "#4A90D9", label: "High" },
-      medium: { symbol: "○", color: "#d97706", label: "Medium" },
+      medium: { symbol: "○", color: "#ca8a04", label: "Medium" },
       low: { symbol: "△", color: "#dc3545", label: "Low" },
     };
     return icons[outlook as keyof typeof icons] || icons.medium;
@@ -1048,7 +1048,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                       約{(state.gdp_usd_billion * USD_JPY / 1000).toFixed(1)}兆円 <span style={{ fontSize: "0.75rem", color: "#999" }}>(USD {state.gdp_usd_billion.toFixed(1)}B)</span>
                     </td>
                     <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>{state.gdp_national_share_pct.toFixed(1)}%</td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#ca8a04" : "#dc3545", fontWeight: 600 }}>
                       {state.gdp_growth_pct.toFixed(1)}%
                     </td>
                     <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.major_industries}</td>
@@ -1153,7 +1153,7 @@ function T2MarketAndDemand(): React.JSX.Element {
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
               <span style={{ color: "#28a745" }}><strong>◎</strong> Very High (成長率 8%+)</span>
               <span style={{ color: "#4A90D9" }}><strong>○</strong> High (成長率 5-8%)</span>
-              <span style={{ color: "#d97706" }}><strong>○</strong> Medium (成長率 3-5%)</span>
+              <span style={{ color: "#ca8a04" }}><strong>○</strong> Medium (成長率 3-5%)</span>
               <span style={{ color: "#dc3545" }}><strong>△</strong> Low (成長率 3%未満)</span>
             </div>
           </div>
