@@ -16,6 +16,7 @@ export type LVProductType = "ACB" | "MCCB" | "MCB" | "RCCB" | "RCBO";
  */
 export interface TariffRow {
   product_type: LVProductType;
+  product_label?: string;           // 表示名オーバーライド（例: "MCCB (630A超~1600A)"）
   hs_code: string;
   hs_description: string;
   mfn_rate_pct: number;

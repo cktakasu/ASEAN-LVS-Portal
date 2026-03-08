@@ -29,19 +29,32 @@ export const MY_TARIFF_DATA: TariffRow[] = [
     atiga_rate_pct: 0,
     jmepa_rate_pct: 0,
     rcep_rate_pct: 5,
-    notes: "※暫定値 — 要確認",
-    source: "KDRM Tariff Schedule 2025 (TBC)",
+    notes: "※暫定値 — JKDM Advance Ruling推奨",
+    source: "JKDM PDK 2025; AHTN 2022; Trademo関税DB",
   },
   {
     product_type: "MCCB",
+    product_label: "MCCB (630A超〜1600A)",
+    hs_code: "8536.20.19",
+    hs_description: "自動遮断器（定格電圧1,000V以下、630A超）",
+    mfn_rate_pct: 15,
+    atiga_rate_pct: 0,
+    jmepa_rate_pct: 0,
+    rcep_rate_pct: 5,
+    notes: "ACBと同HSコード。ST-SIRIM緩和傾向 ※暫定値",
+    source: "JKDM PDK 2025; AHTN 2022; Trademo関税DB",
+  },
+  {
+    product_type: "MCCB",
+    product_label: "MCCB (630A以下)",
     hs_code: "8536.20.11",
     hs_description: "自動遮断器（定格電圧1,000V以下、630A以下）",
     mfn_rate_pct: 15,
     atiga_rate_pct: 0,
     jmepa_rate_pct: 0,
     rcep_rate_pct: 5,
-    notes: "※暫定値 — 要確認",
-    source: "KDRM Tariff Schedule 2025 (TBC)",
+    notes: "※暫定値 — JKDM Advance Ruling推奨",
+    source: "JKDM PDK 2025; AHTN 2022; Trademo関税DB",
   },
   {
     product_type: "MCB",
@@ -52,7 +65,7 @@ export const MY_TARIFF_DATA: TariffRow[] = [
     jmepa_rate_pct: 0,
     rcep_rate_pct: 5,
     notes: "ST-SIRIM CoA必須 ※暫定値",
-    source: "KDRM Tariff Schedule 2025 (TBC)",
+    source: "JKDM PDK 2025; AHTN 2022; Trademo関税DB",
   },
   {
     product_type: "RCCB",
@@ -63,7 +76,7 @@ export const MY_TARIFF_DATA: TariffRow[] = [
     jmepa_rate_pct: 0,
     rcep_rate_pct: 5,
     notes: "ST-SIRIM CoA必須 ※暫定値",
-    source: "KDRM Tariff Schedule 2025 (TBC)",
+    source: "JKDM PDK 2025; AHTN 2022; Trademo関税DB",
   },
   {
     product_type: "RCBO",
@@ -74,7 +87,7 @@ export const MY_TARIFF_DATA: TariffRow[] = [
     jmepa_rate_pct: 0,
     rcep_rate_pct: 5,
     notes: "ST-SIRIM CoA必須 ※暫定値",
-    source: "KDRM Tariff Schedule 2025 (TBC)",
+    source: "JKDM PDK 2025; AHTN 2022; Trademo関税DB",
   },
 ];
 
@@ -532,7 +545,7 @@ export const MY_MARKET_FACILITATORS: MarketFacilitator[] = [
 /* ================================================================== */
 
 export const MARKET_ACCESS_DATA_SOURCES: MarketAccessDataSources = {
-  tariff: "Royal Malaysian Customs (KDRM); ASEAN Tariff Finder; JMEPA Schedule (TBC)",
+  tariff: "JKDM PDK 2025; AHTN 2022分類; Trademo関税DB; ST/SIRIMガイドライン（2026年3月時点）",
   import_process: "KDRM; MITI; 業界ヒアリング (TBC)",
   distribution: "業界ヒアリング; 各社ウェブサイト (TBC)",
   procurement: "CIDB; JKR; 業界ヒアリング (TBC)",

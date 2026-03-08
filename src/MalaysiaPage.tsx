@@ -1201,7 +1201,7 @@ function T4TariffRegime(): React.JSX.Element {
             <tbody>
               {MY_TARIFF_DATA.map((row) => (
                 <tr key={`${row.product_type}-${row.hs_code}`}>
-                  <td><strong>{row.product_type}</strong></td>
+                  <td><strong>{row.product_label ?? row.product_type}</strong></td>
                   <td style={{ fontFamily: "monospace" }}>{row.hs_code}</td>
                   <td style={{ fontSize: FONT_SIZE.medium }}>{row.hs_description}</td>
                   <td style={{ fontWeight: 600, color: row.mfn_rate_pct > 0 ? "#c00" : COLOR.success }}>
@@ -1224,15 +1224,19 @@ function T4TariffRegime(): React.JSX.Element {
         <div style={{ ...infoBoxStyle("#28a745", "#f0fff4"), marginTop: "16px" }}>
           <strong>ポイント:</strong> ATIGA適用により
           <span style={{ color: COLOR.success, fontWeight: 600 }}> ASEAN域内製造品は関税0%</span>。
-          日本からの直接輸出はMFN 15%だが、
-          <span style={{ color: "#004085", fontWeight: 600 }}> JMEPA活用で軽減可能</span>。
+          日本（福山拠点）からの直接輸出はMFN 15%だが、
+          <span style={{ color: "#004085", fontWeight: 600 }}> JMEPA原産地証明で実質0%</span>に軽減可能。
+          <br />
+          <strong>注意:</strong> 630A超MCCBはACBと同じ
+          <span style={{ fontFamily: "monospace", fontWeight: 600 }}> 8536.20.19</span> に分類。
+          境界値製品は<span style={{ color: "#885500", fontWeight: 600 }}> JKDM Advance Ruling（事前教示）</span>の取得を推奨。
         </div>
 
         <p style={SOURCE_STYLE}>
           出典: {MARKET_ACCESS_DATA_SOURCES.tariff}
         </p>
         <p style={DISCLAIMER_STYLE}>
-          ※ 関税率は暫定値です。最新のHS分類・税率はKDRM（マレーシア税関）の公式タリフ表をご確認ください。
+          ※ 関税率は暫定値です（2026年3月時点）。最新のHS分類・税率はJKDM公式ツール（https://ezhs.customs.gov.my/）でご確認ください。境界値製品はAdvance Rulingによる事前確定を推奨します。
         </p>
       </article>
 
