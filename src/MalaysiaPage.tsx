@@ -587,16 +587,16 @@ function T1CountryProfile(): React.JSX.Element {
                   <thead>
                     <tr>
                       <th>産業セクター</th>
-                      <th>GDP比率</th>
-                      <th>遮断器需要連動</th>
+                      <th style={{ textAlign: "center" }}>GDP比率</th>
+                      <th style={{ textAlign: "center" }}>遮断器需要連動</th>
                     </tr>
                   </thead>
                   <tbody>
                     {INDUSTRY_GDP_2025.map((item) => (
                       <tr key={item.sector}>
                         <td><strong>{item.sector}</strong></td>
-                        <td>{item.gdp_share_pct.toFixed(1)}%</td>
-                        <td>
+                        <td style={{ textAlign: "center" }}>{item.gdp_share_pct.toFixed(1)}%</td>
+                        <td style={{ textAlign: "center" }}>
                           <span
                             style={{
                               padding: "2px 8px",
