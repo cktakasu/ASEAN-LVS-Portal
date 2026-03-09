@@ -18,19 +18,13 @@ export const CountryNavCards = React.memo(function CountryNavCards({ countries }
       {countries.map((c) => (
         <div
           key={c.iso3}
-          className={`country-nav-card${c.hasDetailPage ? " country-nav-card--linked" : ""}`}
+          className={`country-nav-card${c.hasDetailPage ? " country-nav-card--active" : " country-nav-card--inactive"}`}
           onClick={() => {
             if (c.hasDetailPage && c.detailRoute) {
               navigate(c.detailRoute);
             }
           }}
         >
-          <span
-            className={`country-nav-badge ${c.hasDetailPage ? "country-nav-badge--ready" : "country-nav-badge--soon"}`}
-          >
-            {c.hasDetailPage ? "詳細あり" : "準備中"}
-          </span>
-
           <p className="country-nav-name-ja">{c.nameJa}</p>
           <p className="country-nav-name-en">{c.nameEn}</p>
           <p className="country-nav-desc">{c.descriptionJa}</p>
