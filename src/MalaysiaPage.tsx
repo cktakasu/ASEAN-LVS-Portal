@@ -124,6 +124,11 @@ import {
   ResponsiveContainer,
   ComposedChart,
   Area,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
 } from "recharts";
 import {
   CB_MARKET_CHART_DATA,
@@ -135,6 +140,14 @@ import {
   REGULATORY_DATA_SOURCES,
   MY_PRODUCT_CERT_REQUIREMENTS,
 } from "./data/malaysiaRegulatoryData";
+import {
+  MY_SCORE_AXES,
+  MY_SWOT,
+  MY_PRODUCT_PRIORITIES,
+  MY_ROADMAP_PHASES,
+  MY_RISKS,
+  MY_NEXT_ACTIONS,
+} from "./data/malaysiaStrategyData";
 import {
   MY_TARIFF_DATA,
   MY_IMPORT_STEPS,
@@ -1505,6 +1518,317 @@ function T4MarketAccess(): React.JSX.Element {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  T5: Strategic Assessment                                           */
+/* ------------------------------------------------------------------ */
+
+function T5StrategicAssessment(): React.JSX.Element {
+  const radarData = MY_SCORE_AXES.map((a) => ({ subject: a.axisEn, score: a.score, fullMark: 5 }));
+
+  const priorityStars = (p: 1 | 2 | 3) => {
+    if (p === 1) return { stars: "★★★", label: "最優先", color: "#dc3545" };
+    if (p === 2) return { stars: "★★☆", label: "第2段階", color: "#fd7e14" };
+    return { stars: "★☆☆", label: "第3段階", color: "#6c757d" };
+  };
+
+  const impactColor = (impact: "High" | "Medium" | "Low") => {
+    if (impact === "High") return "#dc3545";
+    if (impact === "Medium") return "#fd7e14";
+    return "#28a745";
+  };
+
+  const difficultyLabel = (d: "Low" | "Medium" | "High") => {
+    if (d === "Low") return "低";
+    if (d === "Medium") return "中";
+    return "高";
+  };
+
+  const demandLabel = (d: "Low" | "Medium" | "High") => {
+    if (d === "Low") return "低";
+    if (d === "Medium") return "中";
+    return "高";
+  };
+
+  const ORANGE = "#fd7e14";
+
+  return (
+    <>
+      {/* S1: 総合評価スコアカード */}
+      <section className="content-block content-block--major fade-in">
+        <p className="section-kicker">MARKET ENTRY SCORECARD</p>
+        <h2 style={{ fontSize: "28px" }}>マレーシア市場 総合評価</h2>
+        <p className="section-subline">T1〜T4の分析結果を5軸で統合評価（5点満点）</p>
+
+        <div style={{ display: "flex", gap: "32px", alignItems: "flex-start", flexWrap: "wrap", marginTop: "24px" }}>
+          {/* レーダーチャート */}
+          <div style={{ flex: "0 0 320px" }}>
+            <ResponsiveContainer width={320} height={280}>
+              <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+                <PolarGrid stroke="#e0e0e0" />
+                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: "#555" }} />
+                <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fontSize: 10, fill: "#999" }} tickCount={6} />
+                <Radar name="Score" dataKey="score" stroke={ORANGE} fill={ORANGE} fillOpacity={0.25} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* スコアテーブル */}
+          <div style={{ flex: "1 1 320px" }}>
+            <div className="table-wrap">
+              <table className="definition-table" style={{ width: "100%" }}>
+                <thead>
+                  <tr>
+                    <th>評価軸</th>
+                    <th style={{ textAlign: "center", width: "80px" }}>スコア</th>
+                    <th>根拠</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {MY_SCORE_AXES.map((a) => (
+                    <tr key={a.axis}>
+                      <td><strong>{a.axis}</strong></td>
+                      <td style={{ textAlign: "center" }}>
+                        <span style={{
+                          display: "inline-block",
+                          background: ORANGE,
+                          color: "#fff",
+                          borderRadius: "4px",
+                          padding: "2px 8px",
+                          fontWeight: 700,
+                          fontSize: "0.85rem",
+                        }}>
+                          {a.score.toFixed(1)}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: "0.82rem", color: "#555" }}>{a.rationale}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* S2: SWOT 分析 */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">SWOT ANALYSIS</p>
+        <h2 style={{ fontSize: "28px" }}>SWOT 分析</h2>
+        <p className="section-subline">マレーシア低圧遮断器市場における自社の強み・弱み・機会・脅威</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "24px" }}>
+          {/* Strengths */}
+          <div style={{ background: "#e8f5e9", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #28a745" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#1b5e20", fontSize: "0.9rem" }}>💪 Strengths — 強み</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.strengths.map((s, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{s.text}</li>
+              ))}
+            </ul>
+          </div>
+          {/* Weaknesses */}
+          <div style={{ background: "#fff3e0", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #fd7e14" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#e65100", fontSize: "0.9rem" }}>⚠️ Weaknesses — 弱み</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.weaknesses.map((w, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{w.text}</li>
+              ))}
+            </ul>
+          </div>
+          {/* Opportunities */}
+          <div style={{ background: "#e3f2fd", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #2563eb" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#1565c0", fontSize: "0.9rem" }}>🚀 Opportunities — 機会</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.opportunities.map((o, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{o.text}</li>
+              ))}
+            </ul>
+          </div>
+          {/* Threats */}
+          <div style={{ background: "#fce4ec", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #dc3545" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#880e4f", fontSize: "0.9rem" }}>⚡ Threats — 脅威</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.threats.map((t, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{t.text}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* S3: 製品別参入優先度 */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">PRODUCT ENTRY PRIORITY</p>
+        <h2 style={{ fontSize: "28px" }}>製品別 参入優先度</h2>
+        <p className="section-subline">CB Scheme受入度・市場需要・参入難易度を総合した推奨優先順位</p>
+
+        <div className="table-wrap" style={{ marginTop: "20px" }}>
+          <table className="definition-table" style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <th style={{ width: "80px" }}>製品</th>
+                <th style={{ width: "120px" }}>CB受入</th>
+                <th style={{ width: "100px", textAlign: "center" }}>参入難易度</th>
+                <th style={{ width: "120px", textAlign: "center" }}>市場需要</th>
+                <th style={{ width: "140px", textAlign: "center" }}>推奨優先度</th>
+                <th>推奨理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_PRODUCT_PRIORITIES.map((p) => {
+                const { stars, label, color } = priorityStars(p.priority);
+                return (
+                  <tr key={p.product}>
+                    <td><strong>{p.product}</strong></td>
+                    <td>
+                      <span style={{
+                        display: "inline-block",
+                        padding: "2px 8px",
+                        borderRadius: "4px",
+                        fontSize: "0.78rem",
+                        fontWeight: 600,
+                        background: p.cbAcceptance === "Full" ? "#28a745" : "#fd7e14",
+                        color: "#fff",
+                      }}>
+                        CB {p.cbAcceptance}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: "center", fontSize: "0.85rem" }}>{difficultyLabel(p.difficulty)}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.82rem" }}>{demandLabel(p.demand)}</span>
+                      <br />
+                      <span style={{ fontSize: "0.75rem", color: "#777" }}>{p.demandNote}</span>
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ color, fontWeight: 700, fontSize: "0.9rem" }}>{stars}</span>
+                      <br />
+                      <span style={{ fontSize: "0.75rem", color }}>{label}</span>
+                    </td>
+                    <td style={{ fontSize: "0.82rem", color: "#555" }}>{p.rationale}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* S4: 参入ロードマップ */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">ENTRY ROADMAP</p>
+        <h2 style={{ fontSize: "28px" }}>推奨 参入ロードマップ</h2>
+        <p className="section-subline">3フェーズによる段階的市場参入アプローチ</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginTop: "24px" }}>
+          {MY_ROADMAP_PHASES.map((phase) => (
+            <div key={phase.phase} style={{
+              background: "#f9f9fb",
+              borderRadius: "8px",
+              padding: "16px",
+              borderTop: `4px solid ${ORANGE}`,
+            }}>
+              <p style={{ margin: "0 0 2px", fontSize: "0.75rem", color: "#999", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {phase.label} / {phase.period}
+              </p>
+              <p style={{ margin: "0 0 12px", fontWeight: 700, fontSize: "1rem", color: "#1d1d1f" }}>{phase.title}</p>
+              <ul style={{ margin: 0, paddingLeft: "16px" }}>
+                {phase.tasks.map((task, i) => (
+                  <li key={i} style={{ fontSize: "0.82rem", color: "#444", marginBottom: "8px", lineHeight: 1.55 }}>
+                    {task.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* S5: リスクと対策 */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">RISK ASSESSMENT</p>
+        <h2 style={{ fontSize: "28px" }}>リスクと対策</h2>
+        <p className="section-subline">主要リスクの影響度と具体的なミティゲーション</p>
+
+        <div className="table-wrap" style={{ marginTop: "20px" }}>
+          <table className="definition-table" style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <th style={{ width: "200px" }}>リスク</th>
+                <th style={{ width: "100px", textAlign: "center" }}>影響度</th>
+                <th>対策</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_RISKS.map((r, i) => (
+                <tr key={i}>
+                  <td><strong>{r.risk}</strong></td>
+                  <td style={{ textAlign: "center" }}>
+                    <span style={{
+                      display: "inline-block",
+                      padding: "2px 8px",
+                      borderRadius: "4px",
+                      fontSize: "0.78rem",
+                      fontWeight: 600,
+                      background: impactColor(r.impact),
+                      color: "#fff",
+                    }}>
+                      {r.impact}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: "0.83rem", color: "#555" }}>{r.mitigation}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* S6: 次のアクション */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">NEXT STEPS</p>
+        <h2 style={{ fontSize: "28px" }}>次のアクション</h2>
+        <p className="section-subline">今すぐ着手すべき具体的アクション</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "24px" }}>
+          {MY_NEXT_ACTIONS.map((action, i) => (
+            <div key={i} style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "12px",
+              background: "#f9f9fb",
+              borderRadius: "8px",
+              padding: "14px 16px",
+              border: "1px solid #e0e0e0",
+            }}>
+              <span style={{
+                flexShrink: 0,
+                width: "24px",
+                height: "24px",
+                borderRadius: "50%",
+                background: ORANGE,
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "0.78rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                {i + 1}
+              </span>
+              <div>
+                <p style={{ margin: "0 0 4px", fontSize: "0.85rem", color: "#1d1d1f", lineHeight: 1.5 }}>{action.text}</p>
+                {action.owner && (
+                  <p style={{ margin: 0, fontSize: "0.75rem", color: "#888" }}>担当: {action.owner}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
 function TabPlaceholder({ tab }: { tab: TabDef }): React.JSX.Element {
   return (
     <section className="content-block content-block--major fade-in" style={{ textAlign: "center" }}>
@@ -1573,6 +1897,7 @@ export default function MalaysiaPage(): React.JSX.Element {
     if (activeTab === "t2") return <T2MarketAndDemand />;
     if (activeTab === "t3") return <T3RegulatoryGateway />;
     if (activeTab === "t4") return <T4MarketAccess />;
+    if (activeTab === "t5") return <T5StrategicAssessment />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;
