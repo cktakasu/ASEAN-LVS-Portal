@@ -149,6 +149,10 @@ import {
   MY_NEXT_ACTIONS,
 } from "./data/malaysiaStrategyData";
 import {
+  MY_COMPETITORS,
+  COMPETITION_DATA_NOTE,
+} from "./data/malaysiaCompetitionData";
+import {
   MY_TARIFF_DATA,
   MY_IMPORT_STEPS,
   MY_IMPORT_COSTS,
@@ -1581,6 +1585,7 @@ function T5StrategicAssessment(): React.JSX.Element {
                     <th>評価軸</th>
                     <th style={{ textAlign: "center", width: "80px" }}>スコア</th>
                     <th>根拠</th>
+                    <th style={{ textAlign: "center", width: "60px" }}>出典</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1600,7 +1605,25 @@ function T5StrategicAssessment(): React.JSX.Element {
                           {a.score.toFixed(1)}
                         </span>
                       </td>
-                      <td style={{ fontSize: "0.82rem", color: "#555" }}>{a.rationale}</td>
+                      <td style={{ fontSize: "0.82rem", color: "#555" }}>
+                        {a.rationale}
+                        <br />
+                        <span style={{ fontSize: "0.75rem", color: "#888" }}>{a.dataSource.excerpt}</span>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <span style={{
+                          display: "inline-block",
+                          fontSize: "0.72rem",
+                          background: a.dataSource.tabRef === "推定" ? "#f5f5f7" : "#e3f2fd",
+                          color: a.dataSource.tabRef === "推定" ? "#888" : "#1565c0",
+                          borderRadius: "4px",
+                          padding: "2px 6px",
+                          fontWeight: 600,
+                          border: a.dataSource.tabRef === "推定" ? "1px solid #ccc" : "none",
+                        }}>
+                          {a.dataSource.tabRef}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1654,6 +1677,67 @@ function T5StrategicAssessment(): React.JSX.Element {
             </ul>
           </div>
         </div>
+      </section>
+
+      {/* S2.5: 競合マップ */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">COMPETITIVE LANDSCAPE</p>
+        <h2 style={{ fontSize: "28px" }}>競合マップ</h2>
+        <p className="section-subline">マレーシア低圧遮断器市場における主要競合メーカー</p>
+
+        <div className="table-wrap" style={{ marginTop: "20px" }}>
+          <table className="definition-table" style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <th style={{ width: "160px" }}>メーカー</th>
+                <th style={{ width: "110px", textAlign: "center" }}>タイプ</th>
+                <th style={{ width: "100px", textAlign: "center" }}>市場ポジション</th>
+                <th style={{ width: "100px", textAlign: "center" }}>価格帯</th>
+                <th style={{ width: "120px", textAlign: "center" }}>流通力</th>
+                <th style={{ width: "80px", textAlign: "center" }}>AVL登録</th>
+                <th>製品・特徴</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_COMPETITORS.map((c) => {
+                const typeColor = c.type === "Multinational" ? { bg: "#e3f2fd", fg: "#1565c0" }
+                  : c.type === "Chinese" ? { bg: "#fff3e0", fg: "#e65100" }
+                  : { bg: "#f3e5f5", fg: "#6a1b9a" };
+                const posColor = c.marketPosition === "Strong" ? "#dc3545"
+                  : c.marketPosition === "Moderate" ? "#fd7e14" : "#6c757d";
+                const distColor = c.distributionStrength === "High" ? "#28a745"
+                  : c.distributionStrength === "Medium" ? "#fd7e14" : "#6c757d";
+                return (
+                  <tr key={c.name}>
+                    <td><strong>{c.name}</strong></td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ display: "inline-block", padding: "2px 7px", borderRadius: "4px",
+                        fontSize: "0.75rem", fontWeight: 600, background: typeColor.bg, color: typeColor.fg }}>
+                        {c.type}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 600, color: posColor }}>{c.marketPosition}</span>
+                    </td>
+                    <td style={{ textAlign: "center", fontSize: "0.82rem" }}>{c.priceRange}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 600, color: distColor }}>{c.distributionStrength}</span>
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.85rem" }}>{c.avlPresence ? "✅" : "—"}</span>
+                    </td>
+                    <td style={{ fontSize: "0.8rem", color: "#555" }}>
+                      <span style={{ marginRight: "6px" }}>{c.productFocus.join(" / ")}</span>
+                      <br />
+                      <span style={{ color: "#777" }}>{c.notes}</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p style={{ fontSize: "0.75rem", color: "#999", marginTop: "8px" }}>{COMPETITION_DATA_NOTE}</p>
       </section>
 
       {/* S3: 製品別参入優先度 */}

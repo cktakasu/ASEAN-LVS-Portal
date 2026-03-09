@@ -2,12 +2,37 @@
 /*  Strategic Assessment — Type Definitions                            */
 /* ------------------------------------------------------------------ */
 
+/** S1: スコア根拠のデータソース */
+export interface ScoreDataSource {
+  tabRef: "T1" | "T2" | "T3" | "T4" | "推定";
+  dataKey: string;    // 参照データ変数名 (例: "CB_MARKET_CHART_DATA")
+  excerpt: string;    // 根拠要約テキスト
+}
+
 /** S1: レーダーチャート用スコア軸 */
 export interface ScoreAxis {
   axis: string;          // 評価軸ラベル（日本語）
   axisEn: string;        // 英語ラベル（チャート表示用）
   score: number;         // 0–5
   rationale: string;     // 根拠テキスト
+  dataSource: ScoreDataSource;
+}
+
+/** 競争環境: 競合プロフィール */
+export type CompetitorType = "Multinational" | "Chinese" | "Local";
+export type MarketPosition = "Strong" | "Moderate" | "Niche";
+export type PriceRange = "Premium" | "Mid" | "Economy";
+export type StrengthLevel = "High" | "Medium" | "Low";
+
+export interface CompetitorProfile {
+  name: string;
+  type: CompetitorType;
+  marketPosition: MarketPosition;
+  priceRange: PriceRange;
+  productFocus: string[];
+  distributionStrength: StrengthLevel;
+  avlPresence: boolean;
+  notes: string;
 }
 
 /** S2: SWOT 各アイテム */

@@ -21,30 +21,55 @@ export const MY_SCORE_AXES: ScoreAxis[] = [
     axisEn: "Market Size",
     score: 4.5,
     rationale: "CAGR 6.8%、2031年に約312億円規模。ASEAN域内第2位市場。",
+    dataSource: {
+      tabRef: "T2",
+      dataKey: "CB_MARKET_CHART_DATA",
+      excerpt: "CAGR 6.8%（2025–2031）、市場規模 USD 150M→223M。出典: 6Wresearch",
+    },
   },
   {
     axis: "規制参入障壁",
     axisEn: "Regulatory",
     score: 3.5,
     rationale: "CB Scheme受入あり（MCB/RCCBはFull）。ST-SIRIM認証が必須で一定のリードタイムが必要。",
+    dataSource: {
+      tabRef: "T3",
+      dataKey: "MY_PRODUCT_CERT_REQUIREMENTS / MY_CB_SCHEME",
+      excerpt: "MCB/RCCB: ST-SIRIM必須・CB Full受入。MCCB/ACB: CB Partial。認証期間3〜7週間。",
+    },
   },
   {
     axis: "関税・物流",
     axisEn: "Trade Access",
     score: 4.0,
     rationale: "ATIGA協定で関税0%。ポートクラン・クアラルンプール港の物流インフラが良好。",
+    dataSource: {
+      tabRef: "T4",
+      dataKey: "MY_TARIFF_DATA",
+      excerpt: "全CB製品のATIGA税率0%、JMEPA 0%。出典: JKDM PDK 2025",
+    },
   },
   {
     axis: "競争環境",
     axisEn: "Competition",
     score: 3.0,
     rationale: "ABB・Schneider・Siemensが既存シェアを保有。現地メーカーとの価格競争も存在。",
+    dataSource: {
+      tabRef: "推定",
+      dataKey: "MY_COMPETITORS / MY_MARKET_BARRIERS",
+      excerpt: "Multinational 3社 + 中国系2社が競合。正確なシェアデータは推定値。",
+    },
   },
   {
     axis: "戦略的重要性",
     axisEn: "Strategic Fit",
     score: 4.5,
     rationale: "ASEAN第2位市場かつデータセンター・半導体投資が急増。NETR再エネ政策による長期需要が期待。",
+    dataSource: {
+      tabRef: "T2",
+      dataKey: "CB_SECTOR_FOCUS",
+      excerpt: "DCセクターCAGR 10〜19%、半導体CAGR 8.76%。NETR 2035年再エネ44%目標。",
+    },
   },
 ];
 
