@@ -1014,6 +1014,15 @@ export default function App(): JSX.Element {
           </div>
         </section>
 
+        {/* 製品カテゴリ定義 */}
+        <section className="content-block content-block--major">
+          <p className="section-kicker">PRODUCT CATEGORIES</p>
+          <h2>製品カテゴリ定義</h2>
+          <ASEANProductDefs rows={PRODUCT_DEF_ROWS} />
+        </section>
+
+        <hr className="section-divider" />
+
         <section className="content-block content-block--major">
           <p className="section-kicker">ASEAN OVERVIEW</p>
           <ASEANKPICards data={ASEAN_KPI} />
@@ -1037,15 +1046,6 @@ export default function App(): JSX.Element {
           <h2>需要ドライバー比較</h2>
           <p className="section-sub">主要セクター別 国別需要強度（1=軽微 → 5=主要需要）</p>
           <ASEANDemandMatrix data={DEMAND_DRIVER_DATA} />
-        </section>
-
-        <hr className="section-divider" />
-
-        {/* Section 7: 製品カテゴリ定義 */}
-        <section className="content-block content-block--major">
-          <p className="section-kicker">PRODUCT CATEGORIES</p>
-          <h2>製品カテゴリ定義</h2>
-          <ASEANProductDefs rows={PRODUCT_DEF_ROWS} />
         </section>
 
         <hr className="section-divider" />
