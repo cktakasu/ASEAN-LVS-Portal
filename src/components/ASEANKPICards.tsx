@@ -9,7 +9,7 @@ export const ASEANKPICards = React.memo(function ASEANKPICards({ data }: Props) 
   const cards = [
     {
       label: "ASEAN合計 GDP",
-      value: "USD " + data.total_gdp_usd_trillion.toFixed(1) + " T",
+      value: "USD " + Math.round(data.total_gdp_usd_trillion * 1000).toLocaleString() + " B",
       unit: "（2024年推計）",
     },
     {

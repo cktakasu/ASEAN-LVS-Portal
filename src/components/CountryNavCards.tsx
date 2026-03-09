@@ -7,10 +7,7 @@ type Props = {
 };
 
 function formatGDP(billion: number): string {
-  if (billion >= 1000) {
-    return "USD " + (billion / 1000).toFixed(1) + " T";
-  }
-  return "USD " + Math.round(billion) + " B";
+  return "USD " + Math.round(billion).toLocaleString() + " B";
 }
 
 export const CountryNavCards = React.memo(function CountryNavCards({ countries }: Props) {
