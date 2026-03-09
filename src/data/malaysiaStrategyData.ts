@@ -53,11 +53,11 @@ export const MY_SCORE_AXES: ScoreAxis[] = [
     axis: "競争環境",
     axisEn: "Competition",
     score: 3.0,
-    rationale: "ABB・Schneider・Siemensが既存シェアを保有。現地メーカーとの価格競争も存在。",
+    rationale: "ABB・Schneider・Siemensが既存シェアを保有。Fuji Electric・Terasaki等の日系も存在。価格競争もある。",
     dataSource: {
       tabRef: "推定",
       dataKey: "MY_COMPETITORS / MY_MARKET_BARRIERS",
-      excerpt: "Multinational 3社 + 中国系2社が競合。正確なシェアデータは推定値。",
+      excerpt: "Multinational 3社 + 日系2社 + 中国系2社が競合。正確なシェアデータは推定値。",
     },
   },
   {
@@ -99,6 +99,7 @@ export const MY_SWOT: SwotData = {
   threats: [
     { text: "ABB・Schneider・Siemensによる既存チャネル支配とAVL優位性" },
     { text: "中国系ローカルメーカーの低価格製品による価格競争" },
+    { text: "Fuji Electric・Terasaki等の日系メーカーの既存プレゼンスとブランド力" },
     { text: "MYR為替変動リスク（特に円高局面での競争力低下）" },
     { text: "政府調達におけるバミプトラ優遇政策による参入障壁" },
   ],

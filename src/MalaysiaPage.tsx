@@ -1693,7 +1693,6 @@ function T5StrategicAssessment(): React.JSX.Element {
                 <th style={{ width: "110px", textAlign: "center" }}>タイプ</th>
                 <th style={{ width: "100px", textAlign: "center" }}>市場ポジション</th>
                 <th style={{ width: "100px", textAlign: "center" }}>価格帯</th>
-                <th style={{ width: "120px", textAlign: "center" }}>流通力</th>
                 <th style={{ width: "80px", textAlign: "center" }}>AVL登録</th>
                 <th>製品・特徴</th>
               </tr>
@@ -1702,11 +1701,10 @@ function T5StrategicAssessment(): React.JSX.Element {
               {MY_COMPETITORS.map((c) => {
                 const typeColor = c.type === "Multinational" ? { bg: "#e3f2fd", fg: "#1565c0" }
                   : c.type === "Chinese" ? { bg: "#fff3e0", fg: "#e65100" }
+                  : c.type === "Japanese" ? { bg: "#e8f5e9", fg: "#2e7d32" }
                   : { bg: "#f3e5f5", fg: "#6a1b9a" };
                 const posColor = c.marketPosition === "Strong" ? "#dc3545"
                   : c.marketPosition === "Moderate" ? "#fd7e14" : "#6c757d";
-                const distColor = c.distributionStrength === "High" ? "#28a745"
-                  : c.distributionStrength === "Medium" ? "#fd7e14" : "#6c757d";
                 return (
                   <tr key={c.name}>
                     <td><strong>{c.name}</strong></td>
@@ -1720,9 +1718,6 @@ function T5StrategicAssessment(): React.JSX.Element {
                       <span style={{ fontSize: "0.82rem", fontWeight: 600, color: posColor }}>{c.marketPosition}</span>
                     </td>
                     <td style={{ textAlign: "center", fontSize: "0.82rem" }}>{c.priceRange}</td>
-                    <td style={{ textAlign: "center" }}>
-                      <span style={{ fontSize: "0.82rem", fontWeight: 600, color: distColor }}>{c.distributionStrength}</span>
-                    </td>
                     <td style={{ textAlign: "center" }}>
                       <span style={{ fontSize: "0.85rem" }}>{c.avlPresence ? "✅" : "—"}</span>
                     </td>

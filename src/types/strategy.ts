@@ -19,7 +19,7 @@ export interface ScoreAxis {
 }
 
 /** 競争環境: 競合プロフィール */
-export type CompetitorType = "Multinational" | "Chinese" | "Local";
+export type CompetitorType = "Multinational" | "Chinese" | "Local" | "Japanese";
 export type MarketPosition = "Strong" | "Moderate" | "Niche";
 export type PriceRange = "Premium" | "Mid" | "Economy";
 export type StrengthLevel = "High" | "Medium" | "Low";

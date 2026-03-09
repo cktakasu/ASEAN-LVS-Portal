@@ -56,6 +56,26 @@ export const MY_COMPETITORS: CompetitorProfile[] = [
     avlPresence: false,
     notes: "Chintと同様の低価格ポジション。住宅向け小売チャネルで一定の流通量あり。プロジェクト案件への参入は限定的。",
   },
+  {
+    name: "Fuji Electric",
+    type: "Japanese",
+    marketPosition: "Moderate",
+    priceRange: "Premium",
+    productFocus: ["MCCB", "ACB"],
+    distributionStrength: "Medium",
+    avlPresence: true,
+    notes: "産業用MCCBで一定シェアを保有。代理店網は限定だら、EPC・プラント案件でAVL登録実績あり。",
+  },
+  {
+    name: "Terasaki Electric",
+    type: "Japanese",
+    marketPosition: "Niche",
+    priceRange: "Premium",
+    productFocus: ["MCCB", "ACB"],
+    distributionStrength: "Low",
+    avlPresence: true,
+    notes: "船舶・オフショア・特殊産業に特化。流通は特殊用途に限定されるが、船舶・オフショア関連でAVL登録あり。",
+  },
 ];
 
 export const COMPETITION_DATA_NOTE =
