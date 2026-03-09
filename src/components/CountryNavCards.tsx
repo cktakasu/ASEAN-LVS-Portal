@@ -8,9 +8,9 @@ type Props = {
 
 function formatGDP(billion: number): string {
   if (billion >= 1000) {
-    return (billion / 1000).toFixed(1) + " 兆";
+    return "USD " + (billion / 1000).toFixed(1) + " T";
   }
-  return Math.round(billion) + " 十億";
+  return "USD " + Math.round(billion) + " B";
 }
 
 export const CountryNavCards = React.memo(function CountryNavCards({ countries }: Props) {
@@ -41,7 +41,7 @@ export const CountryNavCards = React.memo(function CountryNavCards({ countries }
           <div className="country-nav-kpis">
             <div className="country-nav-kpi-item">
               <span className="country-nav-kpi-val">
-                USD {formatGDP(c.gdp_usd_billion_2024)}
+                {formatGDP(c.gdp_usd_billion_2024)}
               </span>
               <span className="country-nav-kpi-lbl">GDP（2024）</span>
             </div>
