@@ -1014,18 +1014,18 @@ export default function App(): JSX.Element {
           </div>
         </section>
 
+        <section className="content-block content-block--major">
+          <p className="section-kicker">ASEAN OVERVIEW</p>
+          <ASEANKPICards data={ASEAN_KPI} />
+        </section>
+
+        <hr className="section-divider" />
+
         {/* 製品カテゴリ定義 */}
         <section className="content-block content-block--major">
           <p className="section-kicker">PRODUCT CATEGORIES</p>
           <h2>製品カテゴリ定義</h2>
           <ASEANProductDefs rows={PRODUCT_DEF_ROWS} />
-        </section>
-
-        <hr className="section-divider" />
-
-        <section className="content-block content-block--major">
-          <p className="section-kicker">ASEAN OVERVIEW</p>
-          <ASEANKPICards data={ASEAN_KPI} />
         </section>
 
         <hr className="section-divider" />
