@@ -674,27 +674,33 @@ function T1PowerSpecs(): React.JSX.Element {
 
       <article className="reference-block">
         <h3>低圧電力仕様</h3>
-        <div className="legend-inline">
-          <div className="legend-inline-item">
-            <strong>単相:</strong>
-            <span>{MY_POWER_SPECS.voltage_lv.single_phase}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>三相:</strong>
-            <span>{MY_POWER_SPECS.voltage_lv.three_phase}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>周波数:</strong>
-            <span>{MY_POWER_SPECS.frequency}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>プラグ:</strong>
-            <span>{MY_POWER_SPECS.plug_type}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>配電方式:</strong>
-            <span>{MY_POWER_SPECS.distribution_system}</span>
-          </div>
+        <div className="table-wrap">
+          <table className="definition-table" style={{ width: "100%", tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "30%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "30%" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                <th style={{ padding: "2px 6px" }}>単相</th>
+                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.voltage_lv.single_phase}</td>
+                <th style={{ padding: "2px 6px" }}>三相</th>
+                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.voltage_lv.three_phase}</td>
+              </tr>
+              <tr>
+                <th style={{ padding: "2px 6px" }}>周波数</th>
+                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.frequency}</td>
+                <th style={{ padding: "2px 6px" }}>プラグ</th>
+                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.plug_type}</td>
+              </tr>
+              <tr>
+                <th style={{ padding: "2px 6px" }}>配電方式</th>
+                <td style={{ padding: "2px 6px" }} colSpan={3}>{MY_POWER_SPECS.distribution_system}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </article>
 
