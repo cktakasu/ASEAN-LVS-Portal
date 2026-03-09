@@ -141,8 +141,8 @@ body {
 }
 
 #map-section.hero {
-  padding-top: 36px;
-  padding-bottom: 60px;
+  padding-top: 8px;
+  padding-bottom: 24px;
 }
 
 .hero--light {
@@ -1036,7 +1036,7 @@ td:first-child {
 
 /* ヒーロー強化（トップページのみ） */
 #top.hero {
-  padding: 72px 16px 56px;
+  padding: 36px 16px 24px;
 }
 
 #top.hero .hero-kicker {
@@ -1141,42 +1141,56 @@ td:first-child {
   position: relative;
 }
 
-/* アクティブ（詳細あり）: 白背景 + 左アクセントボーダー */
+/* アクティブ（詳細あり） */
 .country-nav-card--active {
   background: #fff;
-  border-left: 4px solid #FF6600;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-  cursor: pointer;
 }
 
-.country-nav-card--active:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255, 102, 0, 0.15);
-}
-
-/* 準備中: グレー背景 + 全体を減光 */
+/* 準備中: 全体を減光 */
 .country-nav-card--inactive {
   background: var(--bg-gray);
-  border-left: 4px solid transparent;
   cursor: default;
-  opacity: 0.55;
+  opacity: 0.5;
+}
+
+.country-nav-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 1px;
 }
 
 .country-nav-name-ja {
-  margin: 0 0 1px;
-  font-size: 18px;
+  margin: 0;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  white-space: nowrap;
   color: var(--text-dark);
   font-family: var(--font-display);
 }
 
-.country-nav-name-en {
-  margin: 0 0 5px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-sub);
-  letter-spacing: 0.01em;
+
+.country-nav-badge {
+  display: inline-block;
+  margin: 0 0 6px;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.country-nav-badge--available {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.country-nav-badge--soon {
+  background: transparent;
+  border: 1px solid #ccc;
+  color: #aaa;
 }
 
 .country-nav-desc {
@@ -1232,7 +1246,7 @@ td:first-child {
 
 @media (max-width: 734px) {
   #top.hero {
-    padding: 48px 24px 40px;
+    padding: 28px 24px 20px;
   }
 
   #top.hero h1 {
@@ -1390,6 +1404,51 @@ td:first-child {
   font-size: 11px;
   color: var(--text-sub);
   margin-top: 10px;
+}
+
+.matrix-scoring-criteria {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e8e4e0;
+}
+
+.matrix-scoring-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-sub);
+  margin: 0 0 10px;
+}
+
+.matrix-scoring-dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 16px;
+  row-gap: 5px;
+  margin: 0;
+}
+
+.matrix-scoring-dl dt {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  padding-top: 1px;
+}
+
+.matrix-scoring-dl dd {
+  font-size: 11px;
+  color: var(--text-sub);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.matrix-scoring-dl cite {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text-main);
+  opacity: 0.6;
 }
 
 /* Product definitions table */

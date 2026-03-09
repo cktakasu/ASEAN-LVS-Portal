@@ -60,7 +60,7 @@ export interface DemandDriverRow {
 }
 
 export const DEMAND_DRIVER_DATA: DemandDriverRow[] = [
-  { iso3: "IDN", nameJa: "インドネシア", scores: [5, 3, 4, 5, 4] },
+  { iso3: "IDN", nameJa: "インドネシア", scores: [5, 4, 4, 5, 4] },
   { iso3: "MYS", nameJa: "マレーシア",   scores: [3, 5, 4, 3, 4] },
   { iso3: "THA", nameJa: "タイ",         scores: [3, 3, 5, 3, 4] },
   { iso3: "VNM", nameJa: "ベトナム",     scores: [4, 4, 5, 4, 3] },
