@@ -296,8 +296,7 @@ const TABS: TabDef[] = [
   { id: "t2", label: "Market & Demand", sublabel: "Where is the demand?" },
   { id: "t3", label: "Regulatory Gateway", sublabel: "What is required to sell here?" },
   { id: "t4", label: "Market Access", sublabel: "How do we enter this market?" },
-  { id: "t5", label: "Competitive Landscape", sublabel: "Who are we competing against?" },
-  { id: "t6", label: "Strategy", sublabel: "What should we do?" },
+  { id: "t5", label: "Strategic Assessment", sublabel: "What should we do?" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -675,29 +674,29 @@ function T1PowerSpecs(): React.JSX.Element {
       <article className="reference-block">
         <h3>低圧電力仕様</h3>
         <div className="table-wrap">
-          <table className="definition-table" style={{ width: "100%", tableLayout: "fixed" }}>
+          <table className="definition-table" style={{ width: "620px", minWidth: "unset", tableLayout: "fixed" }}>
             <colgroup>
-              <col style={{ width: "20%" }} />
-              <col style={{ width: "30%" }} />
-              <col style={{ width: "20%" }} />
-              <col style={{ width: "30%" }} />
+              <col style={{ width: "110px" }} />
+              <col style={{ width: "140px" }} />
+              <col style={{ width: "110px" }} />
+              <col style={{ width: "260px" }} />
             </colgroup>
             <tbody>
               <tr>
-                <th style={{ padding: "2px 6px" }}>単相</th>
-                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.voltage_lv.single_phase}</td>
-                <th style={{ padding: "2px 6px" }}>三相</th>
-                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.voltage_lv.three_phase}</td>
+                <th>単相</th>
+                <td>{MY_POWER_SPECS.voltage_lv.single_phase}</td>
+                <th>三相</th>
+                <td>{MY_POWER_SPECS.voltage_lv.three_phase}</td>
               </tr>
               <tr>
-                <th style={{ padding: "2px 6px" }}>周波数</th>
-                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.frequency}</td>
-                <th style={{ padding: "2px 6px" }}>プラグ</th>
-                <td style={{ padding: "2px 6px" }}>{MY_POWER_SPECS.plug_type}</td>
+                <th>周波数</th>
+                <td>{MY_POWER_SPECS.frequency}</td>
+                <th>プラグ</th>
+                <td>{MY_POWER_SPECS.plug_type}</td>
               </tr>
               <tr>
-                <th style={{ padding: "2px 6px" }}>配電方式</th>
-                <td style={{ padding: "2px 6px" }} colSpan={3}>{MY_POWER_SPECS.distribution_system}</td>
+                <th>配電方式</th>
+                <td colSpan={3}>{MY_POWER_SPECS.distribution_system}</td>
               </tr>
             </tbody>
           </table>
