@@ -1016,6 +1016,7 @@ export default function App(): JSX.Element {
 
         <section className="content-block content-block--major">
           <p className="section-kicker">ASEAN OVERVIEW</p>
+          <h2>ASEAN主要指標</h2>
           <ASEANKPICards data={ASEAN_KPI} />
         </section>
 
