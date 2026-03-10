@@ -1862,10 +1862,10 @@ function T5StrategicAssessment(): React.JSX.Element {
         </div>
       </section>
 
-      {/* S6: 次のアクション */}
+      {/* S6: アクション */}
       <section className="content-block fade-in">
         <p className="section-kicker">NEXT STEPS</p>
-        <h2 style={{ fontSize: "28px" }}>次のアクション</h2>
+        <h2 style={{ fontSize: "28px" }}>アクション</h2>
         <p className="section-subline">今すぐ着手すべき具体的アクション</p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "24px" }}>

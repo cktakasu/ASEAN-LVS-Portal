@@ -84,7 +84,7 @@ export interface RiskItem {
   mitigation: string;
 }
 
-/** S6: 次のアクション */
+/** S6: アクション */
 export interface NextAction {
   text: string;
   owner?: string;       // 担当部門ヒント (任意)
