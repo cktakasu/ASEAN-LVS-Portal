@@ -15,7 +15,6 @@ export interface ASEANCountryCard {
   voltage: string;
   descriptionJa: string;
   hasDetailPage: boolean;
-  detailRoute?: string;
 }
 
 export const ASEAN_KPI: ASEANAggregateKPI = {
@@ -49,7 +48,6 @@ export const ASEAN_COUNTRY_CARDS: ASEANCountryCard[] = [
     descriptionJa:
       "高所得国への移行期にあり、データセンターや半導体産業の急成長が電力需要を牽引。MS IEC規格とSIRIM認証が中心。",
     hasDetailPage: true,
-    detailRoute: "/malaysia",
   },
   {
     iso3: "THA",

@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import type { ASEANCountryCard } from "../data/aseanOverviewData";
 
 type Props = {
@@ -7,41 +6,29 @@ type Props = {
 };
 
 function formatGDP(billion: number): string {
-  if (billion >= 1000) {
-    return (billion / 1000).toFixed(1) + " 兆";
-  }
-  return Math.round(billion) + " 十億";
+  return "USD " + Math.round(billion).toLocaleString() + " B";
 }
 
 export const CountryNavCards = React.memo(function CountryNavCards({ countries }: Props) {
-  const navigate = useNavigate();
-
   return (
     <div className="country-nav-grid">
       {countries.map((c) => (
         <div
           key={c.iso3}
-          className={`country-nav-card${c.hasDetailPage ? " country-nav-card--linked" : ""}`}
-          onClick={() => {
-            if (c.hasDetailPage && c.detailRoute) {
-              navigate(c.detailRoute);
-            }
-          }}
+          className={`country-nav-card${c.hasDetailPage ? " country-nav-card--active" : " country-nav-card--inactive"}`}
         >
-          <span
-            className={`country-nav-badge ${c.hasDetailPage ? "country-nav-badge--ready" : "country-nav-badge--soon"}`}
-          >
-            {c.hasDetailPage ? "詳細あり" : "準備中"}
-          </span>
-
-          <p className="country-nav-name-ja">{c.nameJa}</p>
-          <p className="country-nav-name-en">{c.nameEn}</p>
+          <div className="country-nav-name-row">
+            <p className="country-nav-name-ja">{c.nameJa}</p>
+            {c.hasDetailPage
+              ? <span className="country-nav-badge country-nav-badge--available">詳細あり</span>
+              : <span className="country-nav-badge country-nav-badge--soon">準備中</span>}
+          </div>
           <p className="country-nav-desc">{c.descriptionJa}</p>
 
           <div className="country-nav-kpis">
             <div className="country-nav-kpi-item">
               <span className="country-nav-kpi-val">
-                USD {formatGDP(c.gdp_usd_billion_2024)}
+                {formatGDP(c.gdp_usd_billion_2024)}
               </span>
               <span className="country-nav-kpi-lbl">GDP（2024）</span>
             </div>

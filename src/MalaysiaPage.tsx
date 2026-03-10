@@ -124,6 +124,11 @@ import {
   ResponsiveContainer,
   ComposedChart,
   Area,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
 } from "recharts";
 import {
   CB_MARKET_CHART_DATA,
@@ -136,14 +141,22 @@ import {
   MY_PRODUCT_CERT_REQUIREMENTS,
 } from "./data/malaysiaRegulatoryData";
 import {
+  MY_SCORE_AXES,
+  MY_SWOT,
+  MY_PRODUCT_PRIORITIES,
+  MY_ROADMAP_PHASES,
+  MY_RISKS,
+  MY_NEXT_ACTIONS,
+} from "./data/malaysiaStrategyData";
+import {
+  MY_COMPETITORS,
+  COMPETITION_DATA_NOTE,
+} from "./data/malaysiaCompetitionData";
+import {
   MY_TARIFF_DATA,
   MY_IMPORT_STEPS,
   MY_IMPORT_COSTS,
   MY_DISTRIBUTION_CHANNELS,
-  MY_MARKET_PLAYERS,
-  MY_PROCUREMENT_STAGES,
-  MY_PROCUREMENT_COMPARISON,
-  MY_AVL_INFO,
   MY_MARKET_BARRIERS,
   MY_MARKET_FACILITATORS,
   MY_HIGH_SEVERITY_BARRIERS,
@@ -254,17 +267,11 @@ const badgeStyle = (variant: BadgeVariant): React.CSSProperties => {
 };
 
 // Badge variant mappers — derive BadgeVariant from domain enum values
-const mapInfluenceToBadge = (level: "High" | "Medium" | "Low"): BadgeVariant =>
-  level === "High" ? "danger" : level === "Medium" ? "warning" : "neutral";
-
 const mapSeverityToBadge = (severity: "High" | "Medium" | "Low"): BadgeVariant =>
   severity === "High" ? "danger" : severity === "Medium" ? "warning" : "neutral";
 
 const mapImpactToBadge = (impact: "High" | "Medium" | "Low"): BadgeVariant =>
   impact === "High" ? "success" : impact === "Medium" ? "warning" : "neutral";
-
-const mapScaleToBadge = (scale: "Large" | "Medium" | "Small"): BadgeVariant =>
-  scale === "Large" ? "success" : scale === "Medium" ? "warning" : "neutral";
 
 const mapNecessityToBadge = (necessity: "Required" | "Recommended" | "Optional"): BadgeVariant =>
   necessity === "Required" ? "success" : necessity === "Recommended" ? "warning" : "neutral";
@@ -306,8 +313,7 @@ const TABS: TabDef[] = [
   { id: "t2", label: "Market & Demand", sublabel: "Where is the demand?" },
   { id: "t3", label: "Regulatory Gateway", sublabel: "What is required to sell here?" },
   { id: "t4", label: "Market Access", sublabel: "How do we enter this market?" },
-  { id: "t5", label: "Competitive Landscape", sublabel: "Who are we competing against?" },
-  { id: "t6", label: "Strategy", sublabel: "What should we do?" },
+  { id: "t5", label: "Strategic Assessment", sublabel: "What should we do?" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -597,16 +603,16 @@ function T1CountryProfile(): React.JSX.Element {
                   <thead>
                     <tr>
                       <th>産業セクター</th>
-                      <th>GDP比率</th>
-                      <th>遮断器需要連動</th>
+                      <th style={{ textAlign: "center" }}>GDP比率</th>
+                      <th style={{ textAlign: "center" }}>遮断器需要連動</th>
                     </tr>
                   </thead>
                   <tbody>
                     {INDUSTRY_GDP_2025.map((item) => (
                       <tr key={item.sector}>
                         <td><strong>{item.sector}</strong></td>
-                        <td>{item.gdp_share_pct.toFixed(1)}%</td>
-                        <td>
+                        <td style={{ textAlign: "center" }}>{item.gdp_share_pct.toFixed(1)}%</td>
+                        <td style={{ textAlign: "center" }}>
                           <span
                             style={{
                               padding: "2px 8px",
@@ -684,27 +690,33 @@ function T1PowerSpecs(): React.JSX.Element {
 
       <article className="reference-block">
         <h3>低圧電力仕様</h3>
-        <div className="legend-inline">
-          <div className="legend-inline-item">
-            <strong>単相:</strong>
-            <span>{MY_POWER_SPECS.voltage_lv.single_phase}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>三相:</strong>
-            <span>{MY_POWER_SPECS.voltage_lv.three_phase}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>周波数:</strong>
-            <span>{MY_POWER_SPECS.frequency}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>プラグ:</strong>
-            <span>{MY_POWER_SPECS.plug_type}</span>
-          </div>
-          <div className="legend-inline-item">
-            <strong>配電方式:</strong>
-            <span>{MY_POWER_SPECS.distribution_system}</span>
-          </div>
+        <div className="table-wrap">
+          <table className="definition-table" style={{ width: "620px", minWidth: "unset", tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "110px" }} />
+              <col style={{ width: "140px" }} />
+              <col style={{ width: "110px" }} />
+              <col style={{ width: "260px" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                <th>単相</th>
+                <td>{MY_POWER_SPECS.voltage_lv.single_phase}</td>
+                <th>三相</th>
+                <td>{MY_POWER_SPECS.voltage_lv.three_phase}</td>
+              </tr>
+              <tr>
+                <th>周波数</th>
+                <td>{MY_POWER_SPECS.frequency}</td>
+                <th>プラグ</th>
+                <td>{MY_POWER_SPECS.plug_type}</td>
+              </tr>
+              <tr>
+                <th>配電方式</th>
+                <td colSpan={3}>{MY_POWER_SPECS.distribution_system}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </article>
 
@@ -878,7 +890,7 @@ function T2MarketAndDemand(): React.JSX.Element {
     const icons = {
       very_high: { symbol: "◎", color: "#28a745", label: "Very High" },
       high: { symbol: "○", color: "#4A90D9", label: "High" },
-      medium: { symbol: "○", color: "#d97706", label: "Medium" },
+      medium: { symbol: "○", color: "#ca8a04", label: "Medium" },
       low: { symbol: "△", color: "#dc3545", label: "Low" },
     };
     return icons[outlook as keyof typeof icons] || icons.medium;
@@ -1058,7 +1070,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                       約{(state.gdp_usd_billion * USD_JPY / 1000).toFixed(1)}兆円 <span style={{ fontSize: "0.75rem", color: "#999" }}>(USD {state.gdp_usd_billion.toFixed(1)}B)</span>
                     </td>
                     <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right" }}>{state.gdp_national_share_pct.toFixed(1)}%</td>
-                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#d97706" : "#dc3545", fontWeight: 600 }}>
+                    <td style={{ padding: "10px", border: "1px solid #dee2e6", textAlign: "right", color: state.gdp_growth_pct >= 5.1 ? "#28a745" : state.gdp_growth_pct >= 4 ? "#ca8a04" : "#dc3545", fontWeight: 600 }}>
                       {state.gdp_growth_pct.toFixed(1)}%
                     </td>
                     <td style={{ padding: "10px", border: "1px solid #dee2e6", fontSize: "0.85rem" }}>{state.major_industries}</td>
@@ -1163,7 +1175,7 @@ function T2MarketAndDemand(): React.JSX.Element {
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
               <span style={{ color: "#28a745" }}><strong>◎</strong> Very High (成長率 8%+)</span>
               <span style={{ color: "#4A90D9" }}><strong>○</strong> High (成長率 5-8%)</span>
-              <span style={{ color: "#d97706" }}><strong>○</strong> Medium (成長率 3-5%)</span>
+              <span style={{ color: "#ca8a04" }}><strong>○</strong> Medium (成長率 3-5%)</span>
               <span style={{ color: "#dc3545" }}><strong>△</strong> Low (成長率 3%未満)</span>
             </div>
           </div>
@@ -1230,7 +1242,7 @@ function T4TariffRegime(): React.JSX.Element {
         <div style={{ ...infoBoxStyle(COLOR.success, "#f0fff4"), marginTop: "16px" }}>
           <strong>ポイント:</strong> ATIGA適用により
           <span style={{ color: COLOR.success, fontWeight: 600 }}> ASEAN域内製造品は関税0%</span>。
-          日本（福山拠点）からの直接輸出はMFN 15%だが、
+          日本からの直接輸出はMFN 15%だが、
           <span style={{ color: "#004085", fontWeight: 600 }}> JMEPA原産地証明で実質0%</span>に軽減可能。
           <br />
           <strong>注意:</strong> 630A超MCCBはACBと同じ
@@ -1365,40 +1377,6 @@ function T4DistributionStructure(): React.JSX.Element {
         </div>
       </article>
 
-      {/* --- Key Market Players --- */}
-      <article className="reference-block">
-        <h3>主要ディストリビューター / パネルビルダー</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {MY_MARKET_PLAYERS.map((player) => (
-            <div key={player.company_name} style={{
-              padding: "12px 16px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "8px",
-              borderLeft: `4px solid ${player.company_type === "Distributor" ? "#FF6600" : COLOR.primary}`,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <strong style={{ fontSize: "1rem" }}>{player.company_name}</strong>
-                <span style={badgeStyle(player.company_type === "Distributor" ? "warning" : "success")}>
-                  {player.company_type}
-                </span>
-                <span style={badgeStyle(mapScaleToBadge(player.estimated_scale))}>
-                  {player.estimated_scale}
-                </span>
-              </div>
-              <div style={{ marginTop: "8px", fontSize: FONT_SIZE.medium, color: COLOR.secondary }}>
-                <span>カバー地域: {player.coverage}</span>
-                {player.specialization && <span> | 専門: {player.specialization}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ ...infoBoxStyle(COLOR.warning, "#fff8e1"), marginTop: "16px" }}>
-          <strong>注:</strong> 主要プレーヤーのリストは調査中です。
-          実際の企業名・取引情報は業界ヒアリングに基づき更新予定。
-        </div>
-      </article>
-
       <p style={SOURCE_STYLE}>
         出典: {MARKET_ACCESS_DATA_SOURCES.distribution}
       </p>
@@ -1409,143 +1387,7 @@ function T4DistributionStructure(): React.JSX.Element {
   );
 }
 
-// 4-3 Project Procurement Ecosystem
-function T4ProjectProcurementEcosystem(): React.JSX.Element {
-  return (
-    <section className="content-block fade-in">
-      <p className="section-kicker">PROJECT PROCUREMENT ECOSYSTEM</p>
-      <h2 style={{ fontSize: "28px" }}>プロジェクト調達エコシステム</h2>
-      <p className="section-subline">
-        How are LV switchgear specified and procured in Malaysian projects?
-      </p>
-
-      {/* --- Procurement Stage Flow --- */}
-      <article className="reference-block">
-        <h3>案件の仕様決定 → 発注プロセス</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0", marginTop: "14px" }}>
-          {MY_PROCUREMENT_STAGES.map((stage, idx) => (
-            <div key={stage.stage_number}>
-              <div style={{
-                padding: "16px",
-                backgroundColor: stage.decision_influence === "High" ? "#f0f7ff" : "#f8f9fa",
-                borderRadius: idx === 0 ? "8px 8px 0 0" : idx === MY_PROCUREMENT_STAGES.length - 1 ? "0 0 8px 8px" : "0",
-                borderLeft: `4px solid ${stage.decision_influence === "High" ? COLOR.primary : stage.decision_influence === "Medium" ? COLOR.warning : COLOR.tertiary}`,
-                borderBottom: idx < MY_PROCUREMENT_STAGES.length - 1 ? "1px dashed #ddd" : "none",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px", flexWrap: "wrap" }}>
-                  <span style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    backgroundColor: COLOR.primary,
-                    color: "#fff",
-                    fontSize: FONT_SIZE.medium,
-                    fontWeight: 700,
-                  }}>
-                    {stage.stage_number}
-                  </span>
-                  <strong style={{ fontSize: "1rem" }}>{stage.stage_name}</strong>
-                  <span style={{ fontSize: "0.8rem", color: COLOR.secondaryLight }}>({stage.stage_name_en})</span>
-                  <span style={badgeStyle(mapInfluenceToBadge(stage.decision_influence))}>
-                    影響度: {stage.decision_influence}
-                  </span>
-                </div>
-                <p style={{ margin: "0 0 4px", fontSize: FONT_SIZE.medium, color: "#555" }}>
-                  <strong>キーアクター:</strong> {stage.key_actors.join("、")}
-                </p>
-                <p style={{ margin: "0 0 4px", fontSize: FONT_SIZE.medium }}>{stage.description}</p>
-                <div style={{ ...infoBoxStyle(COLOR.info, "#f0f9ff"), marginTop: "8px", padding: "8px 12px" }}>
-                  <strong>LVタッチポイント:</strong> {stage.lv_touchpoint}
-                </div>
-              </div>
-              {idx < MY_PROCUREMENT_STAGES.length - 1 && (
-                <div style={{ textAlign: "center" as const, color: COLOR.tertiary, fontSize: "1.2rem", lineHeight: "1" }}>
-                  ▼
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </article>
-
-      {/* --- Government vs Private Comparison --- */}
-      <article className="reference-block">
-        <h3>政府調達 vs 民間調達の比較</h3>
-        <div className="table-wrap">
-          <table className="requirements-table">
-            <thead>
-              <tr>
-                <th>比較軸</th>
-                <th>政府調達</th>
-                <th>民間調達</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MY_PROCUREMENT_COMPARISON.map((row) => (
-                <tr key={row.dimension}>
-                  <td><strong>{row.dimension}</strong></td>
-                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.government}</td>
-                  <td style={{ fontSize: FONT_SIZE.medium }}>{row.private_sector}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      {/* --- AVL Structure --- */}
-      <article className="reference-block">
-        <h3>AVL（Approved Vendor List）の仕組み</h3>
-        <div className="table-wrap">
-          <table className="requirements-table">
-            <thead>
-              <tr>
-                <th>AVLオーナー</th>
-                <th>代表例</th>
-                <th>登録要件</th>
-                <th>登録ブランド数</th>
-                <th>影響度</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MY_AVL_INFO.map((avl) => (
-                <tr key={avl.avl_owner_type}>
-                  <td><strong>{avl.avl_owner_type}</strong></td>
-                  <td>{avl.avl_owner_example}</td>
-                  <td style={{ fontSize: FONT_SIZE.medium }}>
-                    <ul style={{ margin: 0, paddingLeft: "16px" }}>
-                      {avl.entry_requirements.map((req, i) => (
-                        <li key={`avl-${avl.avl_owner_type}-req${i}`}>{req}</li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td>{avl.typical_brands_count || "—"}</td>
-                  <td>
-                    <span style={badgeStyle(mapInfluenceToBadge(avl.influence_level))}>
-                      {avl.influence_level}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      <p style={SOURCE_STYLE}>
-        出典: {MARKET_ACCESS_DATA_SOURCES.procurement}
-      </p>
-      <p style={DISCLAIMER_STYLE}>
-        ※ 調達プロセスは案件規模・セクターにより大きく異なります。本情報は一般的な構造を示すものです。
-      </p>
-    </section>
-  );
-}
-
-// 4-4 Barriers & Facilitators
+// 4-3 Barriers & Facilitators
 function T4BarriersAndFacilitators(): React.JSX.Element {
   return (
     <section className="content-block fade-in">
@@ -1675,8 +1517,393 @@ function T4MarketAccess(): React.JSX.Element {
     <>
       <T4TariffRegime />
       <T4DistributionStructure />
-      <T4ProjectProcurementEcosystem />
       <T4BarriersAndFacilitators />
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  T5: Strategic Assessment                                           */
+/* ------------------------------------------------------------------ */
+
+function T5StrategicAssessment(): React.JSX.Element {
+  const radarData = MY_SCORE_AXES.map((a) => ({ subject: a.axisEn, score: a.score, fullMark: 5 }));
+
+  const priorityStars = (p: 1 | 2 | 3) => {
+    if (p === 1) return { stars: "★★★", label: "最優先", color: "#dc3545" };
+    if (p === 2) return { stars: "★★☆", label: "第2段階", color: "#fd7e14" };
+    return { stars: "★☆☆", label: "第3段階", color: "#6c757d" };
+  };
+
+  const impactColor = (impact: "High" | "Medium" | "Low") => {
+    if (impact === "High") return "#dc3545";
+    if (impact === "Medium") return "#fd7e14";
+    return "#28a745";
+  };
+
+  const difficultyLabel = (d: "Low" | "Medium" | "High") => {
+    if (d === "Low") return "低";
+    if (d === "Medium") return "中";
+    return "高";
+  };
+
+  const demandLabel = (d: "Low" | "Medium" | "High") => {
+    if (d === "Low") return "低";
+    if (d === "Medium") return "中";
+    return "高";
+  };
+
+  const ORANGE = "#fd7e14";
+
+  return (
+    <>
+      {/* S1: 総合評価スコアカード */}
+      <section className="content-block content-block--major fade-in">
+        <p className="section-kicker">MARKET ENTRY SCORECARD</p>
+        <h2 style={{ fontSize: "28px" }}>マレーシア市場 総合評価</h2>
+        <p className="section-subline">T1〜T4の分析結果を5軸で統合評価（5点満点）</p>
+
+        <div style={{ display: "flex", gap: "32px", alignItems: "flex-start", flexWrap: "wrap", marginTop: "24px" }}>
+          {/* レーダーチャート */}
+          <div style={{ flex: "0 0 320px" }}>
+            <ResponsiveContainer width={320} height={280}>
+              <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+                <PolarGrid stroke="#e0e0e0" />
+                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: "#555" }} />
+                <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fontSize: 10, fill: "#999" }} tickCount={6} />
+                <Radar name="Score" dataKey="score" stroke={ORANGE} fill={ORANGE} fillOpacity={0.25} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* スコアテーブル */}
+          <div style={{ flex: "1 1 320px" }}>
+            <div className="table-wrap">
+              <table className="definition-table" style={{ width: "100%" }}>
+                <thead>
+                  <tr>
+                    <th>評価軸</th>
+                    <th style={{ textAlign: "center", width: "80px" }}>スコア</th>
+                    <th>根拠</th>
+                    <th style={{ textAlign: "center", width: "60px" }}>出典</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {MY_SCORE_AXES.map((a) => (
+                    <tr key={a.axis}>
+                      <td><strong>{a.axis}</strong></td>
+                      <td style={{ textAlign: "center" }}>
+                        <span style={{
+                          display: "inline-block",
+                          background: ORANGE,
+                          color: "#fff",
+                          borderRadius: "4px",
+                          padding: "2px 8px",
+                          fontWeight: 700,
+                          fontSize: "0.85rem",
+                        }}>
+                          {a.score.toFixed(1)}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: "0.82rem", color: "#555" }}>
+                        {a.rationale}
+                        <br />
+                        <span style={{ fontSize: "0.75rem", color: "#888" }}>{a.dataSource.excerpt}</span>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <span style={{
+                          display: "inline-block",
+                          fontSize: "0.72rem",
+                          background: a.dataSource.tabRef === "推定" ? "#f5f5f7" : "#e3f2fd",
+                          color: a.dataSource.tabRef === "推定" ? "#888" : "#1565c0",
+                          borderRadius: "4px",
+                          padding: "2px 6px",
+                          fontWeight: 600,
+                          border: a.dataSource.tabRef === "推定" ? "1px solid #ccc" : "none",
+                        }}>
+                          {a.dataSource.tabRef}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* S2: SWOT 分析 */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">SWOT ANALYSIS</p>
+        <h2 style={{ fontSize: "28px" }}>SWOT 分析</h2>
+        <p className="section-subline">マレーシア低圧遮断器市場における自社の強み・弱み・機会・脅威</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "24px" }}>
+          {/* Strengths */}
+          <div style={{ background: "#e8f5e9", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #28a745" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#1b5e20", fontSize: "0.9rem" }}>💪 Strengths — 強み</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.strengths.map((s, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{s.text}</li>
+              ))}
+            </ul>
+          </div>
+          {/* Weaknesses */}
+          <div style={{ background: "#fff3e0", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #fd7e14" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#e65100", fontSize: "0.9rem" }}>⚠️ Weaknesses — 弱み</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.weaknesses.map((w, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{w.text}</li>
+              ))}
+            </ul>
+          </div>
+          {/* Opportunities */}
+          <div style={{ background: "#e3f2fd", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #2563eb" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#1565c0", fontSize: "0.9rem" }}>🚀 Opportunities — 機会</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.opportunities.map((o, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{o.text}</li>
+              ))}
+            </ul>
+          </div>
+          {/* Threats */}
+          <div style={{ background: "#fce4ec", borderRadius: "8px", padding: "16px", borderLeft: "4px solid #dc3545" }}>
+            <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#880e4f", fontSize: "0.9rem" }}>⚡ Threats — 脅威</p>
+            <ul style={{ margin: 0, paddingLeft: "18px" }}>
+              {MY_SWOT.threats.map((t, i) => (
+                <li key={i} style={{ fontSize: "0.83rem", color: "#333", marginBottom: "6px", lineHeight: 1.5 }}>{t.text}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* S2.5: 競合マップ */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">COMPETITIVE LANDSCAPE</p>
+        <h2 style={{ fontSize: "28px" }}>競合マップ</h2>
+        <p className="section-subline">マレーシア低圧遮断器市場における主要競合メーカー</p>
+
+        <div className="table-wrap" style={{ marginTop: "20px" }}>
+          <table className="definition-table" style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <th style={{ width: "160px" }}>メーカー</th>
+                <th style={{ width: "110px", textAlign: "center" }}>タイプ</th>
+                <th style={{ width: "100px", textAlign: "center" }}>市場ポジション</th>
+                <th style={{ width: "100px", textAlign: "center" }}>価格帯</th>
+                <th style={{ width: "80px", textAlign: "center" }}>AVL登録</th>
+                <th>製品・特徴</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_COMPETITORS.map((c) => {
+                const typeColor = c.type === "Multinational" ? { bg: "#e3f2fd", fg: "#1565c0" }
+                  : c.type === "Chinese" ? { bg: "#fff3e0", fg: "#e65100" }
+                  : c.type === "Japanese" ? { bg: "#e8f5e9", fg: "#2e7d32" }
+                  : { bg: "#f3e5f5", fg: "#6a1b9a" };
+                const posColor = c.marketPosition === "Strong" ? "#dc3545"
+                  : c.marketPosition === "Moderate" ? "#fd7e14" : "#6c757d";
+                return (
+                  <tr key={c.name}>
+                    <td><strong>{c.name}</strong></td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ display: "inline-block", padding: "2px 7px", borderRadius: "4px",
+                        fontSize: "0.75rem", fontWeight: 600, background: typeColor.bg, color: typeColor.fg }}>
+                        {c.type}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 600, color: posColor }}>{c.marketPosition}</span>
+                    </td>
+                    <td style={{ textAlign: "center", fontSize: "0.82rem" }}>{c.priceRange}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.85rem" }}>{c.avlPresence ? "✅" : "—"}</span>
+                    </td>
+                    <td style={{ fontSize: "0.8rem", color: "#555" }}>
+                      <span style={{ marginRight: "6px" }}>{c.productFocus.join(" / ")}</span>
+                      <br />
+                      <span style={{ color: "#777" }}>{c.notes}</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p style={{ fontSize: "0.75rem", color: "#999", marginTop: "8px" }}>{COMPETITION_DATA_NOTE}</p>
+      </section>
+
+      {/* S3: 製品別参入優先度 */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">PRODUCT ENTRY PRIORITY</p>
+        <h2 style={{ fontSize: "28px" }}>製品別 参入優先度</h2>
+        <p className="section-subline">CB Scheme受入度・市場需要・参入難易度を総合した推奨優先順位</p>
+
+        <div className="table-wrap" style={{ marginTop: "20px" }}>
+          <table className="definition-table" style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <th style={{ width: "80px" }}>製品</th>
+                <th style={{ width: "120px" }}>CB受入</th>
+                <th style={{ width: "100px", textAlign: "center" }}>参入難易度</th>
+                <th style={{ width: "120px", textAlign: "center" }}>市場需要</th>
+                <th style={{ width: "140px", textAlign: "center" }}>推奨優先度</th>
+                <th>推奨理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_PRODUCT_PRIORITIES.map((p) => {
+                const { stars, label, color } = priorityStars(p.priority);
+                return (
+                  <tr key={p.product}>
+                    <td><strong>{p.product}</strong></td>
+                    <td>
+                      <span style={{
+                        display: "inline-block",
+                        padding: "2px 8px",
+                        borderRadius: "4px",
+                        fontSize: "0.78rem",
+                        fontWeight: 600,
+                        background: p.cbAcceptance === "Full" ? "#28a745" : "#fd7e14",
+                        color: "#fff",
+                      }}>
+                        CB {p.cbAcceptance}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: "center", fontSize: "0.85rem" }}>{difficultyLabel(p.difficulty)}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.82rem" }}>{demandLabel(p.demand)}</span>
+                      <br />
+                      <span style={{ fontSize: "0.75rem", color: "#777" }}>{p.demandNote}</span>
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{ color, fontWeight: 700, fontSize: "0.9rem" }}>{stars}</span>
+                      <br />
+                      <span style={{ fontSize: "0.75rem", color }}>{label}</span>
+                    </td>
+                    <td style={{ fontSize: "0.82rem", color: "#555" }}>{p.rationale}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* S4: 参入ロードマップ */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">ENTRY ROADMAP</p>
+        <h2 style={{ fontSize: "28px" }}>推奨 参入ロードマップ</h2>
+        <p className="section-subline">3フェーズによる段階的市場参入アプローチ</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginTop: "24px" }}>
+          {MY_ROADMAP_PHASES.map((phase) => (
+            <div key={phase.phase} style={{
+              background: "#f9f9fb",
+              borderRadius: "8px",
+              padding: "16px",
+              borderTop: `4px solid ${ORANGE}`,
+            }}>
+              <p style={{ margin: "0 0 2px", fontSize: "0.75rem", color: "#999", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {phase.label} / {phase.period}
+              </p>
+              <p style={{ margin: "0 0 12px", fontWeight: 700, fontSize: "1rem", color: "#1d1d1f" }}>{phase.title}</p>
+              <ul style={{ margin: 0, paddingLeft: "16px" }}>
+                {phase.tasks.map((task, i) => (
+                  <li key={i} style={{ fontSize: "0.82rem", color: "#444", marginBottom: "8px", lineHeight: 1.55 }}>
+                    {task.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* S5: リスクと対策 */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">RISK ASSESSMENT</p>
+        <h2 style={{ fontSize: "28px" }}>リスクと対策</h2>
+        <p className="section-subline">主要リスクの影響度と具体的なミティゲーション</p>
+
+        <div className="table-wrap" style={{ marginTop: "20px" }}>
+          <table className="definition-table" style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <th style={{ width: "200px" }}>リスク</th>
+                <th style={{ width: "100px", textAlign: "center" }}>影響度</th>
+                <th>対策</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MY_RISKS.map((r, i) => (
+                <tr key={i}>
+                  <td><strong>{r.risk}</strong></td>
+                  <td style={{ textAlign: "center" }}>
+                    <span style={{
+                      display: "inline-block",
+                      padding: "2px 8px",
+                      borderRadius: "4px",
+                      fontSize: "0.78rem",
+                      fontWeight: 600,
+                      background: impactColor(r.impact),
+                      color: "#fff",
+                    }}>
+                      {r.impact}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: "0.83rem", color: "#555" }}>{r.mitigation}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* S6: 次のアクション */}
+      <section className="content-block fade-in">
+        <p className="section-kicker">NEXT STEPS</p>
+        <h2 style={{ fontSize: "28px" }}>次のアクション</h2>
+        <p className="section-subline">今すぐ着手すべき具体的アクション</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "24px" }}>
+          {MY_NEXT_ACTIONS.map((action, i) => (
+            <div key={i} style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "12px",
+              background: "#f9f9fb",
+              borderRadius: "8px",
+              padding: "14px 16px",
+              border: "1px solid #e0e0e0",
+            }}>
+              <span style={{
+                flexShrink: 0,
+                width: "24px",
+                height: "24px",
+                borderRadius: "50%",
+                background: ORANGE,
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "0.78rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                {i + 1}
+              </span>
+              <div>
+                <p style={{ margin: "0 0 4px", fontSize: "0.85rem", color: "#1d1d1f", lineHeight: 1.5 }}>{action.text}</p>
+                {action.owner && (
+                  <p style={{ margin: 0, fontSize: "0.75rem", color: "#888" }}>担当: {action.owner}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </>
   );
 }
@@ -1749,6 +1976,7 @@ export default function MalaysiaPage(): React.JSX.Element {
     if (activeTab === "t2") return <T2MarketAndDemand />;
     if (activeTab === "t3") return <T3RegulatoryGateway />;
     if (activeTab === "t4") return <T4MarketAccess />;
+    if (activeTab === "t5") return <T5StrategicAssessment />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;
