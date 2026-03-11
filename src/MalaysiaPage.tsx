@@ -7,6 +7,9 @@ import { calculateMaxY, generateYTicks, generateChartData } from "./utils";
 /* ------------------------------------------------------------------ */
 
 import type {
+  EvidenceStatus,
+  ResearchSection,
+  ResearchSource,
   TooltipPayloadItem,
   TooltipProps,
   TabDef,
@@ -163,6 +166,10 @@ import {
   MY_HIGH_IMPACT_FACILITATORS,
   MARKET_ACCESS_DATA_SOURCES,
 } from "./data/malaysiaMarketAccessData";
+import {
+  MALAYSIA_RESEARCH_SECTIONS,
+  MALAYSIA_RESEARCH_SOURCES,
+} from "./data/malaysiaResearchVaultData";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -276,6 +283,15 @@ const mapImpactToBadge = (impact: "High" | "Medium" | "Low"): BadgeVariant =>
 const mapNecessityToBadge = (necessity: "Required" | "Recommended" | "Optional"): BadgeVariant =>
   necessity === "Required" ? "success" : necessity === "Recommended" ? "warning" : "neutral";
 
+const mapEvidenceToBadge = (status: EvidenceStatus): BadgeVariant =>
+  status === "Confirmed" ? "success" : status === "Inference" ? "warning" : "danger";
+
+const EVIDENCE_LABEL: Record<EvidenceStatus, string> = {
+  Confirmed: "Confirmed",
+  Inference: "Inference",
+  Unverified: "Unverified",
+};
+
 // Info box helper (left-border accent boxes)
 const infoBoxStyle = (accentColor: string, bgColor: string): React.CSSProperties => ({
   padding: "12px 16px",
@@ -314,6 +330,7 @@ const TABS: TabDef[] = [
   { id: "t3", label: "Regulatory Gateway", sublabel: "What is required to sell here?" },
   { id: "t4", label: "Market Access", sublabel: "How do we enter this market?" },
   { id: "t5", label: "Strategic Assessment", sublabel: "What should we do?" },
+  { id: "t6", label: "Research Vault", sublabel: "What has been verified so far?" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -1908,6 +1925,201 @@ function T5StrategicAssessment(): React.JSX.Element {
   );
 }
 
+const getResearchSource = (sourceId: string): ResearchSource | undefined =>
+  MALAYSIA_RESEARCH_SOURCES.find((source) => source.id === sourceId);
+
+const collectSectionSourceIds = (section: ResearchSection): string[] => {
+  const sourceIds = new Set<string>();
+
+  section.cards?.forEach((card) => card.source_ids.forEach((id) => sourceIds.add(id)));
+  section.table?.rows.forEach((row) => row.source_ids.forEach((id) => sourceIds.add(id)));
+  section.insights?.forEach((insight) => insight.source_ids.forEach((id) => sourceIds.add(id)));
+
+  return Array.from(sourceIds);
+};
+
+function ResearchSourceLinks({ sourceIds }: { sourceIds: string[] }): React.JSX.Element | null {
+  const uniqueIds = Array.from(new Set(sourceIds));
+  const sources = uniqueIds
+    .map((sourceId) => getResearchSource(sourceId))
+    .filter((source): source is ResearchSource => Boolean(source));
+
+  if (sources.length === 0) return null;
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
+      {sources.map((source) => (
+        <a
+          key={source.id}
+          href={source.url}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "4px 10px",
+            borderRadius: "999px",
+            background: "#f5f7fb",
+            color: "#355070",
+            fontSize: "0.75rem",
+            textDecoration: "none",
+            border: "1px solid #dce6f2",
+          }}
+          title={`${source.publisher} / checked ${source.checked_on}`}
+        >
+          {source.label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function T6ResearchVault(): React.JSX.Element {
+  return (
+    <>
+      <section className="content-block content-block--major fade-in">
+        <p className="section-kicker">RESEARCH VAULT</p>
+        <h2 style={{ fontSize: "28px" }}>一次情報ベースの暫定集約タブ</h2>
+        <p className="section-subline">
+          T3/T4へ再配分する前に、確認済み事実・示唆・未確認論点を分離して保管する
+        </p>
+
+        <div style={{
+          ...infoBoxStyle(COLOR.primary, "#f4f8ff"),
+          marginTop: "14px",
+          display: "grid",
+          gap: "8px",
+        }}>
+          <div><strong>Confirmed:</strong> 公開一次情報で確認済みの事実</div>
+          <div><strong>Inference:</strong> その事実から導く営業・マーケ示唆</div>
+          <div><strong>Unverified:</strong> 今回の公開ソースだけでは断定していない項目</div>
+        </div>
+      </section>
+
+      {MALAYSIA_RESEARCH_SECTIONS.map((section) => {
+        const sectionSourceIds = collectSectionSourceIds(section);
+
+        return (
+          <section key={section.id} className="content-block fade-in">
+            <p className="section-kicker">{section.kicker}</p>
+            <h2 style={{ fontSize: "28px" }}>{section.title}</h2>
+            <p className="section-subline">{section.subtitle}</p>
+
+            {section.description && (
+              <article className="reference-block">
+                <p style={{ margin: 0, color: COLOR.textLight, lineHeight: 1.8 }}>{section.description}</p>
+              </article>
+            )}
+
+            {section.cards && (
+              <article className="reference-block">
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  gap: "16px",
+                }}>
+                  {section.cards.map((card) => (
+                    <div
+                      key={`${section.id}-${card.title}`}
+                      style={{
+                        border: "1px solid #e6ebf2",
+                        borderRadius: "14px",
+                        padding: "16px",
+                        background: "#fff",
+                        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
+                      }}
+                    >
+                      <div style={{ ...STYLES.flex.between, gap: "12px", marginBottom: "10px" }}>
+                        <strong style={{ fontSize: "0.92rem", color: "#1d1d1f" }}>{card.title}</strong>
+                        <span style={badgeStyle(mapEvidenceToBadge(card.status))}>{EVIDENCE_LABEL[card.status]}</span>
+                      </div>
+                      <p style={{ margin: "0 0 8px", fontSize: "1.02rem", fontWeight: 700, color: "#153b63" }}>{card.value}</p>
+                      <p style={{ margin: 0, fontSize: FONT_SIZE.medium, color: COLOR.textLight, lineHeight: 1.7 }}>{card.detail}</p>
+                      <ResearchSourceLinks sourceIds={card.source_ids} />
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )}
+
+            {section.table && (
+              <article className="reference-block">
+                <div className="table-wrap">
+                  <table className="requirements-table">
+                    <thead>
+                      <tr>
+                        {section.table.columns.map((column) => (
+                          <th key={`${section.id}-${column.key}`}>{column.label}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.table.rows.map((row) => (
+                        <tr key={row.id}>
+                          {section.table!.columns.map((column, columnIndex) => (
+                            <td key={`${row.id}-${column.key}`} style={{ verticalAlign: "top" }}>
+                              {columnIndex === 0 ? (
+                                <div style={{ display: "grid", gap: "8px" }}>
+                                  <strong>{row.values[column.key]}</strong>
+                                  <span style={{ width: "fit-content", ...badgeStyle(mapEvidenceToBadge(row.status)) }}>
+                                    {EVIDENCE_LABEL[row.status]}
+                                  </span>
+                                  <ResearchSourceLinks sourceIds={row.source_ids} />
+                                </div>
+                              ) : (
+                                <span style={{ fontSize: FONT_SIZE.medium, color: COLOR.textLight, lineHeight: 1.7 }}>
+                                  {row.values[column.key]}
+                                </span>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            )}
+
+            {section.insights && section.insights.length > 0 && (
+              <article className="reference-block">
+                <h3>示唆メモ</h3>
+                <div style={{ display: "grid", gap: "12px", marginTop: "14px" }}>
+                  {section.insights.map((insight) => (
+                    <div
+                      key={`${section.id}-${insight.title}`}
+                      style={{
+                        ...infoBoxStyle(
+                          insight.status === "Inference" ? COLOR.warning : insight.status === "Confirmed" ? COLOR.success : COLOR.error,
+                          insight.status === "Inference" ? "#fff8e8" : insight.status === "Confirmed" ? "#f0fff4" : "#fff4f4"
+                        ),
+                      }}
+                    >
+                      <div style={{ ...STYLES.flex.between, gap: "12px", marginBottom: "8px" }}>
+                        <strong>{insight.title}</strong>
+                        <span style={badgeStyle(mapEvidenceToBadge(insight.status))}>{EVIDENCE_LABEL[insight.status]}</span>
+                      </div>
+                      <p style={{ margin: 0, color: COLOR.textLight, lineHeight: 1.8 }}>{insight.body}</p>
+                      <ResearchSourceLinks sourceIds={insight.source_ids} />
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )}
+
+            <p style={SOURCE_STYLE}>
+              出典: {sectionSourceIds.length}件の一次情報に紐づけ済み
+            </p>
+            <ResearchSourceLinks sourceIds={sectionSourceIds} />
+            {section.note && <p style={DISCLAIMER_STYLE}>{section.note}</p>}
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
 function TabPlaceholder({ tab }: { tab: TabDef }): React.JSX.Element {
   return (
     <section className="content-block content-block--major fade-in" style={{ textAlign: "center" }}>
@@ -1977,6 +2189,7 @@ export default function MalaysiaPage(): React.JSX.Element {
     if (activeTab === "t3") return <T3RegulatoryGateway />;
     if (activeTab === "t4") return <T4MarketAccess />;
     if (activeTab === "t5") return <T5StrategicAssessment />;
+    if (activeTab === "t6") return <T6ResearchVault />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;
