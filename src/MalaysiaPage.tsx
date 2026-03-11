@@ -121,6 +121,7 @@ import {
   MY_COMPETITORS,
   COMPETITION_DATA_NOTE,
 } from "./data/malaysiaCompetitionData";
+import T6MarketIntelligence from "./components/MalaysiaT6";
 import {
   MY_TARIFF_DATA,
   MY_IMPORT_STEPS,
@@ -218,6 +219,7 @@ const TABS: TabDef[] = [
   { id: "t3", label: "Regulatory Gateway", sublabel: "What is required to sell here?" },
   { id: "t4", label: "Market Access", sublabel: "How do we enter this market?" },
   { id: "t5", label: "Strategic Assessment", sublabel: "What should we do?" },
+  { id: "t6", label: "Market Intelligence", sublabel: "Deep-dive data & investment analysis" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -1880,6 +1882,7 @@ export default function MalaysiaPage(): React.JSX.Element {
     if (activeTab === "t3") return <T3RegulatoryGateway />;
     if (activeTab === "t4") return <T4MarketAccess />;
     if (activeTab === "t5") return <T5StrategicAssessment />;
+    if (activeTab === "t6") return <T6MarketIntelligence />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;
