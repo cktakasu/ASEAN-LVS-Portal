@@ -29,6 +29,18 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
   const USD_JPY = 140;
   const [isYAxisTransitioning, chartTransitionClass, triggerTransition] = useChartTransition(400);
 
+  // 国データのMapを作成（O(1)検索用）
+  const countryMap = useMemo(
+    () => new Map(ASEAN_GDP_COMPARISON.map(c => [c.iso3, c])),
+    [ASEAN_GDP_COMPARISON.length]
+  );
+
+  // 選択国のSetを作成（O(1)チェック用）
+  const comparisonSet = useMemo(
+    () => new Set(comparisonCountries),
+    [comparisonCountries]
+  );
+
   // チャートデータをキャッシュ化
   const chartData = useMemo(
     () => generateChartData(
@@ -193,7 +205,7 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
               >
                 <input
                   type="checkbox"
-                  checked={comparisonCountries.includes(country.iso3)}
+                  checked={comparisonSet.has(country.iso3)}
                   onChange={() => toggleCountry(country.iso3)}
                   style={{ cursor: "pointer" }}
                 />
@@ -225,7 +237,7 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
         }}>
           <LegendItem color={COLOR.primary} label="マレーシア" isSolid={true} />
           {comparisonCountries.map(iso3 => {
-            const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
+            const country = countryMap.get(iso3);
             if (!country) return null;
             return <LegendItem key={iso3} color={country.color} label={country.nameJa} isSolid={true} />;
           })}

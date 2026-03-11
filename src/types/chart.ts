@@ -36,6 +36,16 @@ export interface TooltipPayloadItem {
 
 export interface TooltipProps {
   active?: boolean;
-  payload?: TooltipPayloadItem[];
+  payload?: readonly TooltipPayloadItem[];
   label?: number | string;
 }
+
+/**
+ * Recharts Tooltip content function type
+ * Compatible with recharts internal TooltipContentProps
+ */
+export type TooltipContentFunction = (props: {
+  active?: boolean;
+  payload?: readonly TooltipPayloadItem[];
+  label?: number | string;
+}) => React.ReactNode;

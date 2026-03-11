@@ -32,6 +32,7 @@ export const useChartTransition = (
     return () => {
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null; // リファレンスをクリアしてメモリリーク防止
       }
     };
   }, []);

@@ -9,6 +9,7 @@ import { calculateMaxY, generateYTicks, generateChartData } from "./utils";
 import type {
   TooltipPayloadItem,
   TooltipProps,
+  TooltipContentFunction,
   TabDef,
 } from "./types";
 
@@ -19,39 +20,8 @@ import type {
 import { useChartTransition } from "./hooks";
 import { ForecastBadge, ForecastReferenceArea } from "./components/charts";
 import { DonutLabelWithLeaderLine, cbRelevanceColor } from "./components/DonutLabelWithLeaderLine";
-
-/* ------------------------------------------------------------------ */
-/*  Legend Component                                                   */
-/* ------------------------------------------------------------------ */
-
-interface LegendItemProps {
-  color: string;
-  label: string;
-  isSolid: boolean;
-}
-
-const LegendItem: React.FC<LegendItemProps> = React.memo(({ color, label, isSolid }) => {
-  const dashArray = isSolid ? undefined : "6 4";
-
-  return (
-    <div style={{ ...STYLES.flex.center, gap: "6px", fontSize: FONT_SIZE.small }}>
-      <svg width={20} height={2} style={{ display: "block" }}>
-        <line
-          x1={0}
-          y1={1}
-          x2={20}
-          y2={1}
-          stroke={color}
-          strokeWidth={2}
-          strokeDasharray={dashArray}
-        />
-      </svg>
-      <span style={{ color: COLOR.text }}>{label}</span>
-    </div>
-  );
-});
-
-LegendItem.displayName = "LegendItem";
+import { FONT_SIZE, COLOR, STYLES } from "./constants/malaysia";
+import { LegendItem } from "./components/LegendItem";
 
 /* ------------------------------------------------------------------ */
 /*  Chart Components                                                   */
@@ -98,8 +68,7 @@ const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) 
     );
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <Tooltip content={renderTooltip as any} />;
+  return <Tooltip content={renderTooltip as TooltipContentFunction} />;
 });
 
 GDPChartTooltip.displayName = "GDPChartTooltip";
@@ -171,71 +140,6 @@ import {
 /* ------------------------------------------------------------------ */
 /*  Style Constants                                                   */
 /* ------------------------------------------------------------------ */
-
-// Font sizes
-const FONT_SIZE = {
-  small: "0.78rem",
-  medium: "0.85rem",
-  large: "0.9rem",
-  xlarge: "0.95rem",
-  xxlarge: "1rem",
-  xxxlarge: "1.1rem",
-  header: "1.2rem",
-};
-
-// Colors
-const COLOR = {
-  primary: "#2563eb",
-  primaryLight: "#3b82f6",
-  secondary: "#666",
-  secondaryLight: "#888",
-  tertiary: "#999",
-  error: "#dc3545",
-  success: "#28a745",
-  warning: "#fd7e14",
-  info: "#17a2b8",
-  text: "#333",
-  textLight: "#666",
-  disabled: "#999",
-  white: "#fff",
-  gray: "#e0e0e0",
-  lightGray: "#f5f5f5",
-};
-
-// Spacing
-const SPACING = {
-  xs: "4px",
-  sm: "8px",
-  md: "12px",
-  lg: "16px",
-  xl: "20px",
-  xxl: "24px",
-  xxxl: "32px",
-};
-
-// Common styles (純粋な定数オブジェクト)
-const STYLES = {
-  flex: {
-    center: { display: "flex", justifyContent: "center", alignItems: "center" } as const,
-    centerColumn: { display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" as const },
-    between: { display: "flex", justifyContent: "space-between", alignItems: "center" } as const,
-    wrap: { display: "flex", flexWrap: "wrap" } as const,
-  },
-  margin: {
-    lg: { marginTop: SPACING.lg, marginBottom: SPACING.lg } as const,
-  },
-  fontSize: {
-    small: { fontSize: FONT_SIZE.small } as const,
-    medium: { fontSize: FONT_SIZE.medium } as const,
-    large: { fontSize: FONT_SIZE.large } as const,
-  },
-  color: {
-    primary: { color: COLOR.primary } as const,
-    secondary: { color: COLOR.secondary } as const,
-    tertiary: { color: COLOR.tertiary } as const,
-    text: { color: COLOR.text } as const,
-  },
-};
 
 // Tooltip base style (shared across chart tooltips)
 const TOOLTIP_STYLE: React.CSSProperties = {
@@ -991,8 +895,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                   tickFormatter={(v) => `${Math.round(v / 100000000)}億円`}
                 />
                 {/* ツールチップ */}
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <Tooltip content={<MarketSizeTooltip active={false} payload={[]} label="" /> as any} />
+                <Tooltip content={((props: TooltipProps) => <MarketSizeTooltip {...props} />) as TooltipContentFunction} />
                 {/* オレンジ帯: 不確実性レンジ */}
                 <Area
                   dataKey="market_size_low_jpy"
