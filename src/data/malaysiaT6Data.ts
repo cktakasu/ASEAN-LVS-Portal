@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------ */
 /*  Malaysia — T6 Market Intelligence Hub Data                         */
-/*  ファクトチェック済みデータ（出典明記）                               */
+/*  一次情報、公開情報に基づく推定、内部シミュレーションを区分して表示       */
 /* ------------------------------------------------------------------ */
 
 import type {
@@ -13,7 +13,12 @@ import type {
   InvestmentAnalysis,
   MarketScenario,
   KPIItem,
+  T6DataSource,
 } from "../types/t6";
+import {
+  calculateInvestmentScenario,
+  type InvestmentModelAssumptions,
+} from "../utils/investmentCalculations";
 
 /* ------------------------------------------------------------------ */
 /*  S1: Business Environment（ビジネス環境）                           */
@@ -54,22 +59,22 @@ export const MY_BUSINESS_ENV: BusinessEnvironment = {
     {
       label: "GDP Growth",
       labelJa: "GDP成長率",
-      value: 4.8,
-      unit: "%（2025年予測）",
+      value: 5.2,
+      unit: "%（2025年実績）",
       rank: "ASEAN上位",
       trend: "improving",
       ratingColor: "green",
-      note: "2025年Q3実績5.2%。政府予測4.0〜4.8%の上限水準。出典: マレーシア財務省・Bloomberg 2025年11月。",
+      note: "Department of Statistics Malaysia（DOSM）が2026年5月に公表した2025年通年実績。",
     },
     {
       label: "Minimum Wage",
       labelJa: "最低賃金",
       value: "RM 1,700",
       unit: "/ 月",
-      rank: "製造業平均 RM 3,479",
+      rank: "製造業平均 RM 3,278（2024年）",
       trend: "improving",
       ratingColor: "yellow",
-      note: "2025年2月1日より改定（旧RM 1,500）。従業員5名以上は同年2月から、全雇用主は8月1日から適用。製造業平均賃金は RM 3,479/月（2025年9月）。",
+      note: "最低賃金RM 1,700は2025年2月1日から段階適用、全雇用主は同年8月1日から。製造業平均賃金RM 3,278/月はDOSMの2024年調査。",
     },
     {
       label: "Renewable Energy Target",
@@ -91,16 +96,14 @@ export const MY_BUSINESS_ENV: BusinessEnvironment = {
     { subject: "倒産処理", score: 65 },
   ],
   taxIncentives: [
-    "パイオニア・ステータス（製造業）: 5〜10年法人税免除",
-    "投資税額控除（ITA）: 設備投資の60〜100%控除",
-    "ハイテク産業優遇: 5年間法人税免除",
-    "R&D費控除: 対象費用の200%控除",
-    "データセンター新優遇（2024年〜）: DC・AI投資への特別税制",
-    "グリーン技術インセンティブ: GITA/GITE制度",
-    "配当送金: 源泉税0%（外国親会社への配当）",
+    "製造業向けPioneer Status / Investment Tax Allowance: 対象活動・申請時期・控除率をMIDAへ要確認",
+    "ハイテク・R&D関連優遇: 適格活動、認定要件、現行申請期間をMIDA/HASiLへ要確認",
+    "データセンター関連優遇: New Investment Incentive Frameworkの適用条件を案件別に要確認",
+    "グリーン技術インセンティブ（GITA/GITE）: 対象資産・サービスと現行期限を要確認",
+    "標準法人税率24%、適格中小企業には段階税率。グループ構造・払込資本等の要件を税務専門家へ確認",
   ],
   source:
-    "Transparency International CPI 2024 / World Bank Doing Business 2020 / Inland Revenue Board Malaysia / Bloomberg 2025年11月 / マレーシア財務省 / NETR 2023",
+    "World Bank Doing Business 2020 / Transparency International CPI 2024 / HASiL / DOSM GDP 2025・Salaries and Wages 2024 / Ministry of Human Resources / NETR 2023",
 };
 
 /* ------------------------------------------------------------------ */
@@ -113,11 +116,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "France",
     flag: "🇫🇷",
     estimatedSharePct: 20,
+    estimatedShareRangePct: [18, 22],
     pricePositioning: "Premium",
     products: ["MCB（Acti9）", "MCCB（Compact NS/EasyPact）", "ACB（MasterPact）", "RCCB/RCBO"],
     hasLocalOffice: true,
     officeCities: ["Petaling Jaya", "Penang"],
     annualRevEstUsd: 30,
+    annualRevenueRangeUsdM: [25, 35],
     strength: [
       "製品ラインナップが最も豊富（全カテゴリカバー）",
       "EcoStruxureによるデジタル化・IoT対応",
@@ -137,11 +142,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "Switzerland",
     flag: "🇨🇭",
     estimatedSharePct: 18,
+    estimatedShareRangePct: [16, 20],
     pricePositioning: "Premium",
     products: ["MCB（System Pro M）", "MCCB（Tmax XT）", "ACB（Emax 2）"],
     hasLocalOffice: true,
     officeCities: ["Petaling Jaya", "Penang", "Johor Bahru"],
     annualRevEstUsd: 27,
+    annualRevenueRangeUsdM: [22, 32],
     strength: [
       "産業・インフラ・DC向けブランド力No.1",
       "3拠点体制で全国対応",
@@ -161,11 +168,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "Germany",
     flag: "🇩🇪",
     estimatedSharePct: 12,
+    estimatedShareRangePct: [10, 14],
     pricePositioning: "Premium",
     products: ["MCB（5SL/5SP）", "MCCB（3VA）", "ACB（3WL）"],
     hasLocalOffice: true,
     officeCities: ["Petaling Jaya"],
     annualRevEstUsd: 18,
+    annualRevenueRangeUsdM: [14, 22],
     strength: [
       "製造業・重工業セグメントで強み",
       "自動化・制御システムとの統合提案",
@@ -183,11 +192,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "Japan",
     flag: "🇯🇵",
     estimatedSharePct: 9,
+    estimatedShareRangePct: [7, 11],
     pricePositioning: "Premium",
     products: ["MCCB（BW/BH/BB系）", "ACB（AE/BU系）"],
     hasLocalOffice: true,
     officeCities: ["Petaling Jaya"],
     annualRevEstUsd: 13,
+    annualRevenueRangeUsdM: [10, 16],
     strength: [
       "半導体・電子機器分野での採用実績（Intel等）",
       "日系企業の優先採用ブランド",
@@ -206,11 +217,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "Japan",
     flag: "🇯🇵",
     estimatedSharePct: 4,
+    estimatedShareRangePct: [3, 5],
     pricePositioning: "Premium",
     products: ["MCCB（S-CP/H-CP系）", "ACB（AR型）"],
     hasLocalOffice: false,
     officeCities: ["代理店経由（KL）"],
     annualRevEstUsd: 6,
+    annualRevenueRangeUsdM: [4, 8],
     strength: [
       "船舶・オフショア・特殊産業での高い認知度",
       "AVL登録（オフショア・プラント案件）",
@@ -228,11 +241,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "China",
     flag: "🇨🇳",
     estimatedSharePct: 14,
+    estimatedShareRangePct: [12, 16],
     pricePositioning: "Economy",
     products: ["MCB（NB1/NXB系）", "MCCB（NM1/NXM系）", "RCCB"],
     hasLocalOffice: true,
     officeCities: ["Petaling Jaya"],
     annualRevEstUsd: 21,
+    annualRevenueRangeUsdM: [16, 26],
     strength: [
       "価格競争力が極めて高い（欧州系の40〜50%）",
       "在庫が豊富・即納対応可能",
@@ -251,11 +266,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "China",
     flag: "🇨🇳",
     estimatedSharePct: 5,
+    estimatedShareRangePct: [3, 7],
     pricePositioning: "Economy",
     products: ["MCB（CDM1/C45系）", "RCCB"],
     hasLocalOffice: false,
     officeCities: ["中華系電気商経由"],
     annualRevEstUsd: 7,
+    annualRevenueRangeUsdM: [4, 10],
     strength: [
       "低価格（Chintと同等水準）",
       "住宅向け小売チャネルで一定の流通量",
@@ -272,11 +289,13 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
     country: "Ireland",
     flag: "🇮🇪",
     estimatedSharePct: 6,
+    estimatedShareRangePct: [4, 8],
     pricePositioning: "Premium",
     products: ["MCB（FAZ/PL系）", "MCCB（NZM系）", "ACB"],
     hasLocalOffice: true,
     officeCities: ["Kuala Lumpur"],
     annualRevEstUsd: 9,
+    annualRevenueRangeUsdM: [6, 12],
     strength: [
       "データセンター・電力品質分野での強み",
       "電源管理（UPS等）との統合提案力",
@@ -290,7 +309,7 @@ export const MY_COMPETITORS_INTEL: CompetitorIntelligence[] = [
 ];
 
 export const COMPETITOR_NOTE =
-  "※ 市場シェアは公開情報・業界推定に基づく概算値。実際のシェアは独自調査が必要。出典: 6Wresearch / 業界一般知識 / 各社公開情報。";
+  "※ 競合シェア・マレーシア低圧遮断器売上・価格ポジションは公開情報で直接検証できないため、各社の製品展開と公開情報を参考にした内部シミュレーションのレンジです。市場調査・販売店ヒアリングによる追加検証が必要です。";
 
 /* ------------------------------------------------------------------ */
 /*  S3: Customer Segments（顧客セグメント）                            */
@@ -572,10 +591,10 @@ export const MY_CERT_PATHS: CertProductPath[] = [
   {
     product: "MCB（MS IEC 60898-1）",
     cbScheme: "Full",
-    totalWeeksWithCB: 6,
-    totalWeeksWithoutCB: 14,
-    totalCostMyrWithCB: 15000,
-    totalCostMyrWithoutCB: 35000,
+    totalWeeksWithCBRange: [6, 10],
+    totalWeeksWithoutCBRange: [12, 18],
+    totalCostMyrWithCBRange: [15000, 25000],
+    totalCostMyrWithoutCBRange: [30000, 50000],
     steps: [
       {
         step: 1,
@@ -626,17 +645,17 @@ export const MY_CERT_PATHS: CertProductPath[] = [
         body: "ST（Energy Commission）",
         documents: [],
         costMyr: 5000,
-        notes: "有効期間3年。更新は3ヶ月前から申請可能",
+        notes: "ST CoAの有効期間は12ヶ月。更新条件は申請時点のST案内を確認",
       },
     ],
   },
   {
     product: "MCCB（MS IEC 60947-2）",
     cbScheme: "Partial",
-    totalWeeksWithCB: 12,
-    totalWeeksWithoutCB: 20,
-    totalCostMyrWithCB: 30000,
-    totalCostMyrWithoutCB: 65000,
+    totalWeeksWithCBRange: [10, 16],
+    totalWeeksWithoutCBRange: [16, 24],
+    totalCostMyrWithCBRange: [30000, 45000],
+    totalCostMyrWithoutCBRange: [50000, 80000],
     steps: [
       {
         step: 1,
@@ -672,17 +691,17 @@ export const MY_CERT_PATHS: CertProductPath[] = [
         body: "ST",
         documents: [],
         costMyr: 5000,
-        notes: "有効期間3年",
+        notes: "ST CoAの有効期間は12ヶ月。SIRIMライセンス等とは区別して確認",
       },
     ],
   },
   {
     product: "RCCB（MS IEC 61008-1）",
     cbScheme: "Full",
-    totalWeeksWithCB: 7,
-    totalWeeksWithoutCB: 16,
-    totalCostMyrWithCB: 18000,
-    totalCostMyrWithoutCB: 40000,
+    totalWeeksWithCBRange: [7, 11],
+    totalWeeksWithoutCBRange: [13, 20],
+    totalCostMyrWithCBRange: [18000, 30000],
+    totalCostMyrWithoutCBRange: [35000, 55000],
     steps: [
       {
         step: 1,
@@ -718,21 +737,45 @@ export const MY_CERT_PATHS: CertProductPath[] = [
         body: "ST",
         documents: [],
         costMyr: 5000,
-        notes: "有効期間3年",
+        notes: "ST CoAの有効期間は12ヶ月。更新条件は申請時点のST案内を確認",
       },
     ],
   },
 ];
 
 export const CERT_NOTE =
-  "※ 費用・期間は公開情報（Meide Testing / BlueAsia Labs / SIRIM公式）に基づく推定値。実際は製品・申請内容により変動。出典: en.meidetest.com / blueasialabs.com / cetecomadvanced.com";
+  "※ ST CoA、SIRIM認証、IECEE CB Schemeは別制度です。手続要件は公式情報を参照し、総期間・総費用レンジは比較用の内部シミュレーションです（正式見積ではありません）。製品仕様、CB報告書の受入可否、試験・工場検査で変動するため、ST/SIRIMへ要照会。";
 
 /* ------------------------------------------------------------------ */
 /*  S7: Investment Analysis（投資収支分析）                           */
 /* ------------------------------------------------------------------ */
 
+export const INVESTMENT_MODEL_ASSUMPTIONS: InvestmentModelAssumptions = {
+  initialInvestmentUsd: 380000,
+  year0OperatingCostUsd: 0,
+  annualRevenueUsd: [600000, 900000, 1400000, 1900000, 2400000],
+  cogsRate: 0.55,
+  variableCostRate: 0.08,
+  annualFixedCostUsd: 220000,
+  discountRate: 0.1,
+};
+
+const investmentScenarioInputs = [
+  { name: "Optimistic", nameJa: "楽観シナリオ", color: "#27ae60", revenueMultiplier: 1.3 },
+  { name: "Base Case", nameJa: "基準シナリオ", color: "#2980b9", revenueMultiplier: 1 },
+  { name: "Pessimistic", nameJa: "悲観シナリオ", color: "#e74c3c", revenueMultiplier: 0.7 },
+] as const;
+
+export const CALCULATED_INVESTMENT_SCENARIOS = investmentScenarioInputs.map((input) => ({
+  ...input,
+  ...calculateInvestmentScenario(INVESTMENT_MODEL_ASSUMPTIONS, input.revenueMultiplier),
+}));
+
+const baseInvestmentResult = CALCULATED_INVESTMENT_SCENARIOS[1];
+
 export const MY_INVESTMENT: InvestmentAnalysis = {
   initialInvestmentUsd: 380000,
+  year0OperatingCostUsd: 0,
   initialBreakdown: [
     { label: "ST-SIRIM認証費用（MCB+MCCB+RCCB）", usd: 25000 },
     { label: "現地法人設立（SSM登記・労働許可）", usd: 15000 },
@@ -751,100 +794,20 @@ export const MY_INVESTMENT: InvestmentAnalysis = {
     { label: "出張費（国内10回+海外2回）", usd: 15000 },
     { label: "その他（通信・消耗品・保険）", usd: 16000 },
   ],
-  cashFlow: [
-    {
-      year: "Year 0（初期投資）",
-      revenue: 0,
-      cogs: 0,
-      grossProfit: 0,
-      fixedCost: 220000,
-      variableCost: 0,
-      operatingProfit: -220000,
-      cumulativeCF: -380000,
-    },
-    {
-      year: "Year 1",
-      revenue: 600000,
-      cogs: 330000,
-      grossProfit: 270000,
-      fixedCost: 220000,
-      variableCost: 48000,
-      operatingProfit: 2000,
-      cumulativeCF: -598000,
-    },
-    {
-      year: "Year 2",
-      revenue: 900000,
-      cogs: 495000,
-      grossProfit: 405000,
-      fixedCost: 220000,
-      variableCost: 72000,
-      operatingProfit: 113000,
-      cumulativeCF: -485000,
-    },
-    {
-      year: "Year 3",
-      revenue: 1400000,
-      cogs: 770000,
-      grossProfit: 630000,
-      fixedCost: 220000,
-      variableCost: 112000,
-      operatingProfit: 298000,
-      cumulativeCF: -187000,
-    },
-    {
-      year: "Year 4",
-      revenue: 1900000,
-      cogs: 1045000,
-      grossProfit: 855000,
-      fixedCost: 220000,
-      variableCost: 152000,
-      operatingProfit: 483000,
-      cumulativeCF: 296000,
-    },
-    {
-      year: "Year 5",
-      revenue: 2400000,
-      cogs: 1320000,
-      grossProfit: 1080000,
-      fixedCost: 220000,
-      variableCost: 192000,
-      operatingProfit: 668000,
-      cumulativeCF: 964000,
-    },
-  ],
-  scenarios: [
-    {
-      name: "Optimistic",
-      nameJa: "楽観シナリオ",
-      color: "#27ae60",
-      revenueMultiplier: 1.3,
-      breakEvenMonth: 30,
-      roi3YearPct: 45,
-      npv5YearUsd: 1200000,
-      irrPct: 35,
-    },
-    {
-      name: "Base Case",
-      nameJa: "基準シナリオ",
-      color: "#2980b9",
-      revenueMultiplier: 1.0,
-      breakEvenMonth: 46,
-      roi3YearPct: -49,
-      npv5YearUsd: 780000,
-      irrPct: 24,
-    },
-    {
-      name: "Pessimistic",
-      nameJa: "悲観シナリオ",
-      color: "#e74c3c",
-      revenueMultiplier: 0.7,
-      breakEvenMonth: 66,
-      roi3YearPct: -100,
-      npv5YearUsd: 180000,
-      irrPct: 8,
-    },
-  ],
+  cashFlow: baseInvestmentResult.cashFlow.map((row) => ({
+    ...row,
+    year: row.year === 0 ? "Year 0（初期投資）" : `Year ${row.year}`,
+  })),
+  scenarios: CALCULATED_INVESTMENT_SCENARIOS.map((scenario) => ({
+    name: scenario.name,
+    nameJa: scenario.nameJa,
+    color: scenario.color,
+    revenueMultiplier: scenario.revenueMultiplier,
+    breakEvenMonth: scenario.breakEvenMonth,
+    roi3YearPct: scenario.roi3YearPct,
+    npv5YearUsd: scenario.npv5YearUsd,
+    irrPct: scenario.irrPct,
+  })),
   sensitivityAnalysis: [
     {
       parameter: "販売単価 ±10%",
@@ -878,12 +841,16 @@ export const MY_INVESTMENT: InvestmentAnalysis = {
 };
 
 export const INVESTMENT_ASSUMPTIONS = [
+  "初期投資 $380,000 は認証、法人・オフィス設立、初期在庫、初期販促、採用、運転資本、予備費を含む内部仮定",
+  "Year 0の追加営業費用は $0。年間固定費 $220,000 はYear 1から計上（初期投資内の運転資本と二重計上しない）",
   "売上原価（COGS）= 売上の55%を前提",
   "変動費（輸送・関税・販売手数料）= 売上の8%を前提",
   "売上成長: Y1→Y2: +50%、Y2→Y3: +56%、Y3以降: +35%程度を想定",
   "為替レート: 1 USD = 4.4 MYR（2025年3月時点の概算）",
-  "割引率（NPV計算）: 10%を適用",
-  "上記数値は概算シミュレーション。実際の投資判断は精緻な事業計画が必要",
+  "3年ROI = Year 3終了時の累積CF ÷ 初期投資。税引前・借入前の営業キャッシュフロー近似値",
+  "5年NPV = -初期投資 + Σ（Year t営業利益 ÷ (1 + 10%)^t）、t=1〜5。割引率10%",
+  "IRR = 上記5年キャッシュフローのNPVを0にする割引率。税金、資金調達、終価、運転資本回収は含まない",
+  "上記数値は内部仮定による比較用シミュレーション。実際の投資判断には税・運転資本・為替・見積を含む精緻化が必要",
 ];
 
 /* ------------------------------------------------------------------ */
@@ -1096,9 +1063,9 @@ export const MY_KPIS: KPIItem[] = [
     category: "財務",
     metric: "累積キャッシュフロー",
     unit: "USD",
-    targetY1: "-598,000",
-    targetY2: "-485,000",
-    targetY3: "-187,000",
+    targetY1: baseInvestmentResult.cashFlow[1].cumulativeCF.toLocaleString("en-US"),
+    targetY2: baseInvestmentResult.cashFlow[2].cumulativeCF.toLocaleString("en-US"),
+    targetY3: baseInvestmentResult.cashFlow[3].cumulativeCF.toLocaleString("en-US"),
     frequency: "四半期",
     priority: "High",
   },
@@ -1114,17 +1081,165 @@ export const MY_KPIS: KPIItem[] = [
   },
 ];
 
-export const T6_DATA_SOURCES = [
-  "Transparency International: Corruption Perceptions Index 2024",
-  "World Bank Doing Business Report 2020（最終版）",
-  "Inland Revenue Board Malaysia / PwC Tax Summaries 2025",
-  "マレーシア財務省 GDP プレスリリース 2025年11月",
-  "6Wresearch: Malaysia Circuit Breaker Market Outlook 2025–2031",
-  "Arizton Advisory: Malaysia Data Center Market 2024",
-  "Mordor Intelligence: Malaysia Hyperscale Data Center Market",
-  "Infineon Technologies Press Release（Kulim SiC Fab）2024年8月",
-  "Intel Malaysia 投資発表 2024",
-  "MIDA: National Energy Transition Roadmap (NETR) 2023",
-  "SIRIM / ST: Product Certification Guidelines",
-  "Meide Testing / BlueAsia Labs: SIRIM Cost Estimates",
+export const T6_DATA_SOURCES: T6DataSource[] = [
+  {
+    id: "dosm-gdp-2025",
+    sourceName: "Department of Statistics Malaysia",
+    title: "Gross Domestic Product 2025",
+    url: "https://www.dosm.gov.my/portal-main/release-content/gross-domestic-product-2025",
+    publishedOrReferenceYear: "公開 2026-05-15 / 対象 2025",
+    accessedOn: "2026-09-03",
+    supports: "2025年実質GDP成長率5.2%",
+    status: "一次情報で確認",
+  },
+  {
+    id: "dosm-wages-2024",
+    sourceName: "Department of Statistics Malaysia",
+    title: "Salaries and Wages Survey Report 2024",
+    url: "https://www.dosm.gov.my/portal-main/release-content/salaries-and-wages-survey-report-2024",
+    publishedOrReferenceYear: "公開 2025 / 対象 2024",
+    accessedOn: "2026-09-03",
+    supports: "製造業の平均月額賃金RM3,278",
+    status: "一次情報で確認",
+  },
+  {
+    id: "mohr-minimum-wage-2025",
+    sourceName: "Ministry of Human Resources Malaysia",
+    title: "Implementation of Minimum Wage Order RM1,700 per month",
+    url: "https://www.mohr.gov.my/images/pdf/JLD4%20%2819%29%20KENYATAAN%20MEDIA%20KESUMA_Pelaksanaan%20Perintah%20Gaji%20Minimum%20RM1700%20Sebulan.pdf",
+    publishedOrReferenceYear: "2025",
+    accessedOn: "2026-09-03",
+    supports: "最低賃金RM1,700と段階適用日",
+    status: "一次情報で確認",
+  },
+  {
+    id: "hasil-corporate-tax",
+    sourceName: "Inland Revenue Board of Malaysia (HASiL)",
+    title: "Corporate Tax Rates",
+    url: "https://www.hasil.gov.my/syarikat/kadar-cukai-syarikat/",
+    publishedOrReferenceYear: "参照 2026",
+    accessedOn: "2026-09-03",
+    supports: "標準法人税率24%と適格中小企業の段階税率",
+    status: "一次情報で確認",
+  },
+  {
+    id: "world-bank-doing-business-2020",
+    sourceName: "World Bank",
+    title: "Doing Business 2020: Malaysia",
+    url: "https://documents.worldbank.org/en/publication/documents-reports/documentdetail/847451575012489827",
+    publishedOrReferenceYear: "2020（指標は廃止済み）",
+    accessedOn: "2026-09-03",
+    supports: "当時のEase of Doing Business世界12位（現況指標ではない）",
+    status: "一次情報で確認",
+  },
+  {
+    id: "ti-cpi-2024",
+    sourceName: "Transparency International",
+    title: "Corruption Perceptions Index 2024 — Malaysia",
+    url: "https://www.transparency.org/en/cpi/2024/index/mys",
+    publishedOrReferenceYear: "2024",
+    accessedOn: "2026-09-03",
+    supports: "CPIスコア50、世界57位",
+    status: "一次情報で確認",
+  },
+  {
+    id: "st-guidelines-2024",
+    sourceName: "Energy Commission Malaysia (Suruhanjaya Tenaga)",
+    title: "Guidelines for the Approval of Electrical Equipment (2024 Edition)",
+    url: "https://st.gov.my/sites/default/files/2026-02/Guidelines-for-the-Approval-of-Electrical-Equipment-%282024-Edition%29.pdf",
+    publishedOrReferenceYear: "2024 edition",
+    accessedOn: "2026-09-03",
+    supports: "規制対象電気機器のCoA申請・更新・表示要件",
+    status: "一次情報で確認",
+  },
+  {
+    id: "st-coa-application",
+    sourceName: "Energy Commission Malaysia (Suruhanjaya Tenaga)",
+    title: "Certificate of Approval (CoA) Application",
+    url: "https://www.st.gov.my/eng/web/application/details/5/5",
+    publishedOrReferenceYear: "参照 2026",
+    accessedOn: "2026-09-03",
+    supports: "CoAの有効期間12ヶ月、申請案内、手数料区分",
+    status: "一次情報で確認",
+  },
+  {
+    id: "sirim-product-certification",
+    sourceName: "SIRIM QAS International",
+    title: "Product Certification Scheme",
+    url: "https://www.sirim-qas.com.my/service/product-certification-scheme/",
+    publishedOrReferenceYear: "参照 2026",
+    accessedOn: "2026-09-03",
+    supports: "製品認証スキーム、試験・工場審査の概要",
+    status: "一次情報で確認",
+  },
+  {
+    id: "sirim-iecee-cb",
+    sourceName: "SIRIM QAS International",
+    title: "IECEE CB Scheme",
+    url: "https://www.sirim-qas.com.my/service/iecee-cb-scheme/",
+    publishedOrReferenceYear: "参照 2026",
+    accessedOn: "2026-09-03",
+    supports: "IECEE CB試験証明書・報告書の相互受入枠組み",
+    status: "一次情報で確認",
+  },
+  {
+    id: "mida-investment-2024",
+    sourceName: "Malaysian Investment Development Authority (MIDA)",
+    title: "Malaysia Records Historic High RM378.5 Billion in Investments",
+    url: "https://www.mida.gov.my/media-release/malaysia-records-historic-high-rm378-5-billion-in-investments-with-14-9-y-o-y-growth-generating-more-than-207000-jobs-in-2024/",
+    publishedOrReferenceYear: "公開 2025-02-25 / 対象 2024",
+    accessedOn: "2026-09-03",
+    supports: "承認投資RM378.5bn、E&E承認投資RM55.8bn",
+    status: "一次情報で確認",
+  },
+  {
+    id: "mida-data-centre-2021-2023",
+    sourceName: "Malaysian Investment Development Authority (MIDA)",
+    title: "RM114.7 Billion Investments in Data Centres and Cloud Services",
+    url: "https://www.mida.gov.my/mida-news/malaysia-approved-rm114-7-bln-investments-in-data-centres-cloud-services-from-2021-to-2023/",
+    publishedOrReferenceYear: "公開 2024-06-11 / 対象 2021-2023",
+    accessedOn: "2026-09-03",
+    supports: "データセンター・クラウドサービス承認投資RM114.7bn",
+    status: "一次情報で確認",
+  },
+  {
+    id: "miti-data-centre-guideline",
+    sourceName: "Ministry of Investment, Trade and Industry (MITI)",
+    title: "Guidelines for Sustainable Data Centre Development",
+    url: "https://www.miti.gov.my/miti/resources/Media%20Release/Final_Guidelines_for_Sustainable_Data_Centre.pdf",
+    publishedOrReferenceYear: "2024",
+    accessedOn: "2026-09-03",
+    supports: "データセンター投資の持続可能性要件と政策背景",
+    status: "一次情報で確認",
+  },
+  {
+    id: "economy-netr-2023",
+    sourceName: "Ministry of Economy Malaysia",
+    title: "National Energy Transition Roadmap (NETR)",
+    url: "https://www.ekonomi.gov.my/sites/default/files/2023-09/National%20Energy%20Transition%20Roadmap_0.pdf",
+    publishedOrReferenceYear: "公開 2023-09 / 対象 2050 roadmap",
+    accessedOn: "2026-09-03",
+    supports: "エネルギー移行政策、再エネ容量目標、投資需要の政策背景",
+    status: "一次情報で確認",
+  },
+  {
+    id: "6wresearch-circuit-breaker",
+    sourceName: "6Wresearch",
+    title: "Malaysia Circuit Breaker Market Outlook (2025-2031)",
+    url: "https://www.6wresearch.com/industry-report/malaysia-circuit-breaker-market-outlook",
+    publishedOrReferenceYear: "2025-2031 outlook",
+    accessedOn: "2026-09-03",
+    supports: "公開要約のCAGR 6.8%。市場規模・製品別値・低圧範囲は公開ページだけでは未検証",
+    status: "要追加調査",
+  },
+  {
+    id: "competitor-simulation",
+    sourceName: "Internal planning model",
+    title: "Competitor and product-market working assumptions",
+    url: "https://www.se.com/my/en/product-category/4200-circuit-breakers-and-switches",
+    publishedOrReferenceYear: "作成 2026",
+    accessedOn: "2026-09-03",
+    supports: "製品展開の存在のみ公開情報で確認。競合シェア・推定売上・価格・製品別市場規模は内部レンジ",
+    status: "シミュレーション値",
+  },
 ];

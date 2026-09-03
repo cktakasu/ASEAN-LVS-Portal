@@ -11,6 +11,8 @@ import {
 } from "recharts";
 import type { GdpDataPoint, GdpCountryMeta } from "../data/aseanGdpTrendData";
 
+const RESPONSIVE_CHART_INITIAL_DIMENSION = { width: 1, height: 1 };
+
 interface Props {
   data: GdpDataPoint[];
   meta: GdpCountryMeta[];
@@ -24,7 +26,7 @@ function formatGdp(value: number) {
 export const ASEANGdpChart = React.memo(function ASEANGdpChart({ data, meta }: Props) {
   return (
     <div className="chart-wrapper">
-      <ResponsiveContainer width="100%" height={360}>
+      <ResponsiveContainer width="100%" height={360} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
         <LineChart data={data} margin={{ top: 8, right: 24, left: 16, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
           <XAxis

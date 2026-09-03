@@ -38,11 +38,13 @@ export interface CompetitorIntelligence {
   country: string;
   flag: string;
   estimatedSharePct: number;
+  estimatedShareRangePct: readonly [number, number];
   pricePositioning: "Premium" | "Standard" | "Economy";
   products: string[];
   hasLocalOffice: boolean;
   officeCities: string[];
   annualRevEstUsd: number; // 推定売上（USD M）
+  annualRevenueRangeUsdM: readonly [number, number];
   strength: string[];
   weakness: string[];
   radarScores: {
@@ -123,10 +125,10 @@ export interface CertStep {
 export interface CertProductPath {
   product: string;
   cbScheme: "Full" | "Partial" | "None";
-  totalWeeksWithCB: number;
-  totalWeeksWithoutCB: number;
-  totalCostMyrWithCB: number;
-  totalCostMyrWithoutCB: number;
+  totalWeeksWithCBRange: readonly [number, number];
+  totalWeeksWithoutCBRange: readonly [number, number];
+  totalCostMyrWithCBRange: readonly [number, number];
+  totalCostMyrWithoutCBRange: readonly [number, number];
   steps: CertStep[];
 }
 
@@ -150,14 +152,15 @@ export interface InvestmentScenario {
   nameJa: string;
   color: string;
   revenueMultiplier: number;
-  breakEvenMonth: number;
+  breakEvenMonth: number | null;
   roi3YearPct: number;
   npv5YearUsd: number;
-  irrPct: number;
+  irrPct: number | null;
 }
 
 export interface InvestmentAnalysis {
   initialInvestmentUsd: number;
+  year0OperatingCostUsd: number;
   initialBreakdown: { label: string; usd: number }[];
   annualFixedCostUsd: number;
   annualFixedBreakdown: { label: string; usd: number }[];
@@ -202,4 +205,22 @@ export interface KPIItem {
   targetY3: number | string;
   frequency: string;
   priority: "High" | "Medium" | "Low";
+}
+
+export type SourceEvidenceStatus =
+  | "一次情報で確認"
+  | "公開情報に基づく推定"
+  | "内部仮定"
+  | "シミュレーション値"
+  | "要追加調査";
+
+export interface T6DataSource {
+  id: string;
+  sourceName: string;
+  title: string;
+  url: string;
+  publishedOrReferenceYear: string;
+  accessedOn: string;
+  supports: string;
+  status: SourceEvidenceStatus;
 }

@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------ */
 /*  T6: Market Intelligence Hub                                        */
 /*  マーケット・インテリジェンス・ハブ                                  */
-/*  ファクトチェック済みデータに基づく包括的市場分析                    */
+/*  出典確認済み情報と明示したシミュレーションを組み合わせた市場分析       */
 /* ------------------------------------------------------------------ */
 
 import React, { useState } from "react";
@@ -48,6 +48,7 @@ import {
 /* ------------------------------------------------------------------ */
 
 const ACCENT = "#fd7e14";
+const RESPONSIVE_CHART_INITIAL_DIMENSION = { width: 1, height: 1 };
 const SECTION_KICKER: React.CSSProperties = {
   fontSize: "0.72rem",
   fontWeight: 700,
@@ -70,6 +71,10 @@ const badge = (bg: string, fg: string): React.CSSProperties => ({
   color: fg,
 });
 
+const rangeMidpoint = ([min, max]: readonly [number, number]): number => (min + max) / 2;
+const formatRange = ([min, max]: readonly [number, number]): string =>
+  `${min.toLocaleString()}〜${max.toLocaleString()}`;
+
 /* ------------------------------------------------------------------ */
 /*  S1: Business Environment                                          */
 /* ------------------------------------------------------------------ */
@@ -88,7 +93,7 @@ function S1BusinessEnvironment(): React.JSX.Element {
         <p style={SECTION_KICKER}>BUSINESS ENVIRONMENT</p>
         <h2 style={SECTION_H2}>ビジネス環境評価</h2>
         <p style={SECTION_SUB}>
-          マレーシアへの参入可否を判断するためのマクロ環境評価。各指標はファクトチェック済み。
+          マレーシアへの参入可否を判断するためのマクロ環境評価。参照年と検証状況は「データソース・免責事項」に記載。
         </p>
 
         {/* KPI Cards */}
@@ -144,7 +149,7 @@ function S1BusinessEnvironment(): React.JSX.Element {
         <div style={{ display: "flex", gap: "32px", flexWrap: "wrap", alignItems: "flex-start" }}>
           <div style={{ flex: "0 0 320px" }}>
             <p style={{ fontWeight: 700, marginBottom: "8px", fontSize: "0.9rem" }}>Doing Business サブスコア</p>
-            <ResponsiveContainer width={320} height={260}>
+            <ResponsiveContainer width={320} height={260} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                 <PolarGrid stroke="#e0e0e0" />
                 <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: "#555" }} />
@@ -220,13 +225,13 @@ function S2CompetitiveIntelligence(): React.JSX.Element {
       <section className="content-block content-block--major fade-in">
         <p style={SECTION_KICKER}>COMPETITIVE INTELLIGENCE</p>
         <h2 style={SECTION_H2}>競合詳細分析</h2>
-        <p style={SECTION_SUB}>主要競合8社の推定市場シェア・強弱・多軸評価。行をクリックすると詳細が表示されます。</p>
+        <p style={SECTION_SUB}>主要競合8社の内部推定レンジ・強弱・多軸評価。行をクリックすると詳細が表示されます。</p>
 
         <div style={{ display: "flex", gap: "32px", flexWrap: "wrap", alignItems: "flex-start", marginBottom: "24px" }}>
           {/* Pie Chart */}
           <div style={{ flex: "0 0 320px" }}>
             <p style={{ fontWeight: 700, marginBottom: "8px", fontSize: "0.88rem" }}>推定市場シェア（概算）</p>
-            <ResponsiveContainer width={320} height={280}>
+            <ResponsiveContainer width={320} height={280} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <PieChart>
                 <Pie
                   data={shareData}
@@ -252,7 +257,7 @@ function S2CompetitiveIntelligence(): React.JSX.Element {
             <p style={{ fontSize: "0.75rem", color: "#888", marginBottom: "8px" }}>
               価格競争力は「安いほど高スコア」。各軸10点満点（推定）。
             </p>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={280} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <RadarChart data={radarData} margin={{ top: 10, right: 40, bottom: 10, left: 40 }}>
                 <PolarGrid stroke="#e0e0e0" />
                 <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: "#555" }} />
@@ -297,7 +302,7 @@ function S2CompetitiveIntelligence(): React.JSX.Element {
                     </td>
                     <td style={{ textAlign: "center", fontSize: "0.82rem" }}>{c.country}</td>
                     <td style={{ textAlign: "center" }}>
-                      <span style={{ fontWeight: 700, color: ACCENT }}>{c.estimatedSharePct}%</span>
+                      <span style={{ fontWeight: 700, color: ACCENT }}>{formatRange(c.estimatedShareRangePct)}%</span>
                     </td>
                     <td style={{ textAlign: "center" }}>
                       <span style={badge(pc.bg, pc.fg)}>{c.pricePositioning}</span>
@@ -343,7 +348,7 @@ function S2CompetitiveIntelligence(): React.JSX.Element {
             <p style={{ margin: "0 0 12px", fontWeight: 700, fontSize: "1rem" }}>
               {selectedComp.flag} {selectedComp.name} — 詳細分析
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
               <div>
                 <p style={{ fontWeight: 700, fontSize: "0.82rem", color: "#27ae60", marginBottom: "6px" }}>強み</p>
                 <ul style={{ paddingLeft: "16px", margin: 0 }}>
@@ -364,7 +369,9 @@ function S2CompetitiveIntelligence(): React.JSX.Element {
             <div style={{ marginTop: "12px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
               <span style={{ fontSize: "0.78rem", color: "#666" }}>拠点: {selectedComp.officeCities.join(" / ")}</span>
               <span style={{ fontSize: "0.78rem", color: "#666" }}>|</span>
-              <span style={{ fontSize: "0.78rem", color: "#666" }}>推定売上: ~USD {selectedComp.annualRevEstUsd}M</span>
+              <span style={{ fontSize: "0.78rem", color: "#666" }}>
+                推定売上レンジ: USD {formatRange(selectedComp.annualRevenueRangeUsdM)}M
+              </span>
             </div>
           </div>
         )}
@@ -400,13 +407,13 @@ function S3CustomerSegments(): React.JSX.Element {
       <section className="content-block content-block--major fade-in">
         <p style={SECTION_KICKER}>CUSTOMER SEGMENTS</p>
         <h2 style={SECTION_H2}>顧客セグメント分析</h2>
-        <p style={SECTION_SUB}>セグメント別の市場規模・購買行動・参入障壁。タブを切り替えて詳細を確認。</p>
+        <p style={SECTION_SUB}>セグメント別の市場規模・購買行動・参入障壁の内部シミュレーション。タブを切り替えて詳細を確認。</p>
 
         <div style={{ display: "flex", gap: "32px", flexWrap: "wrap", alignItems: "flex-start" }}>
           {/* Pie Chart */}
           <div style={{ flex: "0 0 300px" }}>
             <p style={{ fontWeight: 700, marginBottom: "8px", fontSize: "0.88rem" }}>セグメント別市場規模（推定 USD M）</p>
-            <ResponsiveContainer width={300} height={280}>
+            <ResponsiveContainer width={300} height={280} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <PieChart>
                 <Pie
                   data={pieData}
@@ -536,11 +543,11 @@ function S4ProductMarket(): React.JSX.Element {
       <section className="content-block content-block--major fade-in">
         <p style={SECTION_KICKER}>PRODUCT MARKET SIZE</p>
         <h2 style={SECTION_H2}>製品別市場規模</h2>
-        <p style={SECTION_SUB}>LV遮断器5製品の2025年・2031年推定市場規模と成長率</p>
+        <p style={SECTION_SUB}>LV遮断器5製品の2025年・2031年市場規模・成長率・価格レンジ（要追加調査の内部シミュレーション）</p>
 
         <div style={{ display: "flex", gap: "32px", flexWrap: "wrap", alignItems: "flex-start" }}>
           <div style={{ flex: "1 1 400px" }}>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={280} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <BarChart data={barData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
@@ -715,10 +722,8 @@ function S6CertificationProcess(): React.JSX.Element {
 
   const costCompareData = MY_CERT_PATHS.map((p) => ({
     product: p.product.split("（")[0],
-    "CB Schemeあり（週）": p.totalWeeksWithCB,
-    "CB Schemeなし（週）": p.totalWeeksWithoutCB,
-    "費用あり（千MYR）": Math.round(p.totalCostMyrWithCB / 1000),
-    "費用なし（千MYR）": Math.round(p.totalCostMyrWithoutCB / 1000),
+    "CB Schemeあり（週・レンジ中点）": rangeMidpoint(p.totalWeeksWithCBRange),
+    "CB Schemeなし（週・レンジ中点）": rangeMidpoint(p.totalWeeksWithoutCBRange),
   }));
 
   return (
@@ -726,20 +731,20 @@ function S6CertificationProcess(): React.JSX.Element {
       <section className="content-block content-block--major fade-in">
         <p style={SECTION_KICKER}>CERTIFICATION PROCESS</p>
         <h2 style={SECTION_H2}>認証取得プロセス詳細</h2>
-        <p style={SECTION_SUB}>ST-SIRIM CoA（Certificate of Approval）取得の全ステップ。CB Scheme活用で大幅な時間・コスト削減が可能。</p>
+        <p style={SECTION_SUB}>ST CoA、SIRIM製品認証、IECEE CB Schemeを区別した計画用整理。期間・費用は正式見積ではなく内部レンジ。</p>
 
         {/* Cost comparison bar chart */}
         <div style={{ marginBottom: "24px" }}>
           <p style={{ fontWeight: 700, fontSize: "0.88rem", marginBottom: "8px" }}>製品別 認証期間比較（CB Schemeあり vs なし）</p>
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={220} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
             <BarChart data={costCompareData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="product" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} label={{ value: "週", angle: -90, position: "insideLeft", fontSize: 11 }} />
               <Tooltip />
               <Legend wrapperStyle={{ fontSize: "0.78rem" }} />
-              <Bar dataKey="CB Schemeあり（週）" fill="#27ae60" />
-              <Bar dataKey="CB Schemeなし（週）" fill="#e74c3c" />
+              <Bar dataKey="CB Schemeあり（週・レンジ中点）" fill="#27ae60" />
+              <Bar dataKey="CB Schemeなし（週・レンジ中点）" fill="#e74c3c" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -775,10 +780,10 @@ function S6CertificationProcess(): React.JSX.Element {
                       CB {p.cbScheme}
                     </span>
                   </td>
-                  <td style={{ textAlign: "center", color: "#27ae60", fontWeight: 700 }}>{p.totalWeeksWithCB}週</td>
-                  <td style={{ textAlign: "center", color: "#e74c3c", fontWeight: 700 }}>{p.totalWeeksWithoutCB}週</td>
-                  <td style={{ textAlign: "center" }}>MYR {p.totalCostMyrWithCB.toLocaleString()}</td>
-                  <td style={{ textAlign: "center" }}>MYR {p.totalCostMyrWithoutCB.toLocaleString()}</td>
+                  <td style={{ textAlign: "center", color: "#27ae60", fontWeight: 700 }}>{formatRange(p.totalWeeksWithCBRange)}週</td>
+                  <td style={{ textAlign: "center", color: "#e74c3c", fontWeight: 700 }}>{formatRange(p.totalWeeksWithoutCBRange)}週</td>
+                  <td style={{ textAlign: "center" }}>MYR {formatRange(p.totalCostMyrWithCBRange)}</td>
+                  <td style={{ textAlign: "center" }}>MYR {formatRange(p.totalCostMyrWithoutCBRange)}</td>
                 </tr>
               ))}
             </tbody>
@@ -824,10 +829,10 @@ function S6CertificationProcess(): React.JSX.Element {
                   <p style={{ margin: 0, fontWeight: 700, fontSize: "0.88rem" }}>{step.phase}</p>
                   <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                     {step.durationWeeks > 0 && (
-                      <span style={badge("#e3f2fd", "#1565c0")}>{step.durationWeeks}週</span>
+                      <span style={badge("#e3f2fd", "#1565c0")}>計画値 {step.durationWeeks}週</span>
                     )}
                     {step.costMyr > 0 && (
-                      <span style={badge("#fff8e1", "#f57f17")}>MYR {step.costMyr.toLocaleString()}</span>
+                      <span style={badge("#fff8e1", "#f57f17")}>仮定 MYR {step.costMyr.toLocaleString()}</span>
                     )}
                     <span style={{ fontSize: "0.75rem", color: "#888" }}>{step.body}</span>
                   </div>
@@ -857,6 +862,8 @@ function S6CertificationProcess(): React.JSX.Element {
 /* ------------------------------------------------------------------ */
 
 function S7InvestmentAnalysis(): React.JSX.Element {
+  const baseScenario = MY_INVESTMENT.scenarios.find((scenario) => scenario.name === "Base Case")
+    ?? MY_INVESTMENT.scenarios[0];
   const cfData = MY_INVESTMENT.cashFlow.map((y) => ({
     year: y.year.replace("（初期投資）", "").replace("（基準シナリオ）", ""),
     revenue: y.revenue / 1000,
@@ -871,7 +878,7 @@ function S7InvestmentAnalysis(): React.JSX.Element {
       <section className="content-block content-block--major fade-in">
         <p style={SECTION_KICKER}>INVESTMENT ANALYSIS</p>
         <h2 style={SECTION_H2}>投資収支分析（5年間）</h2>
-        <p style={SECTION_SUB}>マレーシア市場参入の投資規模・回収期間・損益シミュレーション</p>
+        <p style={SECTION_SUB}>共通前提と計算関数から導出する、税引前・借入前の比較用シミュレーション</p>
 
         {/* KPI summary row */}
         <div
@@ -885,7 +892,7 @@ function S7InvestmentAnalysis(): React.JSX.Element {
           {[
             { label: "初期投資（合計）", value: `$${(MY_INVESTMENT.initialInvestmentUsd / 1000).toFixed(0)}K`, color: "#e74c3c" },
             { label: "年間固定費", value: `$${(MY_INVESTMENT.annualFixedCostUsd / 1000).toFixed(0)}K/年`, color: "#e67e22" },
-            { label: "損益分岐（基準）", value: "約46ヶ月", color: "#f39c12" },
+            { label: "損益分岐（基準）", value: baseScenario.breakEvenMonth === null ? "5年内未回収" : `約${baseScenario.breakEvenMonth}ヶ月`, color: "#f39c12" },
             { label: "5年累積CF（基準）", value: `$${(MY_INVESTMENT.cashFlow[MY_INVESTMENT.cashFlow.length - 1].cumulativeCF / 1000).toFixed(0)}K`, color: "#27ae60" },
           ].map((kpi) => (
             <div
@@ -907,7 +914,7 @@ function S7InvestmentAnalysis(): React.JSX.Element {
         {/* Cash flow chart */}
         <div style={{ marginBottom: "24px" }}>
           <p style={{ fontWeight: 700, fontSize: "0.88rem", marginBottom: "8px" }}>5年間 売上・累積CF推移（USD千）</p>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={300} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
             <LineChart data={cfData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="year" tick={{ fontSize: 10 }} />
@@ -944,7 +951,7 @@ function S7InvestmentAnalysis(): React.JSX.Element {
                   </td>
                   <td style={{ textAlign: "center", fontSize: "0.85rem" }}>×{s.revenueMultiplier.toFixed(1)}</td>
                   <td style={{ textAlign: "center", fontSize: "0.85rem", fontWeight: 700, color: s.color }}>
-                    {s.breakEvenMonth}ヶ月
+                    {s.breakEvenMonth === null ? "5年内未回収" : `${s.breakEvenMonth}ヶ月`}
                   </td>
                   <td style={{ textAlign: "center", fontSize: "0.85rem" }}>
                     <span style={{ color: s.roi3YearPct >= 0 ? "#27ae60" : "#e74c3c" }}>
@@ -954,7 +961,7 @@ function S7InvestmentAnalysis(): React.JSX.Element {
                   <td style={{ textAlign: "center", fontSize: "0.85rem" }}>
                     ${(s.npv5YearUsd / 1000).toFixed(0)}K
                   </td>
-                  <td style={{ textAlign: "center", fontSize: "0.85rem" }}>{s.irrPct}%</td>
+                  <td style={{ textAlign: "center", fontSize: "0.85rem" }}>{s.irrPct === null ? "算定不能" : `${s.irrPct}%`}</td>
                 </tr>
               ))}
             </tbody>
@@ -1030,13 +1037,13 @@ function S8ScenarioAnalysis(): React.JSX.Element {
       <section className="content-block content-block--major fade-in">
         <p style={SECTION_KICKER}>SCENARIO ANALYSIS</p>
         <h2 style={SECTION_H2}>シナリオ分析</h2>
-        <p style={SECTION_SUB}>市場環境の変化に応じた3つのシナリオ。投資戦略の判断指標として活用。</p>
+        <p style={SECTION_SUB}>市場環境の変化に応じた3つの内部シミュレーション。確率・市場規模・CAGRは要追加調査。</p>
 
         {/* Bar chart */}
         <div style={{ display: "flex", gap: "32px", flexWrap: "wrap", alignItems: "flex-start" }}>
           <div style={{ flex: "0 0 320px" }}>
             <p style={{ fontWeight: 700, fontSize: "0.88rem", marginBottom: "8px" }}>2031年市場規模 シナリオ比較</p>
-            <ResponsiveContainer width={320} height={220}>
+            <ResponsiveContainer width={320} height={220} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <BarChart data={marketData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} />
@@ -1234,7 +1241,7 @@ function S10DataSources(): React.JSX.Element {
     <section className="content-block fade-in">
       <p style={SECTION_KICKER}>DATA SOURCES</p>
       <h2 style={SECTION_H2}>データソース・免責事項</h2>
-      <p style={SECTION_SUB}>T6に掲載するデータの出典一覧</p>
+        <p style={SECTION_SUB}>T6に掲載するデータの出典、参照年、検証状態の一覧</p>
 
       <div
         style={{
@@ -1245,9 +1252,18 @@ function S10DataSources(): React.JSX.Element {
         }}
       >
         <ul style={{ paddingLeft: "20px", margin: 0 }}>
-          {T6_DATA_SOURCES.map((src, i) => (
-            <li key={i} style={{ fontSize: "0.8rem", color: "#555", marginBottom: "6px", lineHeight: 1.5 }}>
-              {src}
+          {T6_DATA_SOURCES.map((source) => (
+            <li key={source.id} style={{ fontSize: "0.8rem", color: "#555", marginBottom: "12px", lineHeight: 1.5 }}>
+              <a href={source.url} target="_blank" rel="noopener noreferrer" style={{ color: "#1565c0", fontWeight: 700 }}>
+                {source.sourceName}: {source.title}
+              </a>
+              <br />
+              <span>{source.publishedOrReferenceYear} / 参照日 {source.accessedOn}</span>
+              <br />
+              <span>裏付け対象: {source.supports}</span>{" "}
+              <span style={badge(source.status === "一次情報で確認" ? "#e8f5e9" : "#fff8e1", source.status === "一次情報で確認" ? "#2e7d32" : "#8a5a00")}>
+                {source.status}
+              </span>
             </li>
           ))}
         </ul>
@@ -1263,9 +1279,9 @@ function S10DataSources(): React.JSX.Element {
         >
           <p style={{ margin: 0, fontSize: "0.78rem", color: "#7a4a00", lineHeight: 1.6 }}>
             <strong>免責事項:</strong>{" "}
-            市場シェア・価格帯・競合分析・投資試算等のデータは公開情報・業界一般知識に基づく推定値です。
+            市場規模・製品別市場規模・競合シェア・推定売上・価格・認証費用と期間・シナリオ確率・投資試算は、明記した内部仮定またはシミュレーション値です。
             実際の投資判断に際しては、現地パートナー・専門機関による独立したデューデリジェンスを推奨します。
-            認証費用・期間は製品・申請状況により変動します。
+            有料調査レポートの公開要約だけで具体値を確認できない項目は、ファクトチェック済みとして扱っていません。
           </p>
         </div>
       </div>

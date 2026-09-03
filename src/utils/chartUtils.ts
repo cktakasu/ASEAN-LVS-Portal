@@ -8,20 +8,18 @@ import type { CountryGDP } from "../types/chart";
 export const calculateMaxY = (data: ChartDataItem[], comparisonCountries: string[]): number => {
   if (comparisonCountries.length === 0) return 100;
 
-  // 最適化: 単一ループで配列作成を回避
-  const allValues: number[] = [];
+  let maxVal = 0;
   for (const d of data) {
     for (const key in d) {
       if (key !== "year") {
         const value = d[key];
         if (typeof value === "number") {
-          allValues.push(value);
+          maxVal = Math.max(maxVal, value);
         }
       }
     }
   }
 
-  const maxVal = Math.max(...allValues);
   // 20単位で切り上げ
   return Math.ceil((maxVal + 10) / 20) * 20;
 };
@@ -48,8 +46,12 @@ export const generateChartData = (
 ): ChartDataItem[] => {
   const toJPY = (b: number) => b * usdJpy / 1000;
 
-  // 最適化: 国データのMapを作成（O(1)検索用）
-  const countryMap = new Map(aseanGdpComparison.map(c => [c.iso3, c]));
+  const countryYearMap = new Map(
+    aseanGdpComparison.map((country) => [
+      country.iso3,
+      new Map(country.data.map((point) => [point.year, point])),
+    ])
+  );
 
   // マレーシアのデータ（統合：実績と予測を1つの系列に）
   const malaysiaData = gdpHistory.map(d => ({
@@ -68,14 +70,11 @@ export const generateChartData = (
       forecast: malaysiaItem.forecast,
     };
 
-    // 選択された各国のデータを追加（Mapで高速化）
+    // 同じ国・年を繰り返し検索するため、事前作成した索引から取得する。
     comparisonCountries.forEach((iso3) => {
-      const country = countryMap.get(iso3);
-      if (country) {
-        const yearData = country.data.find(d => d.year === malaysiaItem.year);
-        if (yearData) {
-          item[iso3] = toJPY(yearData.gdp_usd_billion);
-        }
+      const yearData = countryYearMap.get(iso3)?.get(malaysiaItem.year);
+      if (yearData) {
+        item[iso3] = toJPY(yearData.gdp_usd_billion);
       }
     });
 
