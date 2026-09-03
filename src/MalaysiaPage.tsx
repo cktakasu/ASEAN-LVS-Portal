@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { Suspense, lazy, useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { calculateMaxY, generateYTicks, generateChartData } from "./utils";
 
@@ -7,9 +7,11 @@ import { calculateMaxY, generateYTicks, generateChartData } from "./utils";
 /* ------------------------------------------------------------------ */
 
 import type {
+  EvidenceStatus,
+  ResearchSection,
+  ResearchSource,
   TooltipPayloadItem,
   TooltipProps,
-  TooltipContentFunction,
   TabDef,
 } from "./types";
 
@@ -20,8 +22,39 @@ import type {
 import { useChartTransition } from "./hooks";
 import { ForecastBadge, ForecastReferenceArea } from "./components/charts";
 import { DonutLabelWithLeaderLine, cbRelevanceColor } from "./components/DonutLabelWithLeaderLine";
-import { FONT_SIZE, COLOR, STYLES } from "./constants/malaysia";
-import { LegendItem } from "./components/LegendItem";
+
+/* ------------------------------------------------------------------ */
+/*  Legend Component                                                   */
+/* ------------------------------------------------------------------ */
+
+interface LegendItemProps {
+  color: string;
+  label: string;
+  isSolid: boolean;
+}
+
+const LegendItem: React.FC<LegendItemProps> = React.memo(({ color, label, isSolid }) => {
+  const dashArray = isSolid ? undefined : "6 4";
+
+  return (
+    <div style={{ ...STYLES.flex.center, gap: "6px", fontSize: FONT_SIZE.small }}>
+      <svg width={20} height={2} style={{ display: "block" }}>
+        <line
+          x1={0}
+          y1={1}
+          x2={20}
+          y2={1}
+          stroke={color}
+          strokeWidth={2}
+          strokeDasharray={dashArray}
+        />
+      </svg>
+      <span style={{ color: COLOR.text }}>{label}</span>
+    </div>
+  );
+});
+
+LegendItem.displayName = "LegendItem";
 
 /* ------------------------------------------------------------------ */
 /*  Chart Components                                                   */
@@ -68,7 +101,8 @@ const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) 
     );
   };
 
-  return <Tooltip content={renderTooltip as TooltipContentFunction} />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <Tooltip content={renderTooltip as any} />;
 });
 
 GDPChartTooltip.displayName = "GDPChartTooltip";
@@ -121,7 +155,6 @@ import {
   MY_COMPETITORS,
   COMPETITION_DATA_NOTE,
 } from "./data/malaysiaCompetitionData";
-import T6MarketIntelligence from "./components/MalaysiaT6";
 import {
   MY_TARIFF_DATA,
   MY_IMPORT_STEPS,
@@ -133,6 +166,10 @@ import {
   MY_HIGH_IMPACT_FACILITATORS,
   MARKET_ACCESS_DATA_SOURCES,
 } from "./data/malaysiaMarketAccessData";
+import {
+  MALAYSIA_RESEARCH_SECTIONS,
+  MALAYSIA_RESEARCH_SOURCES,
+} from "./data/malaysiaResearchVaultData";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -141,6 +178,71 @@ import {
 /* ------------------------------------------------------------------ */
 /*  Style Constants                                                   */
 /* ------------------------------------------------------------------ */
+
+// Font sizes
+const FONT_SIZE = {
+  small: "0.78rem",
+  medium: "0.85rem",
+  large: "0.9rem",
+  xlarge: "0.95rem",
+  xxlarge: "1rem",
+  xxxlarge: "1.1rem",
+  header: "1.2rem",
+};
+
+// Colors
+const COLOR = {
+  primary: "#2563eb",
+  primaryLight: "#3b82f6",
+  secondary: "#666",
+  secondaryLight: "#888",
+  tertiary: "#999",
+  error: "#dc3545",
+  success: "#28a745",
+  warning: "#fd7e14",
+  info: "#17a2b8",
+  text: "#333",
+  textLight: "#666",
+  disabled: "#999",
+  white: "#fff",
+  gray: "#e0e0e0",
+  lightGray: "#f5f5f5",
+};
+
+// Spacing
+const SPACING = {
+  xs: "4px",
+  sm: "8px",
+  md: "12px",
+  lg: "16px",
+  xl: "20px",
+  xxl: "24px",
+  xxxl: "32px",
+};
+
+// Common styles (純粋な定数オブジェクト)
+const STYLES = {
+  flex: {
+    center: { display: "flex", justifyContent: "center", alignItems: "center" } as const,
+    centerColumn: { display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" as const },
+    between: { display: "flex", justifyContent: "space-between", alignItems: "center" } as const,
+    wrap: { display: "flex", flexWrap: "wrap" } as const,
+  },
+  margin: {
+    lg: { marginTop: SPACING.lg, marginBottom: SPACING.lg } as const,
+  },
+  fontSize: {
+    small: { fontSize: FONT_SIZE.small } as const,
+    medium: { fontSize: FONT_SIZE.medium } as const,
+    large: { fontSize: FONT_SIZE.large } as const,
+  },
+  color: {
+    primary: { color: COLOR.primary } as const,
+    secondary: { color: COLOR.secondary } as const,
+    tertiary: { color: COLOR.tertiary } as const,
+    text: { color: COLOR.text } as const,
+  },
+};
 
 // Tooltip base style (shared across chart tooltips)
 const TOOLTIP_STYLE: React.CSSProperties = {
@@ -181,6 +283,15 @@ const mapImpactToBadge = (impact: "High" | "Medium" | "Low"): BadgeVariant =>
 const mapNecessityToBadge = (necessity: "Required" | "Recommended" | "Optional"): BadgeVariant =>
   necessity === "Required" ? "success" : necessity === "Recommended" ? "warning" : "neutral";
 
+const mapEvidenceToBadge = (status: EvidenceStatus): BadgeVariant =>
+  status === "Confirmed" ? "success" : status === "Inference" ? "warning" : "danger";
+
+const EVIDENCE_LABEL: Record<EvidenceStatus, string> = {
+  Confirmed: "Confirmed",
+  Inference: "Inference",
+  Unverified: "Unverified",
+};
+
 // Info box helper (left-border accent boxes)
 const infoBoxStyle = (accentColor: string, bgColor: string): React.CSSProperties => ({
   padding: "12px 16px",
@@ -220,7 +331,10 @@ const TABS: TabDef[] = [
   { id: "t4", label: "Market Access", sublabel: "How do we enter this market?" },
   { id: "t5", label: "Strategic Assessment", sublabel: "What should we do?" },
   { id: "t6", label: "Market Intelligence", sublabel: "Deep-dive data & investment analysis" },
+  { id: "t7", label: "Research Vault", sublabel: "What has been verified so far?" },
 ];
+
+const T6MarketIntelligence = lazy(() => import("./components/MalaysiaT6"));
 
 /* ------------------------------------------------------------------ */
 /*  Tab content components                                             */
@@ -897,7 +1011,8 @@ function T2MarketAndDemand(): React.JSX.Element {
                   tickFormatter={(v) => `${Math.round(v / 100000000)}億円`}
                 />
                 {/* ツールチップ */}
-                <Tooltip content={((props: TooltipProps) => <MarketSizeTooltip {...props} />) as TooltipContentFunction} />
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                <Tooltip content={<MarketSizeTooltip active={false} payload={[]} label="" /> as any} />
                 {/* オレンジ帯: 不確実性レンジ */}
                 <Area
                   dataKey="market_size_low_jpy"
@@ -1767,10 +1882,10 @@ function T5StrategicAssessment(): React.JSX.Element {
         </div>
       </section>
 
-      {/* S6: アクション */}
+      {/* S6: 次のアクション */}
       <section className="content-block fade-in">
         <p className="section-kicker">NEXT STEPS</p>
-        <h2 style={{ fontSize: "28px" }}>アクション</h2>
+        <h2 style={{ fontSize: "28px" }}>次のアクション</h2>
         <p className="section-subline">今すぐ着手すべき具体的アクション</p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "24px" }}>
@@ -1809,6 +1924,201 @@ function T5StrategicAssessment(): React.JSX.Element {
           ))}
         </div>
       </section>
+    </>
+  );
+}
+
+const getResearchSource = (sourceId: string): ResearchSource | undefined =>
+  MALAYSIA_RESEARCH_SOURCES.find((source) => source.id === sourceId);
+
+const collectSectionSourceIds = (section: ResearchSection): string[] => {
+  const sourceIds = new Set<string>();
+
+  section.cards?.forEach((card) => card.source_ids.forEach((id) => sourceIds.add(id)));
+  section.table?.rows.forEach((row) => row.source_ids.forEach((id) => sourceIds.add(id)));
+  section.insights?.forEach((insight) => insight.source_ids.forEach((id) => sourceIds.add(id)));
+
+  return Array.from(sourceIds);
+};
+
+function ResearchSourceLinks({ sourceIds }: { sourceIds: string[] }): React.JSX.Element | null {
+  const uniqueIds = Array.from(new Set(sourceIds));
+  const sources = uniqueIds
+    .map((sourceId) => getResearchSource(sourceId))
+    .filter((source): source is ResearchSource => Boolean(source));
+
+  if (sources.length === 0) return null;
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
+      {sources.map((source) => (
+        <a
+          key={source.id}
+          href={source.url}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "4px 10px",
+            borderRadius: "999px",
+            background: "#f5f7fb",
+            color: "#355070",
+            fontSize: "0.75rem",
+            textDecoration: "none",
+            border: "1px solid #dce6f2",
+          }}
+          title={`${source.publisher} / checked ${source.checked_on}`}
+        >
+          {source.label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function T6ResearchVault(): React.JSX.Element {
+  return (
+    <>
+      <section className="content-block content-block--major fade-in">
+        <p className="section-kicker">RESEARCH VAULT</p>
+        <h2 style={{ fontSize: "28px" }}>一次情報ベースの暫定集約タブ</h2>
+        <p className="section-subline">
+          T3/T4へ再配分する前に、確認済み事実・示唆・未確認論点を分離して保管する
+        </p>
+
+        <div style={{
+          ...infoBoxStyle(COLOR.primary, "#f4f8ff"),
+          marginTop: "14px",
+          display: "grid",
+          gap: "8px",
+        }}>
+          <div><strong>Confirmed:</strong> 公開一次情報で確認済みの事実</div>
+          <div><strong>Inference:</strong> その事実から導く営業・マーケ示唆</div>
+          <div><strong>Unverified:</strong> 今回の公開ソースだけでは断定していない項目</div>
+        </div>
+      </section>
+
+      {MALAYSIA_RESEARCH_SECTIONS.map((section) => {
+        const sectionSourceIds = collectSectionSourceIds(section);
+
+        return (
+          <section key={section.id} className="content-block fade-in">
+            <p className="section-kicker">{section.kicker}</p>
+            <h2 style={{ fontSize: "28px" }}>{section.title}</h2>
+            <p className="section-subline">{section.subtitle}</p>
+
+            {section.description && (
+              <article className="reference-block">
+                <p style={{ margin: 0, color: COLOR.textLight, lineHeight: 1.8 }}>{section.description}</p>
+              </article>
+            )}
+
+            {section.cards && (
+              <article className="reference-block">
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  gap: "16px",
+                }}>
+                  {section.cards.map((card) => (
+                    <div
+                      key={`${section.id}-${card.title}`}
+                      style={{
+                        border: "1px solid #e6ebf2",
+                        borderRadius: "14px",
+                        padding: "16px",
+                        background: "#fff",
+                        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
+                      }}
+                    >
+                      <div style={{ ...STYLES.flex.between, gap: "12px", marginBottom: "10px" }}>
+                        <strong style={{ fontSize: "0.92rem", color: "#1d1d1f" }}>{card.title}</strong>
+                        <span style={badgeStyle(mapEvidenceToBadge(card.status))}>{EVIDENCE_LABEL[card.status]}</span>
+                      </div>
+                      <p style={{ margin: "0 0 8px", fontSize: "1.02rem", fontWeight: 700, color: "#153b63" }}>{card.value}</p>
+                      <p style={{ margin: 0, fontSize: FONT_SIZE.medium, color: COLOR.textLight, lineHeight: 1.7 }}>{card.detail}</p>
+                      <ResearchSourceLinks sourceIds={card.source_ids} />
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )}
+
+            {section.table && (
+              <article className="reference-block">
+                <div className="table-wrap">
+                  <table className="requirements-table">
+                    <thead>
+                      <tr>
+                        {section.table.columns.map((column) => (
+                          <th key={`${section.id}-${column.key}`}>{column.label}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.table.rows.map((row) => (
+                        <tr key={row.id}>
+                          {section.table!.columns.map((column, columnIndex) => (
+                            <td key={`${row.id}-${column.key}`} style={{ verticalAlign: "top" }}>
+                              {columnIndex === 0 ? (
+                                <div style={{ display: "grid", gap: "8px" }}>
+                                  <strong>{row.values[column.key]}</strong>
+                                  <span style={{ width: "fit-content", ...badgeStyle(mapEvidenceToBadge(row.status)) }}>
+                                    {EVIDENCE_LABEL[row.status]}
+                                  </span>
+                                  <ResearchSourceLinks sourceIds={row.source_ids} />
+                                </div>
+                              ) : (
+                                <span style={{ fontSize: FONT_SIZE.medium, color: COLOR.textLight, lineHeight: 1.7 }}>
+                                  {row.values[column.key]}
+                                </span>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            )}
+
+            {section.insights && section.insights.length > 0 && (
+              <article className="reference-block">
+                <h3>示唆メモ</h3>
+                <div style={{ display: "grid", gap: "12px", marginTop: "14px" }}>
+                  {section.insights.map((insight) => (
+                    <div
+                      key={`${section.id}-${insight.title}`}
+                      style={{
+                        ...infoBoxStyle(
+                          insight.status === "Inference" ? COLOR.warning : insight.status === "Confirmed" ? COLOR.success : COLOR.error,
+                          insight.status === "Inference" ? "#fff8e8" : insight.status === "Confirmed" ? "#f0fff4" : "#fff4f4"
+                        ),
+                      }}
+                    >
+                      <div style={{ ...STYLES.flex.between, gap: "12px", marginBottom: "8px" }}>
+                        <strong>{insight.title}</strong>
+                        <span style={badgeStyle(mapEvidenceToBadge(insight.status))}>{EVIDENCE_LABEL[insight.status]}</span>
+                      </div>
+                      <p style={{ margin: 0, color: COLOR.textLight, lineHeight: 1.8 }}>{insight.body}</p>
+                      <ResearchSourceLinks sourceIds={insight.source_ids} />
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )}
+
+            <p style={SOURCE_STYLE}>
+              出典: {sectionSourceIds.length}件の一次情報に紐づけ済み
+            </p>
+            <ResearchSourceLinks sourceIds={sectionSourceIds} />
+            {section.note && <p style={DISCLAIMER_STYLE}>{section.note}</p>}
+          </section>
+        );
+      })}
     </>
   );
 }
@@ -1882,7 +2192,14 @@ export default function MalaysiaPage(): React.JSX.Element {
     if (activeTab === "t3") return <T3RegulatoryGateway />;
     if (activeTab === "t4") return <T4MarketAccess />;
     if (activeTab === "t5") return <T5StrategicAssessment />;
-    if (activeTab === "t6") return <T6MarketIntelligence />;
+    if (activeTab === "t6") {
+      return (
+        <Suspense fallback={<p role="status">T6データを読み込んでいます…</p>}>
+          <T6MarketIntelligence />
+        </Suspense>
+      );
+    }
+    if (activeTab === "t7") return <T6ResearchVault />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;
