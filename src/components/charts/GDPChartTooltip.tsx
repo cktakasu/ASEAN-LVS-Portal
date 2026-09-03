@@ -1,7 +1,6 @@
 import React from "react";
 import { Tooltip } from "recharts";
-import type { TooltipProps } from "../../types/chart";
-import type { TooltipPayloadItem } from "../../types/chart";
+import type { TooltipContentFunction, TooltipPayloadItem, TooltipProps } from "../../types/chart";
 import { ASEAN_GDP_COMPARISON } from "../../data/aseanGdpData";
 
 interface GDPChartTooltipProps {
@@ -9,7 +8,7 @@ interface GDPChartTooltipProps {
 }
 
 export const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) => {
-  const renderTooltip = ({ active, payload, label }: TooltipProps) => {
+  const renderTooltip: TooltipContentFunction = ({ active, payload, label }: TooltipProps) => {
     if (!active || !payload || payload.length === 0) return null;
 
     return (
@@ -45,8 +44,7 @@ export const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usd
     );
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <Tooltip content={renderTooltip as any} />;
+  return <Tooltip content={renderTooltip} />;
 });
 
 GDPChartTooltip.displayName = "GDPChartTooltip";

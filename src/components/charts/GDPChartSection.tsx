@@ -17,6 +17,9 @@ import { calculateMaxY, generateYTicks, generateChartData } from "../../utils/ch
 import { CHART_CONFIG, STYLES, COLOR, FONT_SIZE } from "../../constants";
 import { useChartTransition } from "../../hooks";
 
+const COUNTRY_BY_ISO3 = new Map(ASEAN_GDP_COMPARISON.map((country) => [country.iso3, country]));
+const RESPONSIVE_CHART_INITIAL_DIMENSION = { width: 1, height: 1 };
+
 interface GDPChartSectionProps {
   comparisonCountries: string[];
   setComparisonCountries: React.Dispatch<React.SetStateAction<string[]>>;
@@ -28,6 +31,12 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
 }) => {
   const USD_JPY = 140;
   const [isYAxisTransitioning, chartTransitionClass, triggerTransition] = useChartTransition(400);
+
+  // 選択国のSetを作成（O(1)チェック用）
+  const comparisonSet = useMemo(
+    () => new Set(comparisonCountries),
+    [comparisonCountries]
+  );
 
   // チャートデータをキャッシュ化
   const chartData = useMemo(
@@ -73,7 +82,7 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
         style={{ '--chart-transition-duration': `${CHART_CONFIG.transitionDuration}ms` } as React.CSSProperties}
       >
         <div style={{ height: `${CHART_CONFIG.height}px`, position: "relative", outline: "none", userSelect: "none", WebkitUserSelect: "none" }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
             <LineChart data={chartData} margin={CHART_CONFIG.margin} style={{ outline: "none", userSelect: "none", WebkitUserSelect: "none" }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis dataKey="year" stroke="#666" tick={{ dy: 12 }} />
@@ -114,7 +123,7 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
               />
               {/* 比較国のライン */}
               {comparisonCountries.map((iso3) => {
-                const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
+                const country = COUNTRY_BY_ISO3.get(iso3);
                 if (!country) return null;
                 return (
                   <Line
@@ -193,7 +202,7 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
               >
                 <input
                   type="checkbox"
-                  checked={comparisonCountries.includes(country.iso3)}
+                  checked={comparisonSet.has(country.iso3)}
                   onChange={() => toggleCountry(country.iso3)}
                   style={{ cursor: "pointer" }}
                 />
@@ -225,7 +234,7 @@ export const GDPChartSection: React.FC<GDPChartSectionProps> = React.memo(({
         }}>
           <LegendItem color={COLOR.primary} label="マレーシア" isSolid={true} />
           {comparisonCountries.map(iso3 => {
-            const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
+            const country = COUNTRY_BY_ISO3.get(iso3);
             if (!country) return null;
             return <LegendItem key={iso3} color={country.color} label={country.nameJa} isSolid={true} />;
           })}

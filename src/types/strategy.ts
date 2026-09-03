@@ -54,7 +54,7 @@ export type EntryPriority = 1 | 2 | 3; // 1=最優先, 2=第2段階, 3=第3段�
 
 export interface ProductPriority {
   product: string;
-  cbAcceptance: "Full" | "Partial";
+  cbAcceptance: "Full" | "Partial" | "要確認";
   difficulty: EntryDifficulty;
   demand: MarketDemand;
   demandNote: string;
@@ -84,7 +84,7 @@ export interface RiskItem {
   mitigation: string;
 }
 
-/** S6: 次のアクション */
+/** S6: アクション */
 export interface NextAction {
   text: string;
   owner?: string;       // 担当部門ヒント (任意)

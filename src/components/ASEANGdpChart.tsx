@@ -1,3 +1,4 @@
+import React from "react";
 import {
   LineChart,
   Line,
@@ -10,6 +11,8 @@ import {
 } from "recharts";
 import type { GdpDataPoint, GdpCountryMeta } from "../data/aseanGdpTrendData";
 
+const RESPONSIVE_CHART_INITIAL_DIMENSION = { width: 1, height: 1 };
+
 interface Props {
   data: GdpDataPoint[];
   meta: GdpCountryMeta[];
@@ -20,10 +23,10 @@ function formatGdp(value: number) {
   return `$${value}B`;
 }
 
-export function ASEANGdpChart({ data, meta }: Props) {
+export const ASEANGdpChart = React.memo(function ASEANGdpChart({ data, meta }: Props) {
   return (
     <div className="chart-wrapper">
-      <ResponsiveContainer width="100%" height={360}>
+      <ResponsiveContainer width="100%" height={360} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
         <LineChart data={data} margin={{ top: 8, right: 24, left: 16, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
           <XAxis
@@ -39,13 +42,11 @@ export function ASEANGdpChart({ data, meta }: Props) {
             width={52}
           />
           <Tooltip
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter={(value: any, name: any) => {
-              const label = meta.find(m => m.key === String(name))?.nameJa ?? String(name);
-              return [`${formatGdp(Number(value))}`, label];
+            formatter={(value: number | undefined, name: string | undefined) => {
+              const label = meta.find(m => m.key === String(name ?? ""))?.nameJa ?? String(name ?? "");
+              return [`${formatGdp(value ?? 0)}`, label];
             }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            labelFormatter={(label: any) => `${label}年`}
+            labelFormatter={(label: React.ReactNode) => `${label}年`}
             contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e0e0e0" }}
           />
           {/* 実績/予測境界線 */}
@@ -82,4 +83,4 @@ export function ASEANGdpChart({ data, meta }: Props) {
       <p className="chart-note">出典: IMF World Economic Outlook 2024。2024年以降は予測値。単位: USD 10億（B）</p>
     </div>
   );
-}
+});

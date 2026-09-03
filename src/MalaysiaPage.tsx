@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { Suspense, lazy, useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { calculateMaxY, generateYTicks, generateChartData } from "./utils";
 
@@ -12,6 +12,7 @@ import type {
   ResearchSource,
   TooltipPayloadItem,
   TooltipProps,
+  TooltipContentFunction,
   TabDef,
 } from "./types";
 
@@ -65,7 +66,7 @@ interface GDPChartTooltipProps {
 }
 
 const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) => {
-  const renderTooltip = ({ active, payload, label }: TooltipProps) => {
+  const renderTooltip: TooltipContentFunction = ({ active, payload, label }: TooltipProps) => {
     if (!active || !payload || payload.length === 0) return null;
 
     return (
@@ -101,8 +102,7 @@ const GDPChartTooltip: React.FC<GDPChartTooltipProps> = React.memo(({ usdJpy }) 
     );
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <Tooltip content={renderTooltip as any} />;
+  return <Tooltip content={renderTooltip} />;
 });
 
 GDPChartTooltip.displayName = "GDPChartTooltip";
@@ -330,8 +330,14 @@ const TABS: TabDef[] = [
   { id: "t3", label: "Regulatory Gateway", sublabel: "What is required to sell here?" },
   { id: "t4", label: "Market Access", sublabel: "How do we enter this market?" },
   { id: "t5", label: "Strategic Assessment", sublabel: "What should we do?" },
-  { id: "t6", label: "Research Vault", sublabel: "What has been verified so far?" },
+  { id: "t6", label: "Market Intelligence", sublabel: "Deep-dive data & investment analysis" },
+  { id: "t7", label: "Research Vault", sublabel: "What has been verified so far?" },
 ];
+
+const T6MarketIntelligence = lazy(() => import("./components/MalaysiaT6"));
+const GDP_USD_JPY = 140;
+const ASEAN_GDP_BY_ISO3 = new Map(ASEAN_GDP_COMPARISON.map((country) => [country.iso3, country]));
+const RESPONSIVE_CHART_INITIAL_DIMENSION = { width: 1, height: 1 };
 
 /* ------------------------------------------------------------------ */
 /*  Tab content components                                             */
@@ -343,6 +349,25 @@ function T1CountryProfile(): React.JSX.Element {
 
   // チャートトランジション用カスタムフック
   const [isYAxisTransitioning, chartTransitionClass, triggerTransition] = useChartTransition(400);
+
+  const comparisonSet = useMemo(() => new Set(comparisonCountries), [comparisonCountries]);
+  const chartData = useMemo(
+    () => generateChartData(GDP_HISTORY, ASEAN_GDP_COMPARISON, comparisonCountries, GDP_USD_JPY),
+    [comparisonCountries]
+  );
+  const maxY = useMemo(
+    () => calculateMaxY(chartData, comparisonCountries),
+    [chartData, comparisonCountries]
+  );
+  const yTicks = useMemo(() => generateYTicks(maxY), [maxY]);
+  const toggleCountry = useCallback((iso3: string) => {
+    triggerTransition();
+    setComparisonCountries((previous) =>
+      previous.includes(iso3)
+        ? previous.filter((country) => country !== iso3)
+        : [...previous, iso3]
+    );
+  }, [triggerTransition]);
 
   return (
     <>
@@ -434,41 +459,7 @@ function T1CountryProfile(): React.JSX.Element {
       </section>
 
       {/* GDP推移グラフ（他国比較機能付き） */}
-      {(() => {
-        const USD_JPY = 140;
-
-        // チャートデータをキャッシュ化
-        const chartData = useMemo(
-          () => generateChartData(GDP_HISTORY, ASEAN_GDP_COMPARISON, comparisonCountries, USD_JPY),
-          [comparisonCountries]  // comparisonCountriesが変更された時のみ再計算
-        );
-
-        // Y軸の最大値を計算
-        const maxY = useMemo(
-          () => calculateMaxY(chartData, comparisonCountries),
-          [chartData, comparisonCountries]
-        );
-
-        // Y軸のticksを生成
-        const yTicks = useMemo(
-          () => generateYTicks(maxY),
-          [maxY]
-        );
-
-        // Y軸トランジションを考慮した国切替関数
-        const toggleCountry = useCallback((iso3: string) => {
-          // 常にトランジション発火（滑らかな切り替えのため）
-          triggerTransition();
-
-          setComparisonCountries(prev =>
-            prev.includes(iso3)
-              ? prev.filter(c => c !== iso3)
-              : [...prev, iso3]
-          );
-        }, [triggerTransition]);
-
-        return (
-          <section className="content-block">
+      <section className="content-block">
             <p className="section-kicker">GDP TREND</p>
             <h2 style={{ fontSize: "28px" }}>GDP 推移（実績 + 予測）</h2>
             <p className="section-subline">2015-2030年度 / 単位：兆円（名目GDP・140円/USD）</p>
@@ -478,7 +469,7 @@ function T1CountryProfile(): React.JSX.Element {
               style={{ '--chart-transition-duration': `${CHART_CONFIG.transitionDuration}ms` } as React.CSSProperties}
             >
               <div style={{ height: `${CHART_CONFIG.height}px`, position: "relative", outline: "none", userSelect: "none", WebkitUserSelect: "none" }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
                   <LineChart data={chartData} margin={CHART_CONFIG.margin} style={{ outline: "none", userSelect: "none", WebkitUserSelect: "none" }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                     <XAxis dataKey="year" stroke="#666" tick={{ dy: 12 }} />
@@ -491,7 +482,7 @@ function T1CountryProfile(): React.JSX.Element {
                     />
                     {/* 予測期間の背景色（2025-2030） */}
                     <ForecastReferenceArea boundaryYear={2025} forecastEndYear={2030} />
-                    <GDPChartTooltip usdJpy={USD_JPY} />
+                    <GDPChartTooltip usdJpy={GDP_USD_JPY} />
                     {/* マレーシア: 統合ライン（実績+予測）2015-2030 */}
                     <Line
                       type="monotone"
@@ -507,7 +498,7 @@ function T1CountryProfile(): React.JSX.Element {
                     />
                     {/* 比較国のライン */}
                     {comparisonCountries.map((iso3) => {
-                      const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
+                      const country = ASEAN_GDP_BY_ISO3.get(iso3);
                       if (!country) return null;
                       return (
                         <Line
@@ -550,7 +541,7 @@ function T1CountryProfile(): React.JSX.Element {
                     >
                       <input
                         type="checkbox"
-                        checked={comparisonCountries.includes(country.iso3)}
+                        checked={comparisonSet.has(country.iso3)}
                         onChange={() => toggleCountry(country.iso3)}
                         style={{ cursor: "pointer" }}
                       />
@@ -584,7 +575,7 @@ function T1CountryProfile(): React.JSX.Element {
                 <LegendItem color={COLOR.primary} label="マレーシア" isSolid={true} />
                 {/* 比較国 */}
                 {comparisonCountries.map(iso3 => {
-                  const country = ASEAN_GDP_COMPARISON.find(c => c.iso3 === iso3);
+                  const country = ASEAN_GDP_BY_ISO3.get(iso3);
                   if (!country) return null;
                   return <LegendItem key={iso3} color={country.color} label={country.nameJa} isSolid={true} />;
                 })}
@@ -597,9 +588,7 @@ function T1CountryProfile(): React.JSX.Element {
               </p>
             </article>
 
-          </section>
-        );
-      })()}
+      </section>
 
       {/* 産業別GDP構成比 */}
       <section className="content-block">
@@ -657,7 +646,7 @@ function T1CountryProfile(): React.JSX.Element {
             </div>
             {/* ドーナツチャート */}
             <div style={{ height: "360px" }} className="chart-transition-container">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
                 <PieChart margin={{ top: 0, right: 50, bottom: 20, left: 50 }}>
                   <Pie
                     data={INDUSTRY_GDP_2025}
@@ -999,7 +988,7 @@ function T2MarketAndDemand(): React.JSX.Element {
         {/* 市場規模折れ線グラフ（推移と不確実性レンジ） */}
         <article className="reference-block">
           <div style={{ position: "relative", height: "360px" }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <ComposedChart data={CB_MARKET_CHART_DATA_JPY} margin={{ top: 10, right: 30, left: 20, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                 <XAxis dataKey="year" stroke="#666" tick={{ dy: 12 }} />
@@ -1008,8 +997,7 @@ function T2MarketAndDemand(): React.JSX.Element {
                   tickFormatter={(v) => `${Math.round(v / 100000000)}億円`}
                 />
                 {/* ツールチップ */}
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <Tooltip content={<MarketSizeTooltip active={false} payload={[]} label="" /> as any} />
+                <Tooltip content={<MarketSizeTooltip />} />
                 {/* オレンジ帯: 不確実性レンジ */}
                 <Area
                   dataKey="market_size_low_jpy"
@@ -1583,7 +1571,7 @@ function T5StrategicAssessment(): React.JSX.Element {
         <div style={{ display: "flex", gap: "32px", alignItems: "flex-start", flexWrap: "wrap", marginTop: "24px" }}>
           {/* レーダーチャート */}
           <div style={{ flex: "0 0 320px" }}>
-            <ResponsiveContainer width={320} height={280}>
+            <ResponsiveContainer width={320} height={280} minWidth={0} initialDimension={RESPONSIVE_CHART_INITIAL_DIMENSION}>
               <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                 <PolarGrid stroke="#e0e0e0" />
                 <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: "#555" }} />
@@ -1756,7 +1744,7 @@ function T5StrategicAssessment(): React.JSX.Element {
       <section className="content-block fade-in">
         <p className="section-kicker">PRODUCT ENTRY PRIORITY</p>
         <h2 style={{ fontSize: "28px" }}>製品別 参入優先度</h2>
-        <p className="section-subline">CB Scheme受入度・市場需要・参入難易度を総合した推奨優先順位</p>
+        <p className="section-subline">CB Scheme確認状態・市場需要・参入難易度を総合した暫定優先順位</p>
 
         <div className="table-wrap" style={{ marginTop: "20px" }}>
           <table className="definition-table" style={{ width: "100%" }}>
@@ -1783,10 +1771,10 @@ function T5StrategicAssessment(): React.JSX.Element {
                         borderRadius: "4px",
                         fontSize: "0.78rem",
                         fontWeight: 600,
-                        background: p.cbAcceptance === "Full" ? "#28a745" : "#fd7e14",
+                        background: p.cbAcceptance === "Full" ? "#28a745" : p.cbAcceptance === "Partial" ? "#fd7e14" : "#6c757d",
                         color: "#fff",
                       }}>
-                        CB {p.cbAcceptance}
+                        {p.cbAcceptance === "要確認" ? "CB 要確認" : `CB ${p.cbAcceptance}`}
                       </span>
                     </td>
                     <td style={{ textAlign: "center", fontSize: "0.85rem" }}>{difficultyLabel(p.difficulty)}</td>
@@ -1879,10 +1867,10 @@ function T5StrategicAssessment(): React.JSX.Element {
         </div>
       </section>
 
-      {/* S6: 次のアクション */}
+      {/* S6: アクション */}
       <section className="content-block fade-in">
         <p className="section-kicker">NEXT STEPS</p>
-        <h2 style={{ fontSize: "28px" }}>次のアクション</h2>
+        <h2 style={{ fontSize: "28px" }}>アクション</h2>
         <p className="section-subline">今すぐ着手すべき具体的アクション</p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginTop: "24px" }}>
@@ -2189,7 +2177,14 @@ export default function MalaysiaPage(): React.JSX.Element {
     if (activeTab === "t3") return <T3RegulatoryGateway />;
     if (activeTab === "t4") return <T4MarketAccess />;
     if (activeTab === "t5") return <T5StrategicAssessment />;
-    if (activeTab === "t6") return <T6ResearchVault />;
+    if (activeTab === "t6") {
+      return (
+        <Suspense fallback={<p role="status">T6データを読み込んでいます…</p>}>
+          <T6MarketIntelligence />
+        </Suspense>
+      );
+    }
+    if (activeTab === "t7") return <T6ResearchVault />;
     const tab = TABS.find((t) => t.id === activeTab);
     if (!tab) return null;
     return <TabPlaceholder tab={tab} />;

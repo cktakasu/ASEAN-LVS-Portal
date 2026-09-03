@@ -20,22 +20,22 @@ export const MY_SCORE_AXES: ScoreAxis[] = [
     axis: "市場規模・成長性",
     axisEn: "Market Size",
     score: 4.5,
-    rationale: "CAGR 6.8%、2031年に約312億円規模。ASEAN域内第2位市場。",
+    rationale: "公開調査ページは2025〜2031年CAGR 6.8%を示す一方、絶対市場規模と低圧範囲は公開情報だけでは未検証。スコアは暫定値。",
     dataSource: {
       tabRef: "T2",
       dataKey: "CB_MARKET_CHART_DATA",
-      excerpt: "CAGR 6.8%（2025–2031）、市場規模 USD 150M→223M。出典: 6Wresearch",
+      excerpt: "6Wresearch公開要約: CAGR 6.8%（2025–2031）。USD 150M→223Mは有料本文未確認の内部仮定。",
     },
   },
   {
     axis: "規制参入障壁",
     axisEn: "Regulatory",
     score: 3.5,
-    rationale: "CB Scheme受入あり（MCB/RCCBはFull）。ST-SIRIM認証が必須で一定のリードタイムが必要。",
+    rationale: "MCB/RCCB/RCBOの規制対象とCoA要件は一次情報で確認。製品別CB報告書の受入範囲と総リードタイムは個別確認が必要。",
     dataSource: {
       tabRef: "T3",
       dataKey: "MY_PRODUCT_CERT_REQUIREMENTS / MY_CB_SCHEME",
-      excerpt: "MCB/RCCB: ST-SIRIM必須・CB Full受入。MCCB/ACB: CB Partial。認証期間3〜7週間。",
+      excerpt: "ST 2024 Guidelines/FAQ: MCB・RCCB・RCBOのregulated scopeを確認。ACB/MCCBとCB受入区分は要追加確認。",
     },
   },
   {
@@ -64,11 +64,11 @@ export const MY_SCORE_AXES: ScoreAxis[] = [
     axis: "戦略的重要性",
     axisEn: "Strategic Fit",
     score: 4.5,
-    rationale: "ASEAN第2位市場かつデータセンター・半導体投資が急増。NETR再エネ政策による長期需要が期待。",
+    rationale: "データセンター・E&Eの大型承認投資とエネルギー移行政策を一次情報で確認。遮断器需要への換算は内部推定。",
     dataSource: {
       tabRef: "T2",
       dataKey: "CB_SECTOR_FOCUS",
-      excerpt: "DCセクターCAGR 10〜19%、半導体CAGR 8.76%。NETR 2035年再エネ44%目標。",
+      excerpt: "MIDA: DC/クラウド承認投資RM114.7bn（2021–2023）、E&E承認投資RM55.8bn（2024）。需要換算は要追加調査。",
     },
   },
 ];
@@ -79,22 +79,22 @@ export const MY_SCORE_AXES: ScoreAxis[] = [
 
 export const MY_SWOT: SwotData = {
   strengths: [
-    { text: "CB Scheme活用で認証期間を最大30%短縮可能（MCB/RCCBはFull受入）" },
+    { text: "有効なIECEE CB報告書を活用できる可能性（受入範囲と短縮効果は製品別に要確認）" },
     { text: "ATIGA・RCEP協定により全製品で実質0%関税" },
     { text: "高品質・高信頼性の製品ブランドで差別化が可能" },
     { text: "英国系規格（BS/IEC）採用で自社規格との整合性が高い" },
   ],
   weaknesses: [
     { text: "現地販売網・代理店ネットワークがまだない" },
-    { text: "ST-SIRIM認証取得に6〜12ヶ月のリードタイムが必要" },
+    { text: "CoA・試験・製品認証の総リードタイムと費用が未確定（計画レンジは内部仮定）" },
     { text: "マレーシア固有の国家差異（National Differences）への仕様対応コスト" },
     { text: "ローカル言語（マレー語）対応・現地サポート体制の未整備" },
   ],
   opportunities: [
-    { text: "データセンター建設ラッシュ：2031年までに市場規模2倍超が見込まれる" },
+    { text: "MIDA公表のDC・クラウド承認投資RM114.7bn（2021〜2023）を背景とする配電需要機会" },
     { text: "NETR（国家エネルギー移行ロードマップ）による再エネ投資の急拡大" },
     { text: "中国+1戦略による製造業FDI流入でMCCB需要が増加" },
-    { text: "半導体・E&E産業の継続拡大（CAGR 8.76%）" },
+    { text: "MIDA公表のE&E承認投資RM55.8bn（2024）を背景とする産業需要機会" },
   ],
   threats: [
     { text: "ABB・Schneider・Siemensによる既存チャネル支配とAVL優位性" },
@@ -112,25 +112,25 @@ export const MY_SWOT: SwotData = {
 export const MY_PRODUCT_PRIORITIES: ProductPriority[] = [
   {
     product: "MCB",
-    cbAcceptance: "Full",
+    cbAcceptance: "要確認",
     difficulty: "Low",
     demand: "High",
     demandNote: "住宅・商業ビル",
     priority: 1,
-    rationale: "CB即受入、最大ボリューム市場。早期認証取得で量販狙い。",
+    rationale: "規制対象は確認済み。CB報告書の受入条件をST/SIRIMへ確認後、住宅・商業向け優先度を確定。",
   },
   {
     product: "RCCB",
-    cbAcceptance: "Full",
+    cbAcceptance: "要確認",
     difficulty: "Low",
     demand: "Medium",
     demandNote: "安全規制強化",
     priority: 1,
-    rationale: "CB Full受入。安全基準強化トレンドで需要増。MCBと同時申請が効率的。",
+    rationale: "規制対象は確認済み。CB受入条件と同時申請の可否はST/SIRIMへ要確認。",
   },
   {
     product: "MCCB",
-    cbAcceptance: "Partial",
+    cbAcceptance: "要確認",
     difficulty: "Medium",
     demand: "High",
     demandNote: "製造業・DC",
@@ -139,7 +139,7 @@ export const MY_PRODUCT_PRIORITIES: ProductPriority[] = [
   },
   {
     product: "RCBO",
-    cbAcceptance: "Partial",
+    cbAcceptance: "要確認",
     difficulty: "Medium",
     demand: "Medium",
     demandNote: "住宅高級化",
@@ -148,7 +148,7 @@ export const MY_PRODUCT_PRIORITIES: ProductPriority[] = [
   },
   {
     product: "ACB",
-    cbAcceptance: "Partial",
+    cbAcceptance: "要確認",
     difficulty: "High",
     demand: "Medium",
     demandNote: "大型施設",
@@ -233,7 +233,7 @@ export const MY_RISKS: RiskItem[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  S6: 次のアクション                                                   */
+/*  S6: アクション                                                      */
 /* ------------------------------------------------------------------ */
 
 export const MY_NEXT_ACTIONS: NextAction[] = [
